@@ -90,7 +90,7 @@ bool parse_opts(int argc, char* argv[], Config *conf)
   }
 
   if (vm.count("dcd")) {
-    conf->xml = vm["dcd"].as<string>();
+    conf->dcd = vm["dcd"].as<string>();
   } else {
     cerr << "==> Error! Must specify dcd file name via cmd line or input file." << endl;
     return false;
@@ -98,14 +98,14 @@ bool parse_opts(int argc, char* argv[], Config *conf)
 
 
   if (vm.count("type1")) {
-    conf->xml = vm["type1"].as<string>();
+    conf->type1 = vm["type1"].as<string>();
   } else {
     cerr << "==> Error! Must specify type 1 for calculation via cmd line or input file." << endl;
     return false;
   }
 
   if (vm.count("type2")) {
-    conf->xml = vm["type2"].as<string>();
+    conf->type2 = vm["type2"].as<string>();
   } else {
     cerr << "==> Error! Must specify type 2 for calculation via cmd line or input file." << endl;
     return false;
