@@ -9,6 +9,8 @@ namespace po = boost::program_options;
 
 using namespace std;
 
+bool stepper(Config *conf);
+
 int main(int argc, char* argv[]) 
 {
   MPI::Init();
@@ -16,32 +18,21 @@ int main(int argc, char* argv[])
   int mpi_size = MPI::COMM_WORLD.Get_size();
   int mpi_rank = MPI::COMM_WORLD.Get_rank();
 
-  // MPI_Comm_size(MPI::COMM_WORLD,&mpi_size);
-  // MPI_Comm_rank(MPI::COMM_WORLD,&mpi_rank);
-
-  Config conf;
+  Config conf; // each proc carries a "configuration" object
   conf.mpi_rank = mpi_rank;
   conf.mpi_size = mpi_size;
 
-  bool success=false;
+  bool success=false; //assume failure
   if (conf.isRoot()) {
     success = parse_opts(argc,argv,&conf);
-  } //else {
-    // conf.path        = vm["path"].as<string>();
-    // conf.xml = vm["xml"].as<string>();
-    // conf.dcd = vm["dcd"].as<string>();
-    // conf.type1 = vm["type1"].as<string>();
-    // conf.type2 = vm["type2"].as<string>();
-    // conf.frame_start = vm["frame_start"].as<int>();
-    // conf.frame_end   = vm["frame_end"].as<int>();
-    // conf.frame_step  = vm["frame_step"].as<int>();
-    // conf.nthreads    = vm["nthreads"].as<int>();
-  //}
-  MPI::COMM_WORLD.Barrier();
+  }
+  // MPI::COMM_WORLD.Barrier(); // Bcast should be blocking so this is uneccesary
 
+  // All MPI procs must fail together so we transmit
+  // the parse_opts result and react together
   MPI::COMM_WORLD.Bcast(&success,1,MPI::BOOL,0);
   if (not success) {
-    MPI::Finalize();
+    MPI::Finalize(); // must be called by all procs before exiting
     return EXIT_FAILURE;
   }
 
@@ -49,6 +40,13 @@ int main(int argc, char* argv[])
   MPI::COMM_WORLD.Bcast(&(conf.frame_end),  1,MPI::INT,0);
   MPI::COMM_WORLD.Bcast(&(conf.frame_step), 1,MPI::INT,0);
   MPI::COMM_WORLD.Bcast(&(conf.nthreads),   1,MPI::INT,0);
+  if (conf.isRoot()) {
+    conf.buildPaths();
+    cout << conf.xmlPath << endl;
+    cout << conf.dcdPath << endl;
+  }
+
+
 
   // if (conf.isRoot())
   //   cout << "===========================" << endl;
@@ -59,9 +57,11 @@ int main(int argc, char* argv[])
   //   }
   //   MPI::COMM_WORLD.Barrier();
   // }
+  success=false; // assume failure
+  success = stepper(&conf);
 
 
-  MPI::Finalize();
+  MPI::Finalize(); // must be called by all procs before exiting
   return EXIT_SUCCESS;
 }
 

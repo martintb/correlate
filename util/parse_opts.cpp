@@ -17,7 +17,7 @@ bool parse_opts(int argc, char* argv[], Config *conf)
   po::options_description opt("Calculation Configuration Options");
   opt.add_options()
     ("help,h", "produce help message")
-    ("config_file", po::value<string>(&config_file),"calculation configuration file")
+    ("config_file,f", po::value<string>(&config_file),"calculation configuration file")
     ("path",        po::value<string>()->default_value("./"), "path to data files")
     ("xml",         po::value<string>(), "xml file name")
     ("dcd",         po::value<string>(), "dcd file name")

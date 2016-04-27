@@ -5,8 +5,8 @@ ALLSRC:=$(wildcard *.cpp)
 MAINOBJ:=$(subst .cpp,.o, $(ALLSRC))
 AGSRC:=$(wildcard atomgroup/*.cpp)
 AGOBJ:=$(subst .cpp,.o, $(AGSRC))
-DEBUGSRC:=$(wildcard debug/*.cpp)
-DEBUGOBJ:=$(subst .cpp,.o, $(DEBUGSRC))
+UTILSRC:=$(wildcard util/*.cpp)
+UTILOBJ:=$(subst .cpp,.o, $(UTILSRC))
 CUDASRC:=$(wildcard cu/*.cu)
 CUDAOBJ:=$(subst .cu,.o, $(CUDASRC))
 
@@ -15,7 +15,7 @@ CC=mpicc
 CXX=mpicxx
 LD=mpicxx
 LDLIBS+= -lboost_filesystem -lboost_system -lboost_regex  -lboost_program_options
-CPPFLAGS+= -Idebug -Iatomgroup
+CPPFLAGS+= -Iutil -Iatomgroup -I./
 CPPFLAGS+= -std=c++11 -g
 CPPFLAGS+= -O3 
 # CPPFLAGS+= -DARMA_NO_DEBUG
@@ -28,7 +28,7 @@ CPPFLAGS+= -O3
 # CUDAFLAGS=-std=c++11 -arch=sm_35 -O3
 
 
-$(EXEC): $(MAINOBJ) $(AGOBJ) $(DEBUGOBJ)
+$(EXEC): $(MAINOBJ) $(AGOBJ) $(UTILOBJ)
 	$(LD) -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
 run: $(EXEC)
@@ -44,4 +44,4 @@ clean:
 	rm -f $(MAINOBJ) $(CUDAOBJ) $(EXEC)
 
 allclean:
-	rm -f $(EXEC) $(AGOBJ) $(MAINOBJ) $(DEBUGOBJ) $(CUDAOBJ)
+	rm -f $(EXEC) $(AGOBJ) $(MAINOBJ) $(UTILOBJ) $(CUDAOBJ)
