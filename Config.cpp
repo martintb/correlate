@@ -32,7 +32,7 @@ Config::~Config() {
 
 void Config::chunk(int isize, int num_ichunks, int jsize,int num_jchunks) {
   ichunks = make_shared<Chunker>(isize,num_ichunks,mpi_rank);
-  jchunks = make_shared<Chunker>(jsize,num_jchunks,mpi_rank);
+  jchunks = make_shared<Chunker>(jsize,num_jchunks,0); // don't chunk the jvalues
 }
 
 void Config::buildPaths() {

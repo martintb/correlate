@@ -12,8 +12,7 @@ namespace fs = boost::filesystem;
 using namespace std;
 
 bool stepper(Config *conf) {
-  int isize=-1;
-  int jsize=-1;
+  int natoms1=-1,natoms2=-1;
   AtomGroup::ptr AG(nullptr),AG1(nullptr),AG2(nullptr); // only root will have initalized AG
   if (conf->isRoot()) {
     conf->buildPaths();
@@ -35,10 +34,20 @@ bool stepper(Config *conf) {
     AG1 = AG->select(sel1);
     AG2 = AG->select(sel2);
 
-    isize = AG1->natoms;
-    jsize = AG2->natoms;
+    natoms1 = AG1->natoms;
+    natoms2 = AG2->natoms;
   }
-  MPI::COMM_WORLD.Barrier(); 
+  MPI::COMM_WORLD.Bcast(&natoms1,1,MPI::INT,0);
+  MPI::COMM_WORLD.Bcast(&natoms2,1,MPI::INT,0);
+  conf->chunk(natoms1,conf->mpi_size,natoms2,1);
+  for (int i=0;i<conf->mpi_size;i++) {
+    MPI::COMM_WORLD.Barrier();
+    if (i==conf->mpi_rank) {
+      cout << i << "===================================" << endl;
+      conf->ichunks->print();
+      cout << i << "===================================" << endl;
+    }
+  }
 
 
 
