@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "Config.hpp"
+#include "debug.hpp"
 
 using namespace std;
 
@@ -31,8 +32,27 @@ Config::~Config() {
 
 
 void Config::chunk(int isize, int num_ichunks, int jsize,int num_jchunks) {
-  ichunks = make_shared<Chunker>(isize,num_ichunks,mpi_rank);
-  jchunks = make_shared<Chunker>(jsize,num_jchunks,0); // don't chunk the jvalues
+  int iindex,jindex;
+  if (num_ichunks==1) {
+    iindex = 0;
+  } else if (num_ichunks==mpi_size) {
+    iindex = mpi_rank;
+  } else {
+    cerr << "Error! Config.chunks() doesn't know how to handle this num_ichunks." << endl;
+    LOC();
+    exit(EXIT_FAILURE);
+  }
+  if (num_jchunks==1) {
+    jindex = 0;
+  } else {
+    cerr << "Error! Config.chunks() doesn't know how to handle this num_jchunks." << endl;
+    LOC();
+    exit(EXIT_FAILURE);
+    jindex = mpi_rank;
+  }
+      
+  ichunks = make_shared<Chunker>(isize,num_ichunks,iindex);
+  jchunks = make_shared<Chunker>(jsize,num_jchunks,jindex); // don't chunk the jvalues
 }
 
 void Config::buildPaths() {
