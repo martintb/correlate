@@ -7,6 +7,8 @@ AGSRC:=$(wildcard atomgroup/*.cpp)
 AGOBJ:=$(subst .cpp,.o, $(AGSRC))
 UTILSRC:=$(wildcard util/*.cpp)
 UTILOBJ:=$(subst .cpp,.o, $(UTILSRC))
+KERNSRC:=$(wildcard kernel/*.cpp)
+KERNOBJ:=$(subst .cpp,.o, $(KERNSRC))
 CUDASRC:=$(wildcard cu/*.cu)
 CUDAOBJ:=$(subst .cu,.o, $(CUDASRC))
 
@@ -28,7 +30,7 @@ CPPFLAGS+= -std=c++11 -g -Wall
 # CUDAFLAGS=-std=c++11 -arch=sm_35 -O3
 
 
-$(EXEC): $(MAINOBJ) $(AGOBJ) $(UTILOBJ)
+$(EXEC): $(MAINOBJ) $(AGOBJ) $(UTILOBJ) $(KERNOBJ)
 	$(LD) -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
 run: $(EXEC)

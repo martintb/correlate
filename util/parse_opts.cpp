@@ -27,6 +27,7 @@ bool parse_opts(int argc, char* argv[], Config *conf)
     ("frame_end",    po::value<int>()->default_value(-1), "last frame to use in calculation")
     ("frame_step",  po::value<int>()->default_value(1), "interval between used frames")
     ("nthreads",    po::value<int>()->default_value(1), "number of openMP/openACC threads to use per mpi process")
+    ("kernel",    po::value<string>(), "Kernel used for calculation")
   ;
 
   
@@ -108,6 +109,13 @@ bool parse_opts(int argc, char* argv[], Config *conf)
     conf->type2 = vm["type2"].as<string>();
   } else {
     cerr << "==> Error! Must specify type 2 for calculation via cmd line or input file." << endl;
+    return false;
+  }
+
+  if (vm.count("kernel")) {
+    conf->kernelStr = vm["kernel"].as<string>();
+  } else {
+    cerr << "==> Error! Must specify kernel string to use for calculation." << endl;
     return false;
   }
 

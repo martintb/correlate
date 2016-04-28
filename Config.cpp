@@ -24,11 +24,22 @@ Config::Config()
   dcdPath    = "";
   type1      = "";
   type2      = "";
-  kernel_str = "";
+  kernelStr = "";
 };
 
 Config::~Config() {
 };
+
+bool Config::setKernelFromStr() {
+  if (kernelStr.compare("printProcXYZ")==0) {
+    kernel = KernelType::printProcXYZ;
+  } else {
+    cerr << "Error! Kernel string not recognized." << endl;
+    return false;
+  }
+
+  return true; //success!
+}
 
 
 void Config::buildPaths() {
@@ -51,4 +62,5 @@ void Config::print() {
   std::cout << "frame_start: " << frame_start << std::endl;
   std::cout << "frame_end:   " << frame_end   << std::endl;
   std::cout << "frame_step:  " << frame_step  << std::endl;
+  std::cout << "kernel:      " << KernelMap[kernel]  << std::endl;
 }

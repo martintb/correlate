@@ -24,7 +24,12 @@ int main(int argc, char* argv[])
 
   bool success=false; //assume failure
   if (conf.isRoot()) {
-    success = parse_opts(argc,argv,&conf);
+    bool success1=false;
+    bool success2=false;
+    success1 = parse_opts(argc,argv,&conf);
+    if (success1)
+      success2 = conf.setKernelFromStr();
+    success = (success1 and success2);
   }
   // MPI::COMM_WORLD.Barrier(); // Bcast should be blocking so this is uneccesary
 
@@ -40,6 +45,7 @@ int main(int argc, char* argv[])
   MPI::COMM_WORLD.Bcast(&(conf.frame_end),  1,MPI::INT,0);
   MPI::COMM_WORLD.Bcast(&(conf.frame_step), 1,MPI::INT,0);
   MPI::COMM_WORLD.Bcast(&(conf.nthreads),   1,MPI::INT,0);
+  MPI::COMM_WORLD.Bcast(&(conf.kernel),     1,MPI::INT,0);
 
   // if (conf.isRoot())
   //   cout << "===========================" << endl;

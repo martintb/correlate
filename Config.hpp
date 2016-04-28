@@ -25,10 +25,20 @@ class Config
     std::string dcdPath;
     std::string type1;
     std::string type2;
-    std::string kernel_str;
 
     int mpi_rank;
     int mpi_size;
+
+    enum KernelType {
+      printProcXYZ,
+    };
+
+    const std::vector<std::string> KernelMap = { "printProcXYZ" };
+    bool setKernelFromStr();
+    std::string kernelStr;
+    KernelType kernel;
+    
+
 };
 
 #endif

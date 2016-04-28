@@ -70,13 +70,11 @@ bool stepper(Config *conf) {
   vector<float> masterX2,masterY2,masterZ2;
   vector<float> x1,y1,z1;
   vector<float> x2,y2,z2;
-  x2.resize(natoms2);
-  y2.resize(natoms2);
-  z2.resize(natoms2);
 
-  MPI::COMM_WORLD.Barrier();
   if (conf->isRoot())
     cout << "Starting frame loop..." << endl;
+  MPI::COMM_WORLD.Barrier();
+
   for (int frame=frame_start;frame<frame_end;frame+=frame_step) 
   {
     if (conf->isRoot()) {
@@ -92,9 +90,6 @@ bool stepper(Config *conf) {
       masterX2 = AG2->toSTLVec(0);
       masterY2 = AG2->toSTLVec(1);
       masterZ2 = AG2->toSTLVec(2);
-      // x2 = masterX2;
-      // y2 = masterY2;
-      // z2 = masterZ2;
 
       box[0] = AG1->lx;
       box[1] = AG1->ly;
@@ -106,47 +101,22 @@ bool stepper(Config *conf) {
     Chunker1.distribute( &masterX1, &x1);
     Chunker1.distribute( &masterY1, &y1);
     Chunker1.distribute( &masterZ1, &z1);
-
-
-    // MPI::COMM_WORLD.Bcast(&x2.front(),natoms2,MPI::FLOAT,0);
-    // MPI::COMM_WORLD.Bcast(&y2.front(),natoms2,MPI::FLOAT,0);
-    // MPI::COMM_WORLD.Bcast(&z2.front(),natoms2,MPI::FLOAT,0);
     Chunker2.distribute( &masterX2, &x2);
     Chunker2.distribute( &masterY2, &y2);
     Chunker2.distribute( &masterZ2, &z2);
-    MPI::COMM_WORLD.Barrier();
     if (conf->isRoot()) 
       cout << "--> Done distributing." << endl;
+    MPI::COMM_WORLD.Barrier();
 
-    for (int i=0; i<conf->mpi_size;i++) {
-      MPI::COMM_WORLD.Barrier();
-      if (i==conf->mpi_rank) {
-        cout << i << " ";
-        cout << box[0] << " ";
-        cout << box[1] << " ";
-        cout << box[2] << " ";
-        cout << "||" << " ";
-        cout << x1.back()<< " ";
-        cout << y1.back()<< " ";
-        cout << z1.back()<< " ";
-        cout << "||" << " ";
-        cout << x2.back()<< " ";
-        cout << y2.back()<< " ";
-        cout << z2.back()<< endl;
-        cout << "----------------------------" << endl;
-      }
-    }
+
   }
 
-// 
-//   if (AG1)
-//     AG1.reset();
-// 
-//   if (AG2)
-//     AG2.reset();
-// 
-//   if (AG)
-//     AG.reset();
+  if (AG1)
+    AG1.reset();
+  if (AG2)
+    AG2.reset();
+  if (AG)
+    AG.reset();
 
   return true;
 }
