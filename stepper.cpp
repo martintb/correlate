@@ -10,6 +10,7 @@ namespace fs = boost::filesystem;
 #include "Config.hpp"
 #include "Chunker.hpp"
 #include "AtomGroup.hpp"
+#include "kernels.hpp"
 
 using namespace std;
 
@@ -108,8 +109,25 @@ bool stepper(Config *conf) {
       cout << "--> Done distributing." << endl;
     MPI::COMM_WORLD.Barrier();
 
+    if (conf->kernel == Config::printProcXYZ) {
+      if (conf->isRoot()) 
+        cout << "--> Calling kernel: printProcXYZ" << endl;
+      printProcXYZ(frame,"xyz1",x1,y1,z1);
+      printProcXYZ(frame,"xyz2",x2,y2,z2);
+    } else {
+      if (conf->isRoot()) {
+        cerr << "==> Error! Stepper() is not set up for this kernel." << endl;
+        LOC();
+      }
+      MPI::Finalize();
+      exit(EXIT_FAILURE);
+    }
+
 
   }
+
+  if (conf->isRoot()) 
+    cout << "Done! Frame loop finished successfully." << endl;
 
   if (AG1)
     AG1.reset();

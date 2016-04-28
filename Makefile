@@ -17,7 +17,7 @@ CC=mpicc
 CXX=mpicxx
 LD=mpicxx
 LDLIBS+= -lboost_filesystem -lboost_system -lboost_regex  -lboost_program_options
-CPPFLAGS+= -Iutil -Iatomgroup -I./
+CPPFLAGS+= -Ikernel -Iutil -Iatomgroup -I./
 CPPFLAGS+= -std=c++11 -g -Wall
 # CPPFLAGS+= -O3 
 # CPPFLAGS+= -DARMA_NO_DEBUG
