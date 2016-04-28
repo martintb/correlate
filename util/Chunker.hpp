@@ -10,18 +10,16 @@ class Chunker
   public:
     typedef std::shared_ptr<Chunker> ptr;
 
-    Chunker(int index_count,int num_chunks,int chunk_index);
+    Chunker(int index_count,int num_chunks);
     ~Chunker() {};
     void print();
+    void distribute(std::vector<float>*, std::vector<float>*);
+                   
 
-    int index_count;
+    int count;
     int num_chunks;
-    int chunk_index;
-    int base_chunk_size;
-    int chunk_size;
-    int mindex;
-    int maxdex;
     std::vector<int> mindex_list;
     std::vector<int> maxdex_list;
+    std::vector<int> chunk_sizes;
 };
 #endif

@@ -31,30 +31,6 @@ Config::~Config() {
 };
 
 
-void Config::chunk(int isize, int num_ichunks, int jsize,int num_jchunks) {
-  int iindex,jindex;
-  if (num_ichunks==1) {
-    iindex = 0;
-  } else if (num_ichunks==mpi_size) {
-    iindex = mpi_rank;
-  } else {
-    cerr << "Error! Config.chunks() doesn't know how to handle this num_ichunks." << endl;
-    LOC();
-    exit(EXIT_FAILURE);
-  }
-  if (num_jchunks==1) {
-    jindex = 0;
-  } else {
-    cerr << "Error! Config.chunks() doesn't know how to handle this num_jchunks." << endl;
-    LOC();
-    exit(EXIT_FAILURE);
-    jindex = mpi_rank;
-  }
-      
-  ichunks = make_shared<Chunker>(isize,num_ichunks,iindex);
-  jchunks = make_shared<Chunker>(jsize,num_jchunks,jindex); // don't chunk the jvalues
-}
-
 void Config::buildPaths() {
   xmlPath = path + "/" + xml;
   dcdPath = path+ "/" + dcd;

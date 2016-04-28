@@ -9,8 +9,8 @@
 class Reader {
   public: 
     typedef std::shared_ptr<Reader> ptr;
-    int const flags;
     std::string const type;
+    int const flags;
     void exists(std::string);
     void contains();
 

@@ -11,7 +11,7 @@
 class AtomGroup {
   public:
     AtomGroup(std::string,std::string);
-    ~AtomGroup() {};
+    ~AtomGroup();
 
     typedef std::shared_ptr<AtomGroup> ptr;
 

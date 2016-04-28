@@ -16,6 +16,14 @@ AtomGroup::AtomGroup(string xmlPath, string dcdPath) {
   this->frame=-1;
 }
 
+AtomGroup::~AtomGroup() {
+  if (dptr.unique())
+    dptr.reset();
+  if (xptr.unique())
+    xptr.reset();
+};
+
+
 void AtomGroup::setSize(int natoms) {
   this->natoms = natoms;
   pos.set_size(natoms,3);
@@ -23,8 +31,8 @@ void AtomGroup::setSize(int natoms) {
 }
 
 void AtomGroup::readFiles() {
-  dptr.reset(new DCD(dcdPath));
-  xptr.reset(new XML(xmlPath));
+  dptr = make_shared<DCD>(dcdPath);
+  xptr = make_shared<XML>(xmlPath);
   this->init=true;
 
   if (dptr->natoms != xptr->natoms) {
@@ -64,12 +72,12 @@ AtomGroup::ptr AtomGroup::select(const vector<string>& type_select) {
   }
  
   arma::uvec sel = arma::conv_to<arma::uvec>::from(std_uvec);
-  AtomGroup::ptr aptr(new AtomGroup(xmlPath,dcdPath));
+  AtomGroup::ptr aptr = make_shared<AtomGroup>(xmlPath,dcdPath);
   if (sel.n_elem>0) { 
     mask(aptr,sel); 
     aptr->type = new_type;
   }
-  cout << ".:: Created Sub AtomGroup with size " << aptr->natoms << endl;
+  // cout << ".:: Created Sub AtomGroup with size " << aptr->natoms << endl;
   return aptr;
 }
 

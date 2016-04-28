@@ -12,7 +12,6 @@ class Config
     void buildPaths();
     bool isRoot();
     void print();
-    void chunk(int isize, int num_ichunks, int jsize,int num_jchunks);
 
     int frame_start;
     int frame_end;
@@ -30,9 +29,6 @@ class Config
 
     int mpi_rank;
     int mpi_size;
-    Chunker::ptr ichunks;
-    Chunker::ptr jchunks;
-
 };
 
 #endif

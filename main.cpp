@@ -40,13 +40,6 @@ int main(int argc, char* argv[])
   MPI::COMM_WORLD.Bcast(&(conf.frame_end),  1,MPI::INT,0);
   MPI::COMM_WORLD.Bcast(&(conf.frame_step), 1,MPI::INT,0);
   MPI::COMM_WORLD.Bcast(&(conf.nthreads),   1,MPI::INT,0);
-  if (conf.isRoot()) {
-    conf.buildPaths();
-    cout << conf.xmlPath << endl;
-    cout << conf.dcdPath << endl;
-  }
-
-
 
   // if (conf.isRoot())
   //   cout << "===========================" << endl;
