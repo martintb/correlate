@@ -1,6 +1,8 @@
+#include <iostream> //cout, endl
+#include <fstream> //ofstream
+#include <iomanip> //setw
 #include <algorithm>
 #include <memory>
-#include <iostream>
 #include <mpi.h>
 #include <boost/algorithm/string/classification.hpp> 
 #include <boost/algorithm/string/split.hpp>
@@ -16,13 +18,10 @@ using namespace std;
 
 bool stepper(Config *conf) {
   vector<string> sel1,sel2;
-  boost::split(sel1,conf->type1,boost::is_any_of(", "),boost::token_compress_on);
-  boost::split(sel2,conf->type2,boost::is_any_of(", "),boost::token_compress_on);
-
   int natoms1=-1,natoms2=-1;
   AtomGroup::ptr AG,AG1,AG2; // only root will have initalized AG
-
   int frame_start,frame_end,frame_step;
+  bool selfHist;
   if (conf->isRoot()) {
     conf->buildPaths();
     AG = make_shared<AtomGroup>(conf->xmlPath,conf->dcdPath);
@@ -36,6 +35,10 @@ bool stepper(Config *conf) {
     AG->dptr->printFileInfo();
     cout << "===================================" << endl;
 
+    selfHist = (conf->type1.compare(conf->type2)==0);
+
+    boost::split(sel1,conf->type1,boost::is_any_of(", "),boost::token_compress_on);
+    boost::split(sel2,conf->type2,boost::is_any_of(", "),boost::token_compress_on);
     AG1 = AG->select(sel1);
     AG2 = AG->select(sel2);
 
@@ -50,6 +53,7 @@ bool stepper(Config *conf) {
 
   }
 
+  MPI::COMM_WORLD.Bcast(&selfHist,1,MPI::BOOL,0);
   MPI::COMM_WORLD.Bcast(&frame_start,1,MPI::INT,0);
   MPI::COMM_WORLD.Bcast(&frame_end,1,MPI::INT,0);
   MPI::COMM_WORLD.Bcast(&frame_step,1,MPI::INT,0);
@@ -71,6 +75,9 @@ bool stepper(Config *conf) {
   vector<float> masterX2,masterY2,masterZ2;
   vector<float> x1,y1,z1;
   vector<float> x2,y2,z2;
+
+  conf->buildSpace();
+  vector<unsigned long> hist(conf->rsize,0);
 
   if (conf->isRoot())
     cout << "Starting frame loop..." << endl;
@@ -109,11 +116,31 @@ bool stepper(Config *conf) {
       cout << "--> Done distributing." << endl;
     MPI::COMM_WORLD.Barrier();
 
+    //####################//
+    //### printProcXYZ ###//
+    //####################//
     if (conf->kernel == Config::printProcXYZ) {
       if (conf->isRoot()) 
         cout << "--> Calling kernel: printProcXYZ" << endl;
       printProcXYZ(frame,"xyz1",x1,y1,z1);
       printProcXYZ(frame,"xyz2",x2,y2,z2);
+      
+    //#################//
+    //### histogram ###//
+    //#################//
+    } else if (conf->kernel == Config::histogram) {
+      if (conf->isRoot()) 
+        cout << "--> Calling kernel: histogram" << endl;
+      histogram(hist,
+                x1,y1,z1,
+                x2,y2,z2,
+                box,
+                selfHist,
+                conf->rmax,conf->dr);
+
+    //##############//
+    //### ERROR! ###//
+    //##############//
     } else {
       if (conf->isRoot()) {
         cerr << "==> Error! Stepper() is not set up for this kernel." << endl;
@@ -126,8 +153,23 @@ bool stepper(Config *conf) {
 
   }
 
-  if (conf->isRoot()) 
+  vector<unsigned long> final_hist;
+  if (conf->isRoot())  {
+    cout << "--> Gathering data from each proc and writing saving to disk..." << endl;
+    final_hist.resize(conf->rsize);
+  }
+
+  MPI::COMM_WORLD.Gather(&hist.front(),hist.size(),MPI::UNSIGNED_LONG,
+                         &final_hist.front(),final_hist.size(),MPI::UNSIGNED_LONG,0);
+
+  if (conf->isRoot()) {
     cout << "Done! Frame loop finished successfully." << endl;
+    ofstream file("hist.dat");
+    for (auto i: final_hist) {
+      file << i << endl;
+    }
+    file.close();
+  }
 
   if (AG1)
     AG1.reset();

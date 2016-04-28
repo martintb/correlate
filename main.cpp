@@ -7,6 +7,8 @@ namespace po = boost::program_options;
 #include "Config.hpp"
 #include "parse_opts.hpp"
 
+#include <armadillo>
+
 using namespace std;
 
 bool stepper(Config *conf);
@@ -46,18 +48,20 @@ int main(int argc, char* argv[])
   MPI::COMM_WORLD.Bcast(&(conf.frame_step), 1,MPI::INT,0);
   MPI::COMM_WORLD.Bcast(&(conf.nthreads),   1,MPI::INT,0);
   MPI::COMM_WORLD.Bcast(&(conf.kernel),     1,MPI::INT,0);
+  MPI::COMM_WORLD.Bcast(&(conf.dr),         1,MPI::FLOAT,0);
+  MPI::COMM_WORLD.Bcast(&(conf.rmax),       1,MPI::FLOAT,0);
 
-  // if (conf.isRoot())
-  //   cout << "===========================" << endl;
-  // for (int i=0;i<mpi_size;++i) {
-  //   if (i==conf.mpi_rank) {
-  //     conf.print();
-  //     cout << "===========================" << endl;
-  //   }
-  //   MPI::COMM_WORLD.Barrier();
-  // }
+  if (conf.isRoot())
+    cout << "===========================" << endl;
+  for (int i=0;i<mpi_size;++i) {
+    if (i==conf.mpi_rank) {
+      conf.print();
+      cout << "===========================" << endl;
+    }
+    MPI::COMM_WORLD.Barrier();
+  }
   success=false; // assume failure
-  success = stepper(&conf);
+  // success = stepper(&conf);
 
 
   MPI::Finalize(); // must be called by all procs before exiting

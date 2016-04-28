@@ -27,6 +27,8 @@ bool parse_opts(int argc, char* argv[], Config *conf)
     ("frame_end",    po::value<int>()->default_value(-1), "last frame to use in calculation")
     ("frame_step",  po::value<int>()->default_value(1), "interval between used frames")
     ("nthreads",    po::value<int>()->default_value(1), "number of openMP/openACC threads to use per mpi process")
+    ("dr",    po::value<float>()->default_value(0.01), "grid size for r-spaced output")
+    ("rmax",  po::value<float>()->default_value(100), "largest r in real-spaced output")
     ("kernel",    po::value<string>(), "Kernel used for calculation")
   ;
 
@@ -82,6 +84,8 @@ bool parse_opts(int argc, char* argv[], Config *conf)
   conf->frame_end = vm["frame_end"].as<int>();
   conf->frame_step = vm["frame_step"].as<int>();
   conf->nthreads = vm["nthreads"].as<int>();
+  conf->dr = vm["dr"].as<float>();
+  conf->rmax = vm["rmax"].as<float>();
 
   if (vm.count("xml")) {
     conf->xml = vm["xml"].as<string>();

@@ -10,6 +10,7 @@ class Config
     Config();
     ~Config();
     void buildPaths();
+    void buildSpace();
     bool isRoot();
     void print();
 
@@ -17,6 +18,10 @@ class Config
     int frame_end;
     int frame_step;
     int nthreads;
+
+    float dr;
+    float rmax;
+    int rsize;
 
     std::string path;
     std::string xml;
@@ -31,9 +36,14 @@ class Config
 
     enum KernelType {
       printProcXYZ,
+      histogram,
     };
 
-    const std::vector<std::string> KernelMap = { "printProcXYZ" };
+    const std::vector<std::string> KernelMap = 
+    { 
+      "printProcXYZ",
+      "histogram",
+    };
     bool setKernelFromStr();
     std::string kernelStr;
     KernelType kernel;
