@@ -92,9 +92,9 @@ bool stepper(Config *conf) {
       masterX2 = AG2->toSTLVec(0);
       masterY2 = AG2->toSTLVec(1);
       masterZ2 = AG2->toSTLVec(2);
-      x2 = masterX2;
-      y2 = masterY2;
-      z2 = masterZ2;
+      // x2 = masterX2;
+      // y2 = masterY2;
+      // z2 = masterZ2;
 
       box[0] = AG1->lx;
       box[1] = AG1->ly;
@@ -108,12 +108,12 @@ bool stepper(Config *conf) {
     Chunker1.distribute( &masterZ1, &z1);
 
 
-    MPI::COMM_WORLD.Bcast(&x2.front(),natoms2,MPI::FLOAT,0);
-    MPI::COMM_WORLD.Bcast(&y2.front(),natoms2,MPI::FLOAT,0);
-    MPI::COMM_WORLD.Bcast(&z2.front(),natoms2,MPI::FLOAT,0);
-    // Chunker2.distribute( &masterX2, &x2);
-    // Chunker2.distribute( &masterY2, &y2);
-    // Chunker2.distribute( &masterZ2, &z2);
+    // MPI::COMM_WORLD.Bcast(&x2.front(),natoms2,MPI::FLOAT,0);
+    // MPI::COMM_WORLD.Bcast(&y2.front(),natoms2,MPI::FLOAT,0);
+    // MPI::COMM_WORLD.Bcast(&z2.front(),natoms2,MPI::FLOAT,0);
+    Chunker2.distribute( &masterX2, &x2);
+    Chunker2.distribute( &masterY2, &y2);
+    Chunker2.distribute( &masterZ2, &z2);
     MPI::COMM_WORLD.Barrier();
     if (conf->isRoot()) 
       cout << "--> Done distributing." << endl;
@@ -138,15 +138,15 @@ bool stepper(Config *conf) {
     }
   }
 
-
-  if (AG1)
-    AG1.reset();
-
-  if (AG2)
-    AG2.reset();
-
-  if (AG)
-    AG.reset();
+// 
+//   if (AG1)
+//     AG1.reset();
+// 
+//   if (AG2)
+//     AG2.reset();
+// 
+//   if (AG)
+//     AG.reset();
 
   return true;
 }
