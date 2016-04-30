@@ -234,7 +234,7 @@ void stepper(Config *conf) {
     }
 
     int width=15;
-    ofstream file("corr.out");
+    ofstream file(conf->outfile);
     file << "#";
     file << setw(width-1)<< "x";
     file << setw(width)  << "hist";

@@ -30,6 +30,7 @@ bool parse_opts(int argc, char* argv[], Config *conf)
     ("dx",    po::value<float>()->default_value(0.01), "grid size for output")
     ("xmax",  po::value<float>()->default_value(100), "largest value output grid")
     ("kernel",    po::value<string>(), "kernel used for calculation")
+    ("outfile",    po::value<string>()->default_value("corr.out"), "name of file to write output to")
   ;
 
   
@@ -80,6 +81,7 @@ bool parse_opts(int argc, char* argv[], Config *conf)
 
   // No need to error check opts with default values
   conf->path = vm["path"].as<string>();
+  conf->outfile = vm["outfile"].as<string>();
   conf->frame_start = vm["frame_start"].as<int>();
   conf->frame_end = vm["frame_end"].as<int>();
   conf->frame_step = vm["frame_step"].as<int>();

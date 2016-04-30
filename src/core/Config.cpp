@@ -22,6 +22,7 @@ Config::Config()
   dx = -1.0f;
   xmax = -1.0f;
 
+  outfile       = "";
   path       = "";
   xml        = "";
   dcd        = "";

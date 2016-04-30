@@ -1,15 +1,16 @@
 .PHONY: doc data clean test
 
 # Gather Objects for Different Cases
-ALLSRC:=$(wildcard *.cpp)
-MAINOBJ:=$(subst .cpp,.o, $(ALLSRC))
-AGSRC:=$(wildcard atomgroup/*.cpp)
+MAINOBJ:=main.o
+CORESRC:=$(wildcard src/core/*.cpp)
+COREOBJ:=$(subst .cpp,.o, $(CORESRC))
+AGSRC:=$(wildcard src/atomgroup/*.cpp)
 AGOBJ:=$(subst .cpp,.o, $(AGSRC))
-UTILSRC:=$(wildcard util/*.cpp)
+UTILSRC:=$(wildcard src/util/*.cpp)
 UTILOBJ:=$(subst .cpp,.o, $(UTILSRC))
-KERNSRC:=$(wildcard kernel/*.cpp)
+KERNSRC:=$(wildcard src/kernel/*.cpp)
 KERNOBJ:=$(subst .cpp,.o, $(KERNSRC))
-CUDASRC:=$(wildcard cu/*.cu)
+CUDASRC:=$(wildcard src/cu/*.cu)
 CUDAOBJ:=$(subst .cu,.o, $(CUDASRC))
 
 EXEC=corr
@@ -18,7 +19,7 @@ CXX=mpicxx
 LD=mpicxx
 LDLIBS+= -lboost_filesystem -lboost_system -lboost_regex  -lboost_program_options
 # LDLIBS+= -lsatlas -larmadillo 
-CPPFLAGS+= -Ikernel -Iutil -Iatomgroup -I./
+CPPFLAGS+= -Isrc/kernel -Isrc/util -Isrc/atomgroup -Isrc/core
 CPPFLAGS+= -std=c++11 -g -Wall
 # CPPFLAGS+= -O3 
 # CPPFLAGS+= -DARMA_NO_DEBUG
@@ -31,7 +32,7 @@ CPPFLAGS+= -std=c++11 -g -Wall
 # CUDAFLAGS=-std=c++11 -arch=sm_35 -O3
 
 
-$(EXEC): $(MAINOBJ) $(AGOBJ) $(UTILOBJ) $(KERNOBJ)
+$(EXEC): $(MAINOBJ) $(COREOBJ) $(AGOBJ) $(UTILOBJ) $(KERNOBJ)
 	$(LD) -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
 run: $(EXEC)
@@ -47,4 +48,4 @@ clean:
 	rm -f $(MAINOBJ) $(CUDAOBJ) $(EXEC)
 
 allclean:
-	rm -f $(EXEC) $(AGOBJ) $(MAINOBJ) $(UTILOBJ) $(CUDAOBJ)
+	rm -f $(EXEC) $(AGOBJ) $(MAINOBJ) $(UTILOBJ) $(CUDAOBJ) $(KERNOBJ) $(COREOBJ)

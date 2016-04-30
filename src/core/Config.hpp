@@ -22,6 +22,7 @@ class Config
     int mpi_rank;
     int mpi_size;
 
+    std::string outfile;
     std::string type1, type2;
     std::string path,xml,dcd;
     std::string xmlPath,dcdPath;
