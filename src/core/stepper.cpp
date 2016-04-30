@@ -32,13 +32,12 @@ void stepper(Config *conf) {
     conf->buildPaths();
     AG = make_shared<AtomGroup>(conf->xmlPath,conf->dcdPath);
     AG->readFiles();
-    cout << "===================================" << endl;
+    conf->print("============= XML INFO =============");
     AG->xptr->contains();
     AG->xptr->printFileInfo();
-    cout << "===================================" << endl;
+    conf->print("============= DCD INFO =============");
     AG->dptr->contains();
     AG->dptr->printFileInfo();
-    cout << "===================================" << endl;
 
     boost::split(sel1,conf->type1,boost::is_any_of(", "),boost::token_compress_on);
     boost::split(sel2,conf->type2,boost::is_any_of(", "),boost::token_compress_on);
@@ -81,9 +80,9 @@ void stepper(Config *conf) {
   //#####################//
   Chunker Chunker1(natoms1,conf->mpi_size);
   Chunker Chunker2(natoms2,1);
-  conf->print("> Chunking for atom type 1:");
+  conf->print("============= CHUNK1 INFO =============");
   Chunker1.print();
-  conf->print("> Chunking for atom type 2:");
+  conf->print("============= CHUNK2 INFO =============");
   Chunker2.print();
 
   //#######################//
@@ -107,6 +106,7 @@ void stepper(Config *conf) {
   //##################//
   //### FRAME LOOP ###//
   //##################//
+  conf->print("============= FRAME LOOP =============");
   ostringstream oss;
   oss << "> Starting frame loop with (start/stop/step): ";
   oss << "(" << frame_start << "/" << frame_end << "/" << frame_step << ")";
@@ -158,9 +158,9 @@ void stepper(Config *conf) {
       printProcXYZ(frame,"xyz1",x1,y1,z1);
       printProcXYZ(frame,"xyz2",x2,y2,z2);
       
-    //#################//
-    //### histogram ###//
-    //#################//
+    //#####################//
+    //### histogram/rdf ###//
+    //#####################//
     } else if (conf->kernel == Config::histogram or conf->kernel == Config::rdf) {
       conf->print("--> Calling kernel: histogram/rdf");
       int offset = Chunker1.mindex_list[conf->mpi_rank];
@@ -171,6 +171,20 @@ void stepper(Config *conf) {
                 selfHist,
                 conf->xmax,conf->dx,
                 offset);
+
+    //#############//
+    //### omega ###//
+    //#############//
+    } else if (conf->kernel == Config::omega) {
+      conf->print("--> Calling kernel: omega");
+      int offset = Chunker1.mindex_list[conf->mpi_rank];
+      omega(procVecFloat,
+            x1,y1,z1,
+            x2,y2,z2,
+            box,
+            selfHist,
+            conf->xmax,conf->dx,
+            offset);
 
     //##############//
     //### ERROR! ###//
@@ -188,6 +202,7 @@ void stepper(Config *conf) {
   }
   conf->print("> Done! Frame loop finished successfully!");
 
+  conf->print("============= POSTPROCESSING  =============");
   //##############################//
   //### GATHER FRAME LOOP DATA ###//
   //##############################//
@@ -247,5 +262,5 @@ void stepper(Config *conf) {
   if (AG2) AG2.reset();
   if (AG)  AG.reset();
 
-  conf->print("==> CALL TO STEPPER() COMPLETE <==");
+  conf->print("============= ALL DONE  =============");
 }

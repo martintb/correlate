@@ -17,6 +17,7 @@ int main(int argc, char* argv[])
 
   Config conf; // each proc carries a "configuration" object
 
+  conf.print("============ PARSE INPUT ============");
   bool success=false; //assume failure
   if (conf.isRoot()) {
     bool success1=false;
@@ -36,7 +37,8 @@ int main(int argc, char* argv[])
   } else {
     conf.sync(); // sync int and float values in conf
   }
-  // conf.print(); // print configuration info of each proc
+  conf.print("============ ROOT CONF ============");
+  conf.print(0); // print configuration info of proc 0
 
   stepper(&conf);
 

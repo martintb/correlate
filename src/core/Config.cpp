@@ -86,26 +86,37 @@ void Config::print(string str) {
   return;
 }
 
+void Config::print(int proc) { 
+  if (this->mpi_rank == proc) {
+    this->contains();
+  }
+  MPI::COMM_WORLD.Barrier();
+}
+
 void Config::print() { 
   this->print("===========================");
   for (int i=0;i<this->mpi_size;++i) {
     MPI::COMM_WORLD.Barrier();
     if (i==this->mpi_rank) {
-      std::cout << "mpi_rank:    " << mpi_rank    << std::endl;
-      std::cout << "mpi_size:    " << mpi_size    << std::endl;
-      std::cout << "xml:         " << xml         << std::endl;
-      std::cout << "dcd:         " << dcd         << std::endl;
-      std::cout << "type1:       " << type1       << std::endl;
-      std::cout << "type2:       " << type2       << std::endl;
-      std::cout << "frame_start: " << frame_start << std::endl;
-      std::cout << "frame_end:   " << frame_end   << std::endl;
-      std::cout << "frame_step:  " << frame_step  << std::endl;
-      std::cout << "kernel:      " << KernelMap[kernel]  << std::endl;
-      std::cout << "dx:          " << dx << std::endl;
-      std::cout << "xmax:        " << xmax   << std::endl;
+      this->contains();
       cout << "===========================" << endl;
     }
   }
+}
+
+void Config::contains() { 
+  std::cout << "mpi_rank:    " << mpi_rank    << std::endl;
+  std::cout << "mpi_size:    " << mpi_size    << std::endl;
+  std::cout << "xml:         " << xml         << std::endl;
+  std::cout << "dcd:         " << dcd         << std::endl;
+  std::cout << "type1:       " << type1       << std::endl;
+  std::cout << "type2:       " << type2       << std::endl;
+  std::cout << "frame_start: " << frame_start << std::endl;
+  std::cout << "frame_end:   " << frame_end   << std::endl;
+  std::cout << "frame_step:  " << frame_step  << std::endl;
+  std::cout << "kernel:      " << KernelMap[kernel]  << std::endl;
+  std::cout << "dx:          " << dx << std::endl;
+  std::cout << "xmax:        " << xmax   << std::endl;
 }
 
 bool Config::setKernelFromStr() {

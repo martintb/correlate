@@ -13,6 +13,8 @@ class Config
     void buildSpace();
     bool isRoot();
     void print();
+    void print(int);
+    void contains();
     void sync();
     void print(std::string);
     std::vector<int> readFiles();

@@ -2,4 +2,5 @@
 #define KERNELS_HPP
 #include "printProcData.hpp"
 #include "histogram.hpp"
+#include "omega.hpp"
 #endif
