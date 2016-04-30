@@ -17,6 +17,9 @@ class Config
     void print(std::string);
     std::vector<int> readFiles();
 
+    int mpi_rank;
+    int mpi_size;
+
     std::string type1, type2;
     std::string path,xml,dcd;
     std::string xmlPath,dcdPath;
@@ -27,23 +30,25 @@ class Config
     int frame_step;
     int nthreads;
 
-    float dr;
-    float rmax;
-    int rsize;
+    // output data size
+    float dx;
+    float xmax;
+    int xsize;
 
-
-    int mpi_rank;
-    int mpi_size;
 
     enum KernelType {
       printProcXYZ,
       histogram,
+      rdf,
+      omega,
     };
 
     const std::vector<std::string> KernelMap = 
     { 
       "printProcXYZ",
       "histogram",
+      "rdf",
+      "omega",
     };
     bool setKernelFromStr();
     std::string kernelStr;

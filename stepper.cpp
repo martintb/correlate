@@ -96,7 +96,13 @@ void stepper(Config *conf) {
   vector<float> x2,y2,z2;
 
   conf->buildSpace();
-  vector<unsigned long> hist(conf->rsize,0);
+  vector<unsigned long> procVecInt;
+  vector<float> procVecFloat;
+  if (conf->kernel == Config::histogram or conf->kernel == Config::rdf) {
+    procVecInt.assign(conf->xsize,0);
+  } else if (conf->kernel == Config::omega) {
+    procVecFloat.assign(conf->xsize,0.0f);
+  }
 
   //##################//
   //### FRAME LOOP ###//
@@ -105,8 +111,10 @@ void stepper(Config *conf) {
   oss << "> Starting frame loop with (start/stop/step): ";
   oss << "(" << frame_start << "/" << frame_end << "/" << frame_step << ")";
   conf->print(oss.str());
+  int num_frames = 0;
   for (int frame=frame_start;frame<frame_end;frame+=frame_step) 
   {
+    num_frames++;
     if (conf->isRoot()) {
       cout << "--> Reading frame " << frame << endl;
       AG->readFrame(frame);
@@ -153,15 +161,15 @@ void stepper(Config *conf) {
     //#################//
     //### histogram ###//
     //#################//
-    } else if (conf->kernel == Config::histogram) {
-      conf->print("--> Calling kernel: histogram");
+    } else if (conf->kernel == Config::histogram or conf->kernel == Config::rdf) {
+      conf->print("--> Calling kernel: histogram/rdf");
       int offset = Chunker1.mindex_list[conf->mpi_rank];
-      histogram(hist,
+      histogram(procVecInt,
                 x1,y1,z1,
                 x2,y2,z2,
                 box,
                 selfHist,
-                conf->rmax,conf->dr,
+                conf->xmax,conf->dx,
                 offset);
 
     //##############//
@@ -178,26 +186,66 @@ void stepper(Config *conf) {
 
 
   }
+  conf->print("> Done! Frame loop finished successfully!");
 
-  //##########################//
-  //### FRAME LOOP CLEANUP ###//
-  //##########################//
-  vector<unsigned long> final_hist(conf->rsize);
-  conf->print("--> Gathering data from each proc and writing saving to disk...");
-  MPI::COMM_WORLD.Reduce(&hist.front(),&final_hist.front(),hist.size(),
+  //##############################//
+  //### GATHER FRAME LOOP DATA ###//
+  //##############################//
+  vector<unsigned long> allVecInt(conf->xsize,0);
+  vector<float> allVecFloat(conf->xsize,0.0f);
+  vector<float> outVec;
+  conf->print("--> Gathering data from each proc...");
+  if (conf->kernel == Config::histogram or conf->kernel == Config::rdf) {
+    MPI::COMM_WORLD.Reduce(&procVecInt.front(),&allVecInt.front(),procVecInt.size(),
                          MPI::UNSIGNED_LONG,MPI::SUM,0);
+    outVec.assign(allVecInt.begin(),allVecInt.end());
+  } else if (conf->kernel == Config::omega) {
+    MPI::COMM_WORLD.Reduce(&procVecFloat.front(),&allVecFloat.front(),procVecFloat.size(),
+                         MPI::FLOAT,MPI::SUM,0);
+    outVec.assign(allVecFloat.begin(),allVecFloat.end());
+  }
 
+  //#############################//
+  //### SCALE AND OUTPUT DATA ###//
+  //#############################//
   if (conf->isRoot()) {
-    cout << "> Done! Frame loop finished successfully." << endl;
-    ofstream file("hist.dat");
-    for (auto i: final_hist) {
-      file << i << endl;
+    conf->print("--> Scaling and writing data to disk..");
+    float pair_rho;
+    float box_volume = box[0]*box[1]*box[2];
+    if (selfHist) {
+      pair_rho = natoms1*(natoms2-1)/box_volume;
+    } else {
+      pair_rho = natoms1*natoms2/box_volume;
+    }
+
+    int width=15;
+    ofstream file("corr.out");
+    file << "#";
+    file << setw(width-1)<< "x";
+    file << setw(width)  << "hist";
+    file << setw(width)  << "conc";
+    file << setw(width)  << "rdf";
+    file << setw(width)  << "omega";
+    file << endl;
+    for (int i=0;i<conf->xsize;i++) {
+      float x1 = i*conf->dx;
+      float x2 = (i+1)*conf->dx;
+      float vol = (4.0/3.0) * (3.14159) * (x2*x2*x2  - x1*x1*x1);
+
+      file << setw(width) << x1;
+      file << setw(width) << outVec[i]/num_frames; 
+      file << setw(width) << outVec[i]/(num_frames*vol);
+      file << setw(width) << outVec[i]/(num_frames*pair_rho*vol);
+      file << setw(width) << outVec[i]/(num_frames*x2); 
+      file << endl;
     }
     file.close();
   }
+  MPI::COMM_WORLD.Barrier();
 
   if (AG1) AG1.reset();
   if (AG2) AG2.reset();
   if (AG)  AG.reset();
 
+  conf->print("==> CALL TO STEPPER() COMPLETE <==");
 }

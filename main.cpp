@@ -7,18 +7,13 @@ namespace po = boost::program_options;
 #include "Config.hpp"
 #include "parse_opts.hpp"
 
-#include <armadillo>
-
 using namespace std;
 
-void stepper(Config *conf);
+void stepper(Config *conf); // forward declaration rather than mini hpp
 
 int main(int argc, char* argv[]) 
 {
   MPI::Init();
-
-  // int mpi_size = MPI::COMM_WORLD.Get_size();
-  // int mpi_rank = MPI::COMM_WORLD.Get_rank();
 
   Config conf; // each proc carries a "configuration" object
 
@@ -41,18 +36,9 @@ int main(int argc, char* argv[])
   } else {
     conf.sync(); // sync int and float values in conf
   }
-
-  conf.print("===========================");
-  for (int i=0;i<conf.mpi_size;++i) {
-    if (i==conf.mpi_rank) {
-      conf.print();
-      cout << "===========================" << endl;
-    }
-    MPI::COMM_WORLD.Barrier();
-  }
+  // conf.print(); // print configuration info of each proc
 
   stepper(&conf);
-
 
   MPI::Finalize(); // must be called by all procs before exiting
   return EXIT_SUCCESS;
