@@ -6,6 +6,7 @@
 #include <mpi.h>
 #include <string>
 #include <vector>
+#include <sstream> // ostringstream
 
 #include <boost/algorithm/string/classification.hpp> 
 #include <boost/algorithm/string/split.hpp>
@@ -21,10 +22,12 @@ using namespace std;
 
 void stepper(Config *conf) {
 
+  //############################//
+  //### INITIAL FILE READING ###//
+  //############################//
   vector<string> sel1,sel2;
   AtomGroup::ptr AG,AG1,AG2; // only root will have initalized AG,AG1,AG2
-  vector<int> mpi_intbuf;
-  mpi_intbuf.reserve(6);
+  vector<int> mpi_intbuf(6,-1);
   if (conf->isRoot()) {
     conf->buildPaths();
     AG = make_shared<AtomGroup>(conf->xmlPath,conf->dcdPath);
@@ -49,14 +52,13 @@ void stepper(Config *conf) {
     if (frame_end == -1) 
       frame_end = AG->dptr->numFrames;
 
-    mpi_intbuf.push_back(selfHist);
-    mpi_intbuf.push_back(natoms1);
-    mpi_intbuf.push_back(natoms2);
-    mpi_intbuf.push_back(frame_start);
-    mpi_intbuf.push_back(frame_step);
-    mpi_intbuf.push_back(frame_end);
+    mpi_intbuf[0] = selfHist;
+    mpi_intbuf[1] = natoms1;
+    mpi_intbuf[2] = natoms2;
+    mpi_intbuf[3] = frame_start;
+    mpi_intbuf[4] = frame_step;
+    mpi_intbuf[5] = frame_end;
   }
-
   MPI::COMM_WORLD.Bcast(&mpi_intbuf.front(),mpi_intbuf.size(),MPI::INT,0);
   bool selfHist = static_cast<bool>(mpi_intbuf[0]);
   int natoms1 = mpi_intbuf[1];
@@ -74,13 +76,19 @@ void stepper(Config *conf) {
     exit(EXIT_FAILURE);
   }
 
+  //#####################//
+  //### DATA CHUNKING ###//
+  //#####################//
   Chunker Chunker1(natoms1,conf->mpi_size);
   Chunker Chunker2(natoms2,1);
-  conf->print("Chunking for atom type 1:");
+  conf->print("> Chunking for atom type 1:");
   Chunker1.print();
-  conf->print("Chunking for atom type 2:");
+  conf->print("> Chunking for atom type 2:");
   Chunker2.print();
 
+  //#######################//
+  //### FRAME LOOP PREP ###//
+  //#######################//
   vector<float> box(3,0.0f);
   vector<float> masterX1,masterY1,masterZ1;
   vector<float> masterX2,masterY2,masterZ2;
@@ -90,8 +98,13 @@ void stepper(Config *conf) {
   conf->buildSpace();
   vector<unsigned long> hist(conf->rsize,0);
 
-  conf->print("Starting frame loop...");
-  MPI::COMM_WORLD.Barrier();
+  //##################//
+  //### FRAME LOOP ###//
+  //##################//
+  ostringstream oss;
+  oss << "> Starting frame loop with (start/stop/step): ";
+  oss << "(" << frame_start << "/" << frame_end << "/" << frame_step << ")";
+  conf->print(oss.str());
   for (int frame=frame_start;frame<frame_end;frame+=frame_step) 
   {
     if (conf->isRoot()) {
@@ -117,6 +130,7 @@ void stepper(Config *conf) {
       cout << box[1] << ", ";
       cout << box[2] << endl;
 
+
     }
     conf->print("--> Distributing positions to processes...");
     MPI::COMM_WORLD.Bcast(&box.front(),box.size(),MPI::FLOAT,0);
@@ -127,7 +141,6 @@ void stepper(Config *conf) {
     Chunker2.distribute( &masterY2, &y2);
     Chunker2.distribute( &masterZ2, &z2);
     conf->print("--> Done distributing.");
-    MPI::COMM_WORLD.Barrier();
 
     //####################//
     //### printProcXYZ ###//
@@ -142,12 +155,14 @@ void stepper(Config *conf) {
     //#################//
     } else if (conf->kernel == Config::histogram) {
       conf->print("--> Calling kernel: histogram");
+      int offset = Chunker1.mindex_list[conf->mpi_rank];
       histogram(hist,
                 x1,y1,z1,
                 x2,y2,z2,
                 box,
                 selfHist,
-                conf->rmax,conf->dr);
+                conf->rmax,conf->dr,
+                offset);
 
     //##############//
     //### ERROR! ###//
@@ -164,17 +179,16 @@ void stepper(Config *conf) {
 
   }
 
-  vector<unsigned long> final_hist;
-  if (conf->isRoot())  {
-    cout << "--> Gathering data from each proc and writing saving to disk..." << endl;
-    final_hist.assign(conf->rsize,0);
-  }
-
+  //##########################//
+  //### FRAME LOOP CLEANUP ###//
+  //##########################//
+  vector<unsigned long> final_hist(conf->rsize);
+  conf->print("--> Gathering data from each proc and writing saving to disk...");
   MPI::COMM_WORLD.Reduce(&hist.front(),&final_hist.front(),hist.size(),
                          MPI::UNSIGNED_LONG,MPI::SUM,0);
 
   if (conf->isRoot()) {
-    cout << "Done! Frame loop finished successfully." << endl;
+    cout << "> Done! Frame loop finished successfully." << endl;
     ofstream file("hist.dat");
     for (auto i: final_hist) {
       file << i << endl;

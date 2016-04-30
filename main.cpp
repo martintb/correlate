@@ -39,16 +39,8 @@ int main(int argc, char* argv[])
     MPI::Finalize(); // must be called by all procs before exiting
     return EXIT_FAILURE;
   } else {
-    conf.sync();
+    conf.sync(); // sync int and float values in conf
   }
-
-  // MPI::COMM_WORLD.Bcast(&(conf.frame_start),1,MPI::INT,0);
-  // MPI::COMM_WORLD.Bcast(&(conf.frame_end),  1,MPI::INT,0);
-  // MPI::COMM_WORLD.Bcast(&(conf.frame_step), 1,MPI::INT,0);
-  // MPI::COMM_WORLD.Bcast(&(conf.nthreads),   1,MPI::INT,0);
-  // MPI::COMM_WORLD.Bcast(&(conf.kernel),     1,MPI::INT,0);
-  // MPI::COMM_WORLD.Bcast(&(conf.dr),         1,MPI::FLOAT,0);
-  // MPI::COMM_WORLD.Bcast(&(conf.rmax),       1,MPI::FLOAT,0);
 
   conf.print("===========================");
   for (int i=0;i<conf.mpi_size;++i) {

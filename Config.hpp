@@ -15,6 +15,12 @@ class Config
     void print();
     void sync();
     void print(std::string);
+    std::vector<int> readFiles();
+
+    std::string type1, type2;
+    std::string path,xml,dcd;
+    std::string xmlPath,dcdPath;
+
 
     int frame_start;
     int frame_end;
@@ -25,13 +31,6 @@ class Config
     float rmax;
     int rsize;
 
-    std::string path;
-    std::string xml;
-    std::string dcd;
-    std::string xmlPath;
-    std::string dcdPath;
-    std::string type1;
-    std::string type2;
 
     int mpi_rank;
     int mpi_size;

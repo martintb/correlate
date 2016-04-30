@@ -7,9 +7,10 @@ void histogram(
                 vector<unsigned long> &hist,
                 vector<float> &x1, vector<float> &y1, vector<float> &z1,
                 vector<float> &x2, vector<float> &y2, vector<float> &z2,
-                vector<float> &box, bool selfHist,float rmax,float dr
+                vector<float> &box, bool selfHist,float rmax,float dr,int offset
               )
 {
+
   int natoms1 = x1.size();
   int natoms2 = x2.size();
   float bx = box[0];
@@ -22,13 +23,15 @@ void histogram(
 
   for (int i=0;i<natoms1;i++) {
     for (int j=0;j<natoms2;j++) {
-      if (not (selfHist and i==j)) {
-        float dx = x1[i] - x2[j];
-        float dy = x1[i] = y2[j];
-        float dz = x1[i] = z2[j];
+      if (not (selfHist and (i+offset)==j)) {
+        float dx = abs(x1[i] - x2[j]);
+        float dy = abs(y1[i] - y2[j]);
+        float dz = abs(z1[i] - z2[j]);
+
         if (dx>bx2) dx-=bx;
         if (dy>by2) dy-=by;
         if (dz>bz2) dz-=bz;
+
         float dist = dx*dx + dy*dy + dz*dz;
         if (dist<rmaxsq) {
           int bindex = static_cast<int>(sqrt(dist)/dr);

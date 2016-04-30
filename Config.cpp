@@ -30,10 +30,10 @@ Config::Config()
   type1      = "";
   type2      = "";
   kernelStr = "";
-};
+}
 
 Config::~Config() {
-};
+}
 
 void Config::sync()
 {
@@ -60,8 +60,7 @@ void Config::sync()
   MPI::COMM_WORLD.Bcast(&fbuf.front(),fbuf.size(),MPI::FLOAT,0);
   dr = fbuf[0];
   rmax  = fbuf[1];
-
-};
+}
 
 bool Config::setKernelFromStr() {
   if (kernelStr.compare("printProcXYZ")==0) {
@@ -72,7 +71,6 @@ bool Config::setKernelFromStr() {
     cerr << "Error! Kernel string not recognized." << endl;
     return false;
   }
-
   return true; //success!
 }
 
@@ -94,9 +92,10 @@ bool Config::isRoot() {
 }
 
 void Config::print(string str) { 
-  if (mpi_rank==0) {
+  if (this->isRoot()) {
     cout << str << endl;
   }
+  return;
 }
 
 void Config::print() { 
