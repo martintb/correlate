@@ -16,7 +16,8 @@ EXEC=corr
 CC=mpicc
 CXX=mpicxx
 LD=mpicxx
-LDLIBS+= -larmadillo -lboost_filesystem -lboost_system -lboost_regex  -lboost_program_options
+LDLIBS+= -lboost_filesystem -lboost_system -lboost_regex  -lboost_program_options
+# LDLIBS+= -lsatlas -larmadillo 
 CPPFLAGS+= -Ikernel -Iutil -Iatomgroup -I./
 CPPFLAGS+= -std=c++11 -g -Wall
 # CPPFLAGS+= -O3 

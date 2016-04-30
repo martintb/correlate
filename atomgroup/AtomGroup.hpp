@@ -19,8 +19,10 @@ class AtomGroup {
     void readFiles();
     void setSize(int);
     ptr select(const std::vector<std::string>&);
+    int check_select_size(const std::vector<std::string>&);
     void mask(ptr, arma::umat&);
     std::vector<float> toSTLVec(float dim);
+    arma::fvec toARMAfvec(float dim);
 
     std::string dcdPath;
     std::string xmlPath;

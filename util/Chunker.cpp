@@ -30,15 +30,18 @@ Chunker::Chunker(int count,int num_chunks)
 };
 
 void Chunker::print() {
-  cout << "count:      " << count << endl;
-  cout << "num_chunks:       " << num_chunks << endl;
-  cout << "rank\tmindex\tmaxdex\tchunk_size" << endl;
-  cout << "----\t------\t------\t----------" << endl;
-  for (int i=0;i<num_chunks;i++) {
-    cout << i << "\t";
-    cout << mindex_list[i] << "\t";
-    cout << maxdex_list[i] << "\t";
-    cout << chunk_sizes[i] << endl;
+  int mpi_rank = MPI::COMM_WORLD.Get_rank();
+  if (mpi_rank==0) {
+    cout << "count:      " << count << endl;
+    cout << "num_chunks:       " << num_chunks << endl;
+    cout << "rank\tmindex\tmaxdex\tchunk_size" << endl;
+    cout << "----\t------\t------\t----------" << endl;
+    for (int i=0;i<num_chunks;i++) {
+      cout << i << "\t";
+      cout << mindex_list[i] << "\t";
+      cout << maxdex_list[i] << "\t";
+      cout << chunk_sizes[i] << endl;
+    }
   }
 };
 

@@ -4,6 +4,9 @@
 #include <algorithm>
 #include <memory>
 #include <mpi.h>
+#include <string>
+#include <vector>
+
 #include <boost/algorithm/string/classification.hpp> 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/filesystem.hpp>
@@ -16,16 +19,15 @@ namespace fs = boost::filesystem;
 
 using namespace std;
 
-bool stepper(Config *conf) {
+void stepper(Config *conf) {
+
   vector<string> sel1,sel2;
-  int natoms1=-1,natoms2=-1;
-  AtomGroup::ptr AG,AG1,AG2; // only root will have initalized AG
-  int frame_start,frame_end,frame_step;
-  bool selfHist;
+  AtomGroup::ptr AG,AG1,AG2; // only root will have initalized AG,AG1,AG2
+  vector<int> mpi_intbuf;
+  mpi_intbuf.reserve(6);
   if (conf->isRoot()) {
     conf->buildPaths();
     AG = make_shared<AtomGroup>(conf->xmlPath,conf->dcdPath);
-
     AG->readFiles();
     cout << "===================================" << endl;
     AG->xptr->contains();
@@ -35,40 +37,49 @@ bool stepper(Config *conf) {
     AG->dptr->printFileInfo();
     cout << "===================================" << endl;
 
-    selfHist = (conf->type1.compare(conf->type2)==0);
-
     boost::split(sel1,conf->type1,boost::is_any_of(", "),boost::token_compress_on);
     boost::split(sel2,conf->type2,boost::is_any_of(", "),boost::token_compress_on);
-    AG1 = AG->select(sel1);
-    AG2 = AG->select(sel2);
 
-    natoms1 = AG1->natoms;
-    natoms2 = AG2->natoms;
-
-    frame_step = conf->frame_step;
-    frame_start = conf->frame_start;
-    frame_end = conf->frame_end;
+    bool selfHist = conf->type1.compare(conf->type2)==0;//selfHist
+    int natoms1 = AG->check_select_size(sel1); //natoms1
+    int natoms2 = AG->check_select_size(sel2); //natoms2
+    int frame_start = conf->frame_start; //frame_start
+    int frame_step = conf->frame_step; //frame_step
+    int frame_end = conf->frame_end; //frame_end
     if (frame_end == -1) 
       frame_end = AG->dptr->numFrames;
 
+    mpi_intbuf.push_back(selfHist);
+    mpi_intbuf.push_back(natoms1);
+    mpi_intbuf.push_back(natoms2);
+    mpi_intbuf.push_back(frame_start);
+    mpi_intbuf.push_back(frame_step);
+    mpi_intbuf.push_back(frame_end);
   }
 
-  MPI::COMM_WORLD.Bcast(&selfHist,1,MPI::BOOL,0);
-  MPI::COMM_WORLD.Bcast(&frame_start,1,MPI::INT,0);
-  MPI::COMM_WORLD.Bcast(&frame_end,1,MPI::INT,0);
-  MPI::COMM_WORLD.Bcast(&frame_step,1,MPI::INT,0);
-  MPI::COMM_WORLD.Bcast(&natoms1,1,MPI::INT,0);
-  MPI::COMM_WORLD.Bcast(&natoms2,1,MPI::INT,0);
+  MPI::COMM_WORLD.Bcast(&mpi_intbuf.front(),mpi_intbuf.size(),MPI::INT,0);
+  bool selfHist = static_cast<bool>(mpi_intbuf[0]);
+  int natoms1 = mpi_intbuf[1];
+  int natoms2 = mpi_intbuf[2];
+  int frame_start = mpi_intbuf[3];
+  int frame_step = mpi_intbuf[4];
+  int frame_end = mpi_intbuf[5];
+
+  if (natoms1<=0 or natoms2<=0) {
+    if (conf->isRoot()) {
+      cerr << "==> Error! natoms1 or natoms2 is zero." << endl;
+      LOC();
+    }
+    MPI::Finalize();
+    exit(EXIT_FAILURE);
+  }
 
   Chunker Chunker1(natoms1,conf->mpi_size);
   Chunker Chunker2(natoms2,1);
-
-  if (conf->isRoot())  {
-    Chunker1.print();
-    cout << "===================================" << endl;
-    Chunker2.print();
-    cout << "===================================" << endl;
-  }
+  conf->print("Chunking for atom type 1:");
+  Chunker1.print();
+  conf->print("Chunking for atom type 2:");
+  Chunker2.print();
 
   vector<float> box(3,0.0f);
   vector<float> masterX1,masterY1,masterZ1;
@@ -79,10 +90,8 @@ bool stepper(Config *conf) {
   conf->buildSpace();
   vector<unsigned long> hist(conf->rsize,0);
 
-  if (conf->isRoot())
-    cout << "Starting frame loop..." << endl;
+  conf->print("Starting frame loop...");
   MPI::COMM_WORLD.Barrier();
-
   for (int frame=frame_start;frame<frame_end;frame+=frame_step) 
   {
     if (conf->isRoot()) {
@@ -103,8 +112,13 @@ bool stepper(Config *conf) {
       box[1] = AG1->ly;
       box[2] = AG1->lz;
 
-      cout << "--> Distributing positions to processes..." << endl;
+      cout << "--> Box (lx,ly,lz): ";
+      cout << box[0] << ", ";
+      cout << box[1] << ", ";
+      cout << box[2] << endl;
+
     }
+    conf->print("--> Distributing positions to processes...");
     MPI::COMM_WORLD.Bcast(&box.front(),box.size(),MPI::FLOAT,0);
     Chunker1.distribute( &masterX1, &x1);
     Chunker1.distribute( &masterY1, &y1);
@@ -112,16 +126,14 @@ bool stepper(Config *conf) {
     Chunker2.distribute( &masterX2, &x2);
     Chunker2.distribute( &masterY2, &y2);
     Chunker2.distribute( &masterZ2, &z2);
-    if (conf->isRoot()) 
-      cout << "--> Done distributing." << endl;
+    conf->print("--> Done distributing.");
     MPI::COMM_WORLD.Barrier();
 
     //####################//
     //### printProcXYZ ###//
     //####################//
     if (conf->kernel == Config::printProcXYZ) {
-      if (conf->isRoot()) 
-        cout << "--> Calling kernel: printProcXYZ" << endl;
+      conf->print("--> Calling kernel: printProcXYZ");
       printProcXYZ(frame,"xyz1",x1,y1,z1);
       printProcXYZ(frame,"xyz2",x2,y2,z2);
       
@@ -129,8 +141,7 @@ bool stepper(Config *conf) {
     //### histogram ###//
     //#################//
     } else if (conf->kernel == Config::histogram) {
-      if (conf->isRoot()) 
-        cout << "--> Calling kernel: histogram" << endl;
+      conf->print("--> Calling kernel: histogram");
       histogram(hist,
                 x1,y1,z1,
                 x2,y2,z2,
@@ -156,11 +167,11 @@ bool stepper(Config *conf) {
   vector<unsigned long> final_hist;
   if (conf->isRoot())  {
     cout << "--> Gathering data from each proc and writing saving to disk..." << endl;
-    final_hist.resize(conf->rsize);
+    final_hist.assign(conf->rsize,0);
   }
 
-  MPI::COMM_WORLD.Gather(&hist.front(),hist.size(),MPI::UNSIGNED_LONG,
-                         &final_hist.front(),final_hist.size(),MPI::UNSIGNED_LONG,0);
+  MPI::COMM_WORLD.Reduce(&hist.front(),&final_hist.front(),hist.size(),
+                         MPI::UNSIGNED_LONG,MPI::SUM,0);
 
   if (conf->isRoot()) {
     cout << "Done! Frame loop finished successfully." << endl;
@@ -171,12 +182,8 @@ bool stepper(Config *conf) {
     file.close();
   }
 
-  if (AG1)
-    AG1.reset();
-  if (AG2)
-    AG2.reset();
-  if (AG)
-    AG.reset();
+  if (AG1) AG1.reset();
+  if (AG2) AG2.reset();
+  if (AG)  AG.reset();
 
-  return true;
 }

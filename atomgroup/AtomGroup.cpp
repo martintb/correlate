@@ -81,6 +81,19 @@ AtomGroup::ptr AtomGroup::select(const vector<string>& type_select) {
   return aptr;
 }
 
+int AtomGroup::check_select_size(const vector<string>& type_select) {
+  int count=0;
+  for (int i=0; i<natoms; ++i) {
+    //search through type_select array for current type
+    //if found, increment counter
+    if (find( type_select.begin(), type_select.end(), xptr->type[i]) != type_select.end()){
+      count +=1;
+    }
+  }
+ 
+  return count;
+}
+
 void AtomGroup::mask(AtomGroup::ptr aptr, arma::umat& sel) {
   aptr->setSize(sel.n_elem);
   aptr->frame = frame;
@@ -93,6 +106,10 @@ void AtomGroup::mask(AtomGroup::ptr aptr, arma::umat& sel) {
 
 vector<float> AtomGroup::toSTLVec(float dim) {
   return arma::conv_to<vector<float> >::from(pos.col(dim));
+}
+
+arma::fvec AtomGroup::toARMAfvec(float dim) {
+  return pos.col(dim);
 }
  
 // void AtomGroup::unwrap_by_image() {

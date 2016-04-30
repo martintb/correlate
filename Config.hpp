@@ -13,6 +13,8 @@ class Config
     void buildSpace();
     bool isRoot();
     void print();
+    void sync();
+    void print(std::string);
 
     int frame_start;
     int frame_end;

@@ -1,4 +1,6 @@
+#include <mpi.h>
 #include <string>
+#include <vector>
 #include <iostream>
 #include <memory>
 
@@ -9,16 +11,16 @@ using namespace std;
 
 Config::Config() 
 {
-  mpi_rank  = -1;
-  mpi_size  = -1;
+  mpi_size = MPI::COMM_WORLD.Get_size();
+  mpi_rank = MPI::COMM_WORLD.Get_rank();
 
   frame_start = -1;
   frame_end   = -1;
   frame_step  = -1;
   nthreads    = -1;
 
-  dr = -1;
-  rmax = -1;
+  dr = -1.0f;
+  rmax = -1.0f;
 
   path       = "";
   xml        = "";
@@ -31,6 +33,34 @@ Config::Config()
 };
 
 Config::~Config() {
+};
+
+void Config::sync()
+{
+  vector<int> ibuf(5,0);
+  if (this->isRoot()) {
+    ibuf[0] = frame_start;
+    ibuf[1] = frame_step;
+    ibuf[2] = frame_end;
+    ibuf[3] = nthreads;
+    ibuf[4] = kernel;
+  }
+  MPI::COMM_WORLD.Bcast(&ibuf.front(),ibuf.size(),MPI::INT,0);
+  frame_start = ibuf[0];
+  frame_step  = ibuf[1];
+  frame_end   = ibuf[2];
+  nthreads    = ibuf[3];
+  kernel      = static_cast<KernelType>(ibuf[4]);
+
+  vector<float> fbuf(2,0.0f);
+  if (this->isRoot()) {
+    fbuf[0] = dr;
+    fbuf[1] = rmax;
+  }
+  MPI::COMM_WORLD.Bcast(&fbuf.front(),fbuf.size(),MPI::FLOAT,0);
+  dr = fbuf[0];
+  rmax  = fbuf[1];
+
 };
 
 bool Config::setKernelFromStr() {
@@ -61,6 +91,12 @@ void Config::buildPaths() {
 
 bool Config::isRoot() { 
   return (mpi_rank==0);
+}
+
+void Config::print(string str) { 
+  if (mpi_rank==0) {
+    cout << str << endl;
+  }
 }
 
 void Config::print() { 
