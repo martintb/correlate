@@ -15,7 +15,7 @@
 
 using namespace std;
 
-#define TYPES Reader::POSITION | Reader::BOX | Reader::TYPE  | Reader::IMAGE | Reader::VELOCITY
+#define TYPES Reader::POSITION | Reader::BOX | Reader::TYPE  | Reader::IMAGE | Reader::VELOCITY | Reader::MOLECULE
 XML::XML(string fileName) : Reader("XML",TYPES) {
   xmlCharArray = nullptr;
   setFilename(fileName);
@@ -28,6 +28,7 @@ void XML::setFilename(string fileName) {
   exists(fileName);
   pos.reset();
   vel.reset();
+  mol.reset();
   img.reset();
   type.clear(); // type is a vector<string> all others are armadillo types
 
@@ -54,8 +55,8 @@ void XML::parse() {
   rapidxml::xml_node<> *head_node;
   rapidxml::xml_node<> *node;
   rapidxml::xml_attribute<> *attr;
-  char* temp;
-  int num;
+  // char* temp;
+  // int num;
 
   head_node = xmlFile.first_node("hoomd_xml");
   assert(head_node);
@@ -77,11 +78,12 @@ void XML::parse() {
   pos.set_size(natoms,3);
   parse_node<float>(pos_str,pos,"float");
 
-  // node = head_node->first_node("velocity");
-  // assert(node);
-  // string vel_str(node->value());
-  // vel.set_size(natoms,3);
-  // parse_node<float>(vel_str,vel,"float");
+  node = head_node->first_node("molecule");
+  if (node) {
+    string mol_str(node->value());
+    mol.set_size(natoms);
+    parse_node<int>(mol_str,mol,"int");
+  }
 
   node = head_node->first_node("image");
   assert(node);

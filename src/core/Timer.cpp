@@ -92,8 +92,8 @@ void Timer::print_stats()
     cout << endl;
     cout << setw(key_width) << "----";
     cout << setw(width) << "---";
-    cout << setw(width) << "-----";
     cout << setw(width) << "---";
+    cout << setw(width) << "-----";
     cout << endl;
     int i = 0;
     for (auto const &kv : dt ) {

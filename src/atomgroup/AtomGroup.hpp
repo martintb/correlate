@@ -22,6 +22,7 @@ class AtomGroup {
     int check_select_size(const std::vector<std::string>&);
     void mask(ptr, arma::umat&);
     std::vector<float> toSTLVec(float dim);
+    std::vector<int> STLMol();
     arma::fvec toARMAfvec(float dim);
 
     std::string dcdPath;
@@ -35,6 +36,7 @@ class AtomGroup {
     double ly;
     double lz;
     arma::Mat<float> pos;
+    arma::Mat<int> mol;
     std::vector<std::string> type;
     int natoms;
     int frame;

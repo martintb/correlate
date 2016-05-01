@@ -19,6 +19,7 @@ class XML : public Reader {
     double lx;
     double ly;
     double lz;
+    arma::Mat<int> mol;
     arma::Mat<float> pos;
     arma::Mat<float> vel;
     arma::Mat<int> img;

@@ -97,6 +97,8 @@ void stepper(Config *conf) {
   vector<float> masterX2,masterY2,masterZ2;
   vector<float> x1,y1,z1;
   vector<float> x2,y2,z2;
+  vector<int> mol1,mol2;
+  vector<int> masterMol1,masterMol2;
 
   conf->buildSpace();
   vector<unsigned long> procVecInt;
@@ -132,6 +134,11 @@ void stepper(Config *conf) {
       masterX2 = AG2->toSTLVec(0);
       masterY2 = AG2->toSTLVec(1);
       masterZ2 = AG2->toSTLVec(2);
+
+      masterMol1 = AG1->STLMol();
+      masterMol2 = AG2->STLMol();
+      cout << masterMol1.size() << masterMol1[0] << endl;
+      cout << masterMol2.size() << masterMol2[0] << endl;
 
       box[0] = AG1->lx;
       box[1] = AG1->ly;

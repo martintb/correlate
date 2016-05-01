@@ -27,6 +27,8 @@ AtomGroup::~AtomGroup() {
 void AtomGroup::setSize(int natoms) {
   this->natoms = natoms;
   pos.set_size(natoms,3);
+  mol.set_size(natoms);
+  mol.fill(-1);
   type.reserve(natoms);
 }
 
@@ -51,6 +53,7 @@ void AtomGroup::readFrame(int frame) {
   dptr->readFrame(frame);
   pos = dptr->pos;
   type = xptr->type;
+  mol = xptr->mol;
   lx = dptr->lx;
   ly = dptr->ly;
   lz = dptr->lz;
@@ -101,7 +104,14 @@ void AtomGroup::mask(AtomGroup::ptr aptr, arma::umat& sel) {
   aptr->ly = ly;
   aptr->lz = lz;
   aptr->pos = pos.rows(sel);
+  if (mol.n_elem == pos.n_elem) {
+    aptr->mol = mol.rows(sel);
+  }
   aptr->init=true;
+}
+
+vector<int> AtomGroup::STLMol() {
+  return arma::conv_to<vector<int> >::from(mol);
 }
 
 vector<float> AtomGroup::toSTLVec(float dim) {

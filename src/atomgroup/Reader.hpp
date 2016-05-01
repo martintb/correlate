@@ -31,6 +31,7 @@ class Reader {
       IMAGE    = 1 << 2,
       BOX      = 1 << 3,
       TYPE     = 1 << 4,
+      MOLECULE = 1 << 5,
     };
 
 
