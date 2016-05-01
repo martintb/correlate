@@ -32,6 +32,7 @@ void stepper(Config *conf) {
   vector<string> sel1,sel2;
   AtomGroup::ptr AG,AG1,AG2; // only root will have initalized AG,AG1,AG2
   vector<int> mpi_intbuf(6,-1);
+  timer.tic("io");
   if (conf->isRoot()) {
     conf->buildPaths();
     AG = make_shared<AtomGroup>(conf->xmlPath,conf->dcdPath);
@@ -67,6 +68,9 @@ void stepper(Config *conf) {
     mpi_intbuf[4] = frame_step;
     mpi_intbuf[5] = frame_end;
   }
+  MPI::COMM_WORLD.Barrier();
+  timer.toc("io",/*printSplit=*/true);
+
   MPI::COMM_WORLD.Bcast(&mpi_intbuf.front(),mpi_intbuf.size(),MPI::INT,0);
   bool selfHist = static_cast<bool>(mpi_intbuf[0]);
   int natoms1 = mpi_intbuf[1];
@@ -84,9 +88,9 @@ void stepper(Config *conf) {
     exit(EXIT_FAILURE);
   }
 
-  //#####################//
-  //### DATA CHUNKING ###//
-  //#####################//
+  //###############################//
+  //### INTIALIZE DATA CHUNKERS ###//
+  //###############################//
   Chunker Chunker1(natoms1,conf->mpi_size);
   Chunker Chunker2(natoms2,1);
   conf->print("============= CHUNK1 INFO =============");
@@ -131,7 +135,8 @@ void stepper(Config *conf) {
   int num_frames = 0;
   for (int frame=frame_start;frame<frame_end;frame+=frame_step) 
   {
-    num_frames++;
+    timer.tic("frame_loop");
+    timer.tic("io");
     if (conf->isRoot()) {
       cout << "--> Reading frame " << frame << endl;
       AG->readFrame(frame);
@@ -158,19 +163,22 @@ void stepper(Config *conf) {
       cout << box[1] << ", ";
       cout << box[2] << endl;
     }
-    conf->print("--> Distributing positions to processes...");
+    MPI::COMM_WORLD.Barrier();
+    timer.toc("io",/*printSplit=*/true);
+
+    conf->print("--> Distributing atomdata to mpi-processes...");
     timer.tic("comm_time");
     MPI::COMM_WORLD.Bcast(&box.front(),box.size(),MPI::FLOAT,0);
     Chunker1.distribute( &masterX1, &x1);
     Chunker1.distribute( &masterY1, &y1);
     Chunker1.distribute( &masterZ1, &z1);
-    Chunker1.distribute( &masterMol1f, &mol1f);
     Chunker2.distribute( &masterX2, &x2);
     Chunker2.distribute( &masterY2, &y2);
     Chunker2.distribute( &masterZ2, &z2);
-    Chunker1.distribute( &masterMol2f, &mol2f);
     // distribute deals in floats, but we need the 
     // mol numbers as ints for equality comparsons
+    Chunker1.distribute( &masterMol1f, &mol1f);
+    Chunker2.distribute( &masterMol2f, &mol2f);
     mol1.assign(mol1f.begin(),mol1f.end());
     mol2.assign(mol2f.begin(),mol2f.end());
     timer.toc("comm_time",/*printSplit=*/true);
@@ -243,6 +251,9 @@ void stepper(Config *conf) {
     }
 
 
+    timer.toc("frame_loop",/*printSplit=*/true);
+    num_frames++;
+    conf->print("-----------------------------------------------------------");
   }
   conf->print("> Done! Frame loop finished successfully!");
 
@@ -254,7 +265,8 @@ void stepper(Config *conf) {
   vector<float> allVecFloat(conf->xsize,0.0f);
   vector<float> outVec;
   conf->print("--> Gathering data from each proc...");
-  if ( conf->kernel == Config::histogram or 
+  if ( 
+       conf->kernel == Config::histogram or 
        conf->kernel == Config::rdf or
        conf->kernel == Config::inter_mol_rdf
      ) 
@@ -277,6 +289,7 @@ void stepper(Config *conf) {
   //#############################//
   //### SCALE AND OUTPUT DATA ###//
   //#############################//
+  timer.tic("io");
   if (conf->isRoot()) {
     conf->print("--> Scaling and writing data to disk..");
     float pair_rho;
@@ -319,6 +332,8 @@ void stepper(Config *conf) {
     }
     file.close();
   }
+  MPI::COMM_WORLD.Barrier();
+  timer.toc("io",/*printSplit=*/true);
 
   if (AG1) AG1.reset();
   if (AG2) AG2.reset();
