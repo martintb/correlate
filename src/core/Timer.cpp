@@ -1,6 +1,7 @@
 #include <iostream>
 #include <iomanip> //setw
 #include <map>
+#include <cmath> // sqrt
 #include <chrono>
 #include <string>
 #include <vector>
@@ -16,6 +17,7 @@ Timer::Timer()
 {
   mpi_size = MPI::COMM_WORLD.Get_size();
   mpi_rank = MPI::COMM_WORLD.Get_rank();
+  total_t0 = chrono::high_resolution_clock::now();
 }
 
 Timer::~Timer() {};
@@ -58,6 +60,7 @@ void Timer::print_stats()
 {
 
   vector<float> avg_buf_in;
+  vector<float> avg_sq_buf_in;
   vector<float> tot_buf_in;
   vector<int> count_buf_in;
   for (auto const &kv : dt ) {
@@ -65,9 +68,14 @@ void Timer::print_stats()
     float tot = kv.second;
     float avg = tot/count;
     avg_buf_in.push_back(avg);
+    avg_sq_buf_in.push_back(avg*avg);
     tot_buf_in.push_back(tot);
     count_buf_in.push_back(count);
   }
+
+  vector<float> avg_sq_buf_out(avg_sq_buf_in.size());
+  MPI::COMM_WORLD.Reduce(&avg_sq_buf_in.front(),&avg_sq_buf_out.front(),
+                         avg_sq_buf_in.size(),MPI::FLOAT,MPI::SUM,0);
 
   vector<float> avg_buf_out(avg_buf_in.size());
   MPI::COMM_WORLD.Reduce(&avg_buf_in.front(),&avg_buf_out.front(),
@@ -83,28 +91,40 @@ void Timer::print_stats()
 
 
   if (mpi_rank==0) {
+    auto t1 = chrono::high_resolution_clock::now();
+    float total_time = fmins(t1-total_t0).count();
+
     int width=15;
-    int key_width=width+2;
+    int key_width=width+5;
     cout << setw(key_width) << "name";
-    cout << setw(width) << "avg";
-    cout << setw(width) << "tot";
-    cout << setw(width) << "count";
+    cout << setw(width) << "per call avg";
+    cout << setw(width) << "per call std";
+    cout << setw(width) << "total";
+    cout << setw(width) << "call count";
+    cout << setw(width) << "%";
     cout << endl;
     cout << setw(key_width) << "----";
-    cout << setw(width) << "---";
-    cout << setw(width) << "---";
-    cout << setw(width) << "-----";
+    cout << setw(width)     << "------------";
+    cout << setw(width)     << "------------";
+    cout << setw(width)     << "-----";
+    cout << setw(width)     << "----------";
+    cout << setw(width)     << "-";
     cout << endl;
     int i = 0;
+    float N = static_cast<float>(mpi_size);
     for (auto const &kv : dt ) {
       auto key = kv.first;
-      float avg = avg_buf_out[i]/mpi_size;
-      float tot = tot_buf_out[i]/mpi_size;
-      float count = count_buf_out[i];
+      float per_call_avg = avg_buf_out[i]/N;
+      float per_call_std = sqrt(avg_sq_buf_out[i]/N - (avg_buf_out[i]/N)*(avg_buf_out[i]/N));
+      float total        = tot_buf_out[i]/N;
+      float count        = count_buf_out[i]/N;
+      float perc         = 100*total/total_time;
       cout << setw(key_width) << key;
-      cout << setw(width) << avg;
-      cout << setw(width) << tot;
-      cout << setw(width) << count;
+      cout << setw(width)    << per_call_avg;
+      cout << setw(width)    << per_call_std;
+      cout << setw(width)    << total;
+      cout << setw(width)    << count;
+      cout << setw(width)    << perc;
       cout << endl;
       i++;
     }

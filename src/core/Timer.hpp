@@ -25,6 +25,7 @@ class Timer
     std::map<std::string,time_point> t0;
     std::map<std::string,float> dt;
     std::map<std::string,long> counts;
+    time_point total_t0;
 
 };
 

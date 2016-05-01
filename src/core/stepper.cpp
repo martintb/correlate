@@ -345,8 +345,8 @@ void stepper(Config *conf) {
 
   if (conf->isRoot()) {
     cout << "\n\n";
-    cout << setw(15*4+2);
-    cout << "===================== TIMINGS =====================";
+    cout << setw(15*6+2);
+    cout << "===================== PROC TIMINGS =====================";
     cout << endl;
   }
   timer.toc("stepper");
