@@ -46,7 +46,12 @@ void stepper(Config *conf) {
     boost::split(sel1,conf->type1,boost::is_any_of(", "),boost::token_compress_on);
     boost::split(sel2,conf->type2,boost::is_any_of(", "),boost::token_compress_on);
 
-    bool selfHist = conf->type1.compare(conf->type2)==0;//selfHist
+    bool selfHist;
+    if (conf->kernel == Config::inter_mol_rdf) {
+      selfHist = false;
+    } else {
+      selfHist = conf->type1.compare(conf->type2)==0;
+    }
     int natoms1 = AG->check_select_size(sel1); //natoms1
     int natoms2 = AG->check_select_size(sel2); //natoms2
     int frame_start = conf->frame_start; //frame_start
@@ -98,12 +103,18 @@ void stepper(Config *conf) {
   vector<float> x1,y1,z1;
   vector<float> x2,y2,z2;
   vector<int> mol1,mol2;
-  vector<int> masterMol1,masterMol2;
+  vector<float> mol1f,mol2f;
+  vector<float> masterMol1f,masterMol2f;
+  unsigned long pair_count=0;
 
   conf->buildSpace();
   vector<unsigned long> procVecInt;
   vector<float> procVecFloat;
-  if (conf->kernel == Config::histogram or conf->kernel == Config::rdf) {
+  if (conf->kernel == Config::histogram or 
+      conf->kernel == Config::rdf or
+      conf->kernel == Config::inter_mol_rdf
+     ) 
+  {
     procVecInt.assign(conf->xsize,0);
   } else if (conf->kernel == Config::omega) {
     procVecFloat.assign(conf->xsize,0.0f);
@@ -135,10 +146,8 @@ void stepper(Config *conf) {
       masterY2 = AG2->toSTLVec(1);
       masterZ2 = AG2->toSTLVec(2);
 
-      masterMol1 = AG1->STLMol();
-      masterMol2 = AG2->STLMol();
-      cout << masterMol1.size() << masterMol1[0] << endl;
-      cout << masterMol2.size() << masterMol2[0] << endl;
+      masterMol1f = AG1->STLMolFloat();
+      masterMol2f = AG2->STLMolFloat();
 
       box[0] = AG1->lx;
       box[1] = AG1->ly;
@@ -155,9 +164,15 @@ void stepper(Config *conf) {
     Chunker1.distribute( &masterX1, &x1);
     Chunker1.distribute( &masterY1, &y1);
     Chunker1.distribute( &masterZ1, &z1);
+    Chunker1.distribute( &masterMol1f, &mol1f);
     Chunker2.distribute( &masterX2, &x2);
     Chunker2.distribute( &masterY2, &y2);
     Chunker2.distribute( &masterZ2, &z2);
+    Chunker1.distribute( &masterMol2f, &mol2f);
+    // distribute deals in floats, but we need the 
+    // mol numbers as ints for equality comparsons
+    mol1.assign(mol1f.begin(),mol1f.end());
+    mol2.assign(mol2f.begin(),mol2f.end());
     timer.toc("comm_time",/*printSplit=*/true);
     conf->print("--> Done distributing.");
 
@@ -184,6 +199,20 @@ void stepper(Config *conf) {
                 conf->xmax,conf->dx,
                 offset);
       timer.toc("histogram_kernel",/*printSplit=*/true);
+
+    //###########################//
+    //### inter_histogram/rdf ###//
+    //###########################//
+    } else if (conf->kernel == Config::inter_mol_rdf) {
+      conf->print("--> Calling kernel: inter_mol_rdf");
+      timer.tic("ihist_kernel");
+      pair_count=0;
+      inter_mol_histogram(procVecInt,
+                          x1,y1,z1,
+                          x2,y2,z2,
+                          mol1,mol2,
+                          box, conf->xmax,conf->dx,pair_count);
+      timer.toc("ihist_kernel",/*printSplit=*/true);
 
     //#############//
     //### omega ###//
@@ -217,7 +246,7 @@ void stepper(Config *conf) {
   }
   conf->print("> Done! Frame loop finished successfully!");
 
-  conf->print("============= POSTPROCESSING  =============");
+  conf->print("============= POSTPROCESSING =============");
   //##############################//
   //### GATHER FRAME LOOP DATA ###//
   //##############################//
@@ -225,7 +254,11 @@ void stepper(Config *conf) {
   vector<float> allVecFloat(conf->xsize,0.0f);
   vector<float> outVec;
   conf->print("--> Gathering data from each proc...");
-  if (conf->kernel == Config::histogram or conf->kernel == Config::rdf) {
+  if ( conf->kernel == Config::histogram or 
+       conf->kernel == Config::rdf or
+       conf->kernel == Config::inter_mol_rdf
+     ) 
+  {
     MPI::COMM_WORLD.Reduce(&procVecInt.front(),&allVecInt.front(),procVecInt.size(),
                          MPI::UNSIGNED_LONG,MPI::SUM,0);
     outVec.assign(allVecInt.begin(),allVecInt.end());
@@ -233,6 +266,12 @@ void stepper(Config *conf) {
     MPI::COMM_WORLD.Reduce(&procVecFloat.front(),&allVecFloat.front(),procVecFloat.size(),
                          MPI::FLOAT,MPI::SUM,0);
     outVec.assign(allVecFloat.begin(),allVecFloat.end());
+  }
+
+  unsigned long all_pair_count = 0;
+  if ( conf->kernel == Config::inter_mol_rdf) 
+  {
+    MPI::COMM_WORLD.Reduce(&pair_count,&all_pair_count,1, MPI::UNSIGNED_LONG,MPI::SUM,0);
   }
 
   //#############################//
@@ -243,14 +282,15 @@ void stepper(Config *conf) {
     float pair_rho;
     float natoms = natoms1+natoms2;
     float box_volume = box[0]*box[1]*box[2];
-    if (selfHist) {
+
+    if (conf->kernel == Config::inter_mol_rdf) {
+      pair_rho = all_pair_count/box_volume;
+    } else if (selfHist) {
       pair_rho = natoms1*(natoms2-1)/box_volume;
     } else {
       pair_rho = natoms1*natoms2/box_volume;
     }
 
-
-    
     float constant = 0;
     if (selfHist) {
       constant = 1.0;
@@ -285,13 +325,13 @@ void stepper(Config *conf) {
   if (AG)  AG.reset();
 
 
-  conf->print("============= ALL DONE  =============");
+  conf->print("============= ALL DONE =============");
   MPI::COMM_WORLD.Barrier();
 
   if (conf->isRoot()) {
     cout << "\n\n";
     cout << setw(15*4+2);
-    cout << "===================== TIMINGS  =====================";
+    cout << "===================== TIMINGS =====================";
     cout << endl;
   }
   timer.toc("stepper");

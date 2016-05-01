@@ -104,14 +104,16 @@ void AtomGroup::mask(AtomGroup::ptr aptr, arma::umat& sel) {
   aptr->ly = ly;
   aptr->lz = lz;
   aptr->pos = pos.rows(sel);
-  if (mol.n_elem == pos.n_elem) {
-    aptr->mol = mol.rows(sel);
-  }
+  aptr->mol = mol.rows(sel);
   aptr->init=true;
 }
 
 vector<int> AtomGroup::STLMol() {
   return arma::conv_to<vector<int> >::from(mol);
+}
+
+vector<float> AtomGroup::STLMolFloat() {
+  return arma::conv_to<vector<float> >::from(mol);
 }
 
 vector<float> AtomGroup::toSTLVec(float dim) {

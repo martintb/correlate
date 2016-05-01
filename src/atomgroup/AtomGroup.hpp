@@ -23,6 +23,7 @@ class AtomGroup {
     void mask(ptr, arma::umat&);
     std::vector<float> toSTLVec(float dim);
     std::vector<int> STLMol();
+    std::vector<float> STLMolFloat();
     arma::fvec toARMAfvec(float dim);
 
     std::string dcdPath;

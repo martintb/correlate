@@ -3,4 +3,5 @@
 #include "printProcData.hpp"
 #include "histogram.hpp"
 #include "omega.hpp"
+#include "inter_mol_histogram.hpp"
 #endif

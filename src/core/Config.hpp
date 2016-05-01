@@ -43,6 +43,7 @@ class Config
       printProcXYZ,
       histogram,
       rdf,
+      inter_mol_rdf,
       omega,
     };
 
@@ -51,6 +52,7 @@ class Config
       "printProcXYZ",
       "histogram",
       "rdf",
+      "inter_mol_rdf",
       "omega",
     };
     bool setKernelFromStr();
