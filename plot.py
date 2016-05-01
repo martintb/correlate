@@ -8,6 +8,6 @@ hist = np.loadtxt('calc.dat')
 
 data = {k:v for k,v in zip(keys,hist.T)}
 
-plt.plot(data['x'],data['omega'])
+plt.plot(data['x'],data['rdf'])
 plt.show()
 

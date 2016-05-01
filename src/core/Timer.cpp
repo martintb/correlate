@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip> //setw
 #include <map>
 #include <chrono>
 #include <string>
@@ -29,7 +30,7 @@ void Timer::tic(string key)
   t0[key] = chrono::high_resolution_clock::now();
 }
 
-void Timer::toc(string key) 
+void Timer::toc(string key,bool printSplit) 
 {
   if (not t0.count(key)) {
     if (mpi_rank==0) {
@@ -41,8 +42,16 @@ void Timer::toc(string key)
   }
 
   Timer::time_point t1 = chrono::high_resolution_clock::now();
-  dt[key] += chrono::duration_cast<chrono::minutes>(t1-t0[key]).count();
+  dt[key] += fmins(t1-t0[key]).count();
   counts[key] += 1;
+
+  if ((mpi_rank==0) and printSplit) {
+    cout << ">>> root ";
+    cout << key;
+    cout << " split: ";
+    cout << fmins(t1-t0[key]).count();
+    cout << " minutes" << endl;
+  };
 }
 
 void Timer::print_stats() 
@@ -52,7 +61,7 @@ void Timer::print_stats()
   vector<float> tot_buf_in;
   vector<int> count_buf_in;
   for (auto const &kv : dt ) {
-    int count = counts[kv.first];
+    float count = counts[kv.first];
     float tot = kv.second;
     float avg = tot/count;
     avg_buf_in.push_back(avg);
@@ -74,19 +83,29 @@ void Timer::print_stats()
 
 
   if (mpi_rank==0) {
-    cout << "name\t|\tavg\t|\ttot\t|\tcount\t|\t";
-    cout << "----\t|\t---\t|\t---\t|\t-----\t|\t";
+    int width=15;
+    int key_width=width+2;
+    cout << setw(key_width) << "name";
+    cout << setw(width) << "avg";
+    cout << setw(width) << "tot";
+    cout << setw(width) << "count";
+    cout << endl;
+    cout << setw(key_width) << "----";
+    cout << setw(width) << "---";
+    cout << setw(width) << "-----";
+    cout << setw(width) << "---";
+    cout << endl;
     int i = 0;
     for (auto const &kv : dt ) {
       auto key = kv.first;
-      int avg = avg_buf_out[i]/mpi_size;
-      int tot = tot_buf_out[i]/mpi_size;
-      int count = count_buf_out[i];
-      cout << key << "\t|\t";
-      cout << avg << "\t|\t";
-      cout << tot << "\t|\t";
-      cout << count << "\t|\t"; 
-      cout <<endl;
+      float avg = avg_buf_out[i]/mpi_size;
+      float tot = tot_buf_out[i]/mpi_size;
+      float count = count_buf_out[i];
+      cout << setw(key_width) << key;
+      cout << setw(width) << avg;
+      cout << setw(width) << tot;
+      cout << setw(width) << count;
+      cout << endl;
       i++;
     }
   }

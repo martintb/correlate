@@ -13,6 +13,7 @@
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 
+#include "Timer.hpp"
 #include "Config.hpp"
 #include "Chunker.hpp"
 #include "AtomGroup.hpp"
@@ -21,6 +22,9 @@ namespace fs = boost::filesystem;
 using namespace std;
 
 void stepper(Config *conf) {
+
+  Timer timer;
+  timer.tic("stepper");
 
   //############################//
   //### INITIAL FILE READING ###//
@@ -137,10 +141,9 @@ void stepper(Config *conf) {
       cout << box[0] << ", ";
       cout << box[1] << ", ";
       cout << box[2] << endl;
-
-
     }
     conf->print("--> Distributing positions to processes...");
+    timer.tic("comm_time");
     MPI::COMM_WORLD.Bcast(&box.front(),box.size(),MPI::FLOAT,0);
     Chunker1.distribute( &masterX1, &x1);
     Chunker1.distribute( &masterY1, &y1);
@@ -148,6 +151,7 @@ void stepper(Config *conf) {
     Chunker2.distribute( &masterX2, &x2);
     Chunker2.distribute( &masterY2, &y2);
     Chunker2.distribute( &masterZ2, &z2);
+    timer.toc("comm_time",/*printSplit=*/true);
     conf->print("--> Done distributing.");
 
     //####################//
@@ -164,6 +168,7 @@ void stepper(Config *conf) {
     } else if (conf->kernel == Config::histogram or conf->kernel == Config::rdf) {
       conf->print("--> Calling kernel: histogram/rdf");
       int offset = Chunker1.mindex_list[conf->mpi_rank];
+      timer.tic("histogram_kernel");
       histogram(procVecInt,
                 x1,y1,z1,
                 x2,y2,z2,
@@ -171,6 +176,7 @@ void stepper(Config *conf) {
                 selfHist,
                 conf->xmax,conf->dx,
                 offset);
+      timer.toc("histogram_kernel",/*printSplit=*/true);
 
     //#############//
     //### omega ###//
@@ -178,6 +184,7 @@ void stepper(Config *conf) {
     } else if (conf->kernel == Config::omega) {
       conf->print("--> Calling kernel: omega");
       int offset = Chunker1.mindex_list[conf->mpi_rank];
+      timer.tic("omega_kernel");
       omega(procVecFloat,
             x1,y1,z1,
             x2,y2,z2,
@@ -185,6 +192,7 @@ void stepper(Config *conf) {
             selfHist,
             conf->xmax,conf->dx,
             offset);
+      timer.toc("omega_kernel",/*printSplit=*/true);
 
     //##############//
     //### ERROR! ###//
@@ -264,11 +272,21 @@ void stepper(Config *conf) {
     }
     file.close();
   }
-  MPI::COMM_WORLD.Barrier();
 
   if (AG1) AG1.reset();
   if (AG2) AG2.reset();
   if (AG)  AG.reset();
 
+
   conf->print("============= ALL DONE  =============");
+  MPI::COMM_WORLD.Barrier();
+
+  if (conf->isRoot()) {
+    cout << "\n\n";
+    cout << setw(15*4+2);
+    cout << "===================== TIMINGS  =====================";
+    cout << endl;
+  }
+  timer.toc("stepper");
+  timer.print_stats();
 }
