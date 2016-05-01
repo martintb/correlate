@@ -21,8 +21,8 @@ LDLIBS+= -lboost_filesystem -lboost_system -lboost_regex  -lboost_program_option
 # LDLIBS+= -lsatlas -larmadillo 
 CPPFLAGS+= -Isrc/kernel -Isrc/util -Isrc/atomgroup -Isrc/core
 CPPFLAGS+= -std=c++11 -g -Wall
-# CPPFLAGS+= -O3 
-# CPPFLAGS+= -DARMA_NO_DEBUG
+CPPFLAGS+= -O3 
+CPPFLAGS+= -DARMA_NO_DEBUG
 # CPPFLAGS+= -fopenmp
 
 # CUDA things

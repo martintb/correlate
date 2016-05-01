@@ -226,11 +226,19 @@ void stepper(Config *conf) {
   if (conf->isRoot()) {
     conf->print("--> Scaling and writing data to disk..");
     float pair_rho;
+    float natoms = natoms1+natoms2;
     float box_volume = box[0]*box[1]*box[2];
     if (selfHist) {
       pair_rho = natoms1*(natoms2-1)/box_volume;
     } else {
       pair_rho = natoms1*natoms2/box_volume;
+    }
+
+
+    
+    float constant = 0;
+    if (selfHist) {
+      constant = 1.0;
     }
 
     int width=15;
@@ -251,7 +259,7 @@ void stepper(Config *conf) {
       file << setw(width) << outVec[i]/num_frames; 
       file << setw(width) << outVec[i]/(num_frames*vol);
       file << setw(width) << outVec[i]/(num_frames*pair_rho*vol);
-      file << setw(width) << outVec[i]/(num_frames*x2); 
+      file << setw(width) << outVec[i]/(num_frames*natoms*x2)+constant; 
       file << endl;
     }
     file.close();

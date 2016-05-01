@@ -2,8 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import ipdb; ist = ipdb.set_trace
 
-hist = np.loadtxt('corr.out')
+with open('calc.dat','r') as f:
+  keys = f.readline()[1:].split()
+hist = np.loadtxt('calc.dat')
 
-plt.plot(hist[:,0],hist[:,3])
+data = {k:v for k,v in zip(keys,hist.T)}
+
+plt.plot(data['x'],data['omega'])
 plt.show()
 
