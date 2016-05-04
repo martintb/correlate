@@ -37,8 +37,8 @@ void Reader::fileExists(string p) {
 }
 
 map<string,string> Reader::extInfo = { 
-                                        {".lammps","LAMMPS structure file"},
-                                        {".lmptrj","LAMMPS trajectory file"},
+                                        {".lmpbond","LAMMPS structure file w/ AtomStyle Bond"},
+                                        {".lmptrj", "LAMMPS trajectory file"},
                                         {".xml","HOOMD-Blue based structure file"},
                                         {".dcd","DCD trajectory file"},
                                      };

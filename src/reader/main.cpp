@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>
+#include <string>
 #include <memory>
 #include "Reader.hpp"
 
@@ -20,6 +22,9 @@ int main(int argc, char* argv[])
   std::vector<float> z;
   rptr->getPositions(x,y,z);
   cout << x[0] << endl;
+  std::vector<string> t;
+  rptr->getTypes(t);
+  cout << t.size() << endl;
 
 
   cout << Reader::extInfo["xml"] << endl;
