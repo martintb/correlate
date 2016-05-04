@@ -131,6 +131,8 @@ bool Config::setKernelFromStr() {
     kernel = KernelType::inter_mol_rdf;
   } else if (kernelStr.compare("omega")==0) {
     kernel = KernelType::omega;
+  } else if (kernelStr.compare("inter_mol_omega")==0) {
+    kernel = KernelType::inter_mol_omega;
   } else {
     cerr << "Error! Kernel string not recognized." << endl;
     return false;

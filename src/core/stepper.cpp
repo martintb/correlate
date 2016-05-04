@@ -39,16 +39,22 @@ void stepper(Config *conf) {
     AG->readFiles();
     conf->print("============= XML INFO =============");
     AG->xptr->contains();
+    conf->print("------------------------------------");
     AG->xptr->printFileInfo();
     conf->print("============= DCD INFO =============");
     AG->dptr->contains();
+    conf->print("------------------------------------");
     AG->dptr->printFileInfo();
 
     boost::split(sel1,conf->type1,boost::is_any_of(", "),boost::token_compress_on);
     boost::split(sel2,conf->type2,boost::is_any_of(", "),boost::token_compress_on);
 
     bool selfHist;
-    if (conf->kernel == Config::inter_mol_rdf) {
+    if (
+        conf->kernel == Config::inter_mol_rdf or
+        conf->kernel == Config::inter_mol_omega
+       ) 
+    {
       selfHist = false;
     } else {
       selfHist = conf->type1.compare(conf->type2)==0;
@@ -238,6 +244,20 @@ void stepper(Config *conf) {
             offset);
       timer.toc("omega_kernel",/*printSplit=*/true);
 
+    //###################//
+    //### inter_omega ###//
+    //###################//
+    } else if (conf->kernel == Config::inter_mol_omega) {
+      conf->print("--> Calling kernel: inter_mol_omega");
+      timer.tic("iomega_kernel");
+      pair_count=0;
+      inter_mol_omega(procVecFloat,
+                      x1,y1,z1,
+                      x2,y2,z2,
+                      mol1,mol2,
+                      box, conf->xmax,conf->dx,pair_count);
+      timer.toc("iomega_kernel",/*printSplit=*/true);
+
     //##############//
     //### ERROR! ###//
     //##############//
@@ -274,14 +294,21 @@ void stepper(Config *conf) {
     MPI::COMM_WORLD.Reduce(&procVecInt.front(),&allVecInt.front(),procVecInt.size(),
                          MPI::UNSIGNED_LONG,MPI::SUM,0);
     outVec.assign(allVecInt.begin(),allVecInt.end());
-  } else if (conf->kernel == Config::omega) {
+  } else if (
+              conf->kernel == Config::omega or
+              conf->kernel == Config::inter_mol_omega
+            ) 
+  {
     MPI::COMM_WORLD.Reduce(&procVecFloat.front(),&allVecFloat.front(),procVecFloat.size(),
                          MPI::FLOAT,MPI::SUM,0);
     outVec.assign(allVecFloat.begin(),allVecFloat.end());
   }
 
   unsigned long all_pair_count = 0;
-  if ( conf->kernel == Config::inter_mol_rdf) 
+  if ( 
+      conf->kernel == Config::inter_mol_rdf or
+      conf->kernel == Config::inter_mol_omega
+     ) 
   {
     MPI::COMM_WORLD.Reduce(&pair_count,&all_pair_count,1, MPI::UNSIGNED_LONG,MPI::SUM,0);
   }
@@ -346,7 +373,7 @@ void stepper(Config *conf) {
   if (conf->isRoot()) {
     cout << "\n\n";
     cout << setw(15*6+2);
-    cout << "===================== PROC TIMINGS =====================";
+    cout << "================================== PROC TIMINGS ==================================";
     cout << endl;
   }
   timer.toc("stepper");

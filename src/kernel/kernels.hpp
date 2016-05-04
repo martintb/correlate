@@ -4,4 +4,5 @@
 #include "histogram.hpp"
 #include "omega.hpp"
 #include "inter_mol_histogram.hpp"
+#include "inter_mol_omega.hpp"
 #endif

@@ -1,6 +1,6 @@
 #include <vector>
 #include <cmath>
-#include "histogram.hpp"
+#include "inter_mol_histogram.hpp"
 
 using namespace std;
 void inter_mol_histogram(
