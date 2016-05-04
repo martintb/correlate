@@ -54,6 +54,8 @@ Reader::ptr Reader::get(string fileName) {
   boost::filesystem::path p(fileName);
   if (p.extension().compare(".dcd")==0) {
     return Reader::ptr(new dcdReader(fileName));
+  } else if (p.extension().compare(".lmpbond")==0) {
+    return Reader::ptr(new lmpBondReader(fileName));
   } else {
     cerr << "Error! File extension not recognized!" << endl;
     cerr << "File extension: " << p.extension() << endl;
