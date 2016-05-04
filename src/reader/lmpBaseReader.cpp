@@ -15,7 +15,7 @@ void lmpBaseReader::goToSection(ifstream &f, string section_title)
   string line;
   while (getline(f,line)) {
     if (regex_search(line,sectionRE)) {
-      getline(f,line);// blank lines
+      getline(f,line);// blank line
       break;
     }
   }
@@ -28,6 +28,13 @@ map<string,float> lmpBaseReader::readHeader(ifstream &f)
   regex natoms("(.*) atoms",regex::extended);
   regex nbonds("(.*) bonds",regex::extended);
   regex nangles("(.*) angles",regex::extended);
+  regex ndih("(.*) dihedrals",regex::extended);
+  regex nimp("(.*) impropers",regex::extended);
+  regex ntypes("(.*) atom types",regex::extended);
+  regex nbtypes("(.*) bond types",regex::extended);
+  regex natypes("(.*) angle types",regex::extended);
+  regex ndtypes("(.*) dihedral types",regex::extended);
+  regex nitypes("(.*) improper types",regex::extended);
   regex boxx("(.*) (.*) xlo xhi",regex::extended);
   regex boxy("(.*) (.*) ylo yhi",regex::extended);
   regex boxz("(.*) (.*) zlo zhi",regex::extended);
@@ -58,6 +65,27 @@ map<string,float> lmpBaseReader::readHeader(ifstream &f)
       headerData["xlo"] = temp1;
       headerData["xhi"] = temp2;
       headerData["lx"]  = temp2 - temp1;
+    } else if (regex_search(line,m,nitypes)) {
+      istringstream (m[1].str()) >> temp1;
+      headerData["nimpropertypes"] = temp1;
+    } else if (regex_search(line,m,ndtypes)) {
+      istringstream (m[1].str()) >> temp1;
+      headerData["ndihedraltypes"] = temp1;
+    } else if (regex_search(line,m,natypes)) {
+      istringstream (m[1].str()) >> temp1;
+      headerData["nangletypes"] = temp1;
+    } else if (regex_search(line,m,nbtypes)) {
+      istringstream (m[1].str()) >> temp1;
+      headerData["nbondtypes"] = temp1;
+    } else if (regex_search(line,m,ntypes)) {
+      istringstream (m[1].str()) >> temp1;
+      headerData["natomtypes"] = temp1;
+    } else if (regex_search(line,m,nimp)) {
+      istringstream (m[1].str()) >> temp1;
+      headerData["nimpropers"] = temp1;
+    } else if (regex_search(line,m,ndih)) {
+      istringstream (m[1].str()) >> temp1;
+      headerData["ndihedrals"] = temp1;
     } else if (regex_search(line,m,nangles)) {
       istringstream (m[1].str()) >> temp1;
       headerData["nangles"] = temp1;
@@ -67,7 +95,6 @@ map<string,float> lmpBaseReader::readHeader(ifstream &f)
     } else if (regex_search(line,m,natoms)) {
       istringstream (m[1].str()) >> temp1;
       headerData["natoms"] = temp1;
-      cout << "FOUND IT " << temp1 << endl;
     }
     if (lineNo>maxHeaderSize) break;
     lineNo++;

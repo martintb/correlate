@@ -24,6 +24,7 @@ lmpBondReader::lmpBondReader(string fileName) :
   this->fileExists(fileName);
   this->fileName = fileName;
   ifstream f(fileName);
+
   auto headerData = readHeader(f);
   natoms = headerData["natoms"];
 
@@ -42,9 +43,9 @@ lmpBondReader::lmpBondReader(string fileName) :
   z.resize(natoms);
 
   goToSection(f,"Atoms");
-  float dummy1;
+  float id;
   for (int i=0;i<natoms;i++) {
-    f >> dummy1 >> molecule[i] >> type[i] >> x[i] >> y[i] >> z[i] >> ix[i] >> iy[i] >> iz[i];
+    f >> id >> molecule[i] >> type[i] >> x[i] >> y[i] >> z[i] >> ix[i] >> iy[i] >> iz[i];
   }
   f.close();
 }
