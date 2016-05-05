@@ -53,6 +53,7 @@ outfile=calc.dat
 # Dependencies:
 ## Required:
 * gcc 4.9 or greater
+    * need the stl regex library for parsing lammps data files
 * boost
     * boost_filesystem
     * boost_system
