@@ -1,16 +1,16 @@
 CORRELATE
 # Supported Calculation Kernels:
-1. histogram
+1. **histogram**
     * radial distance histogram of atom positions
-2. rdf
+2. **rdf**
     * radial distribution function
-3. omega
+3. **omega**
     * structure factor calculation via sin(kr)/kr summation
-4. inter_mol_rdf
+4. **inter_mol_rdf**
     * inter molecular radial distribution function
-5. inter_mol_omega
+5. **inter_mol_omega**
     * inter molecular structure factor calculator
-6. printProcXYZ
+6. **printProcXYZ**
     * Print the xyz coordinates of each mpi process (debugging tool)
 
 # Input Variables:
