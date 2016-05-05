@@ -48,7 +48,7 @@ void Timer::toc(string key,bool printSplit)
   counts[key] += 1;
 
   if ((mpi_rank==0) and printSplit) {
-    cout << ">>> root ";
+    cout << ">>> root proc ";
     cout << key;
     cout << " split: ";
     cout << fmins(t1-t0[key]).count();

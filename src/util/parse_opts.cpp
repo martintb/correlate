@@ -80,7 +80,6 @@ bool parse_opts(int argc, char* argv[], Config *conf)
   /*transfer parameters into conf structure*/
 
   // No need to error check opts with default values
-  conf->path = vm["path"].as<string>();
   conf->outfile = vm["outfile"].as<string>();
   conf->frame_start = vm["frame_start"].as<int>();
   conf->frame_end = vm["frame_end"].as<int>();
@@ -90,14 +89,14 @@ bool parse_opts(int argc, char* argv[], Config *conf)
   conf->xmax = vm["xmax"].as<float>();
 
   if (vm.count("topo")) {
-    conf->topo = vm["topo"].as<string>();
+    conf->setTopoFile(vm["path"].as<string>(),vm["topo"].as<string>());
   } else {
     cerr << "==> Error! Must specify topology file name via cmd line or input file." << endl;
     return false;
   }
 
   if (vm.count("trj")) {
-    conf->trj = vm["trj"].as<string>();
+    conf->setTrjFile(vm["path"].as<string>(),vm["trj"].as<string>());
   } else {
     cerr << "==> Error! Must specify trajectory file name via cmd line or input file." << endl;
     return false;

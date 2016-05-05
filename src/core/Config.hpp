@@ -9,13 +9,15 @@ class Config
   public:
     Config();
     ~Config();
-    void buildPaths();
+    void setTopoFile(std::string,std::string);
+    void setTrjFile(std::string,std::string);
     void buildSpace();
     bool isRoot();
     void print();
     void print(int);
     void contains();
     void sync();
+    void syncString(std::string&);
     void print(std::string);
     std::vector<int> readFiles();
 
@@ -24,19 +26,18 @@ class Config
 
     std::string outfile;
     std::string type1, type2;
-    std::string path,topo,trj;
     std::string topoPath,trjPath;
 
-
+    int natoms1;
+    int natoms2;
     int frame_start;
     int frame_end;
     int frame_step;
     int nthreads;
-
-    // output data size
     float dx;
     float xmax;
     int xsize;
+    bool selfHist;
 
 
     enum KernelType {

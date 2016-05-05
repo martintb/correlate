@@ -34,11 +34,7 @@ int main(int argc, char* argv[])
   if (not success) {
     MPI::Finalize(); // must be called by all procs before exiting
     return EXIT_FAILURE;
-  } else {
-    conf.sync(); // sync int and float values in conf
-  }
-  conf.print("============ ROOT CONF ============");
-  conf.print(0); // print configuration info of proc 0
+  } 
 
   stepper(&conf);
 
