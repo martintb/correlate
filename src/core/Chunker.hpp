@@ -14,6 +14,7 @@ class Chunker
     ~Chunker() {};
     void print();
     void distribute(std::vector<float>*, std::vector<float>*);
+    void distribute(std::vector<int>*, std::vector<int>*);
                    
 
     int count;

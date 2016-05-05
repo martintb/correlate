@@ -142,7 +142,7 @@ void dcdReader::getPositions(std::vector<float>&x,std::vector<float>&y,std::vect
   y = this->y;
   z = this->z;
 }
-void dcdReader::getBox(std::vector<float>&)
+void dcdReader::getBox(std::vector<float>& box)
 {
   box = this->box;
 }

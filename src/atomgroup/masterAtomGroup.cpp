@@ -41,7 +41,7 @@ masterAtomGroup::masterAtomGroup(string topoFile,string trjFile,bool printFileIn
 
 // Similar virtuals to Reader class
 void masterAtomGroup::readFrame(int frame) {
-  topo->readFrame(frame);
+  trj->readFrame(frame);
   this->frame = frame;
 }
 
@@ -62,13 +62,9 @@ void masterAtomGroup::getBox(vector<float>&box) {
 }
 
 AtomGroup::ptr masterAtomGroup::select_types(vector<string> &selTypes) {
-  cout << "BLOOP"<< endl;
   vector<string> all_types;
-  cout << "BLOOP"<< endl;
   vector<int> indices;
-  cout << "BLOOP"<< endl;
   topo->getTypes(all_types);
-  cout << "BLOOP"<< endl;
   for (const auto &selT : selTypes) {
     for (unsigned int atomNo=0;atomNo<all_types.size();atomNo++) {
       if (selT == all_types[atomNo]) {
@@ -76,7 +72,6 @@ AtomGroup::ptr masterAtomGroup::select_types(vector<string> &selTypes) {
       }
     }
   }
-  cout << "INDICES SIZE: " << indices.size() << endl;
 
   // the indices need to be sorted to be useful
   sort(indices.begin(),indices.end());

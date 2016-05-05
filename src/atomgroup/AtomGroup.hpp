@@ -1,46 +1,31 @@
 #ifndef ATOMGROUP_HPP
 #define ATOMGROUP_HPP
-
-#include <armadillo>
 #include <vector>
 #include <string>
-#include <memory>
-#include "XML.hpp"
-#include "DCD.hpp"
 
-class AtomGroup {
+#include "Reader.hpp"
+
+class AtomGroup
+{
   public:
-    AtomGroup(std::string,std::string);
-    ~AtomGroup();
-
     typedef std::shared_ptr<AtomGroup> ptr;
+    static ptr make(std::string,std::string);
 
-    void readFrame(int);
-    void readFiles();
-    void setSize(int);
-    ptr select(const std::vector<std::string>&);
-    int check_select_size(const std::vector<std::string>&);
-    void mask(ptr, arma::umat&);
-    std::vector<float> toSTLVec(float dim);
-    std::vector<int> STLMol();
-    std::vector<float> STLMolFloat();
-    arma::fvec toARMAfvec(float dim);
-
-    std::string dcdPath;
-    std::string xmlPath;
-    bool init;
-
-    XML::ptr xptr;
-    DCD::ptr dptr;
-
-    double lx;
-    double ly;
-    double lz;
-    arma::Mat<float> pos;
-    arma::Mat<int> mol;
-    std::vector<std::string> type;
     int natoms;
+    int numFrames;
     int frame;
+    Reader::ptr topo;
+    Reader::ptr trj;
 
+    // Similar virtuals to Reader class
+    virtual ptr select_types(std::vector<std::string> &selTypes)=0;
+    virtual void readFrame(int)=0;
+    virtual void getPositions(std::vector<float>&,std::vector<float>&,std::vector<float>&)=0;
+    virtual void getTypes(std::vector<std::string>&)=0;
+    virtual void getMolecules(std::vector<int>&)=0;
+    virtual void getBox(std::vector<float>&)=0;
+
+  protected:
+    AtomGroup() {};
 };
 #endif

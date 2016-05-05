@@ -1,3 +1,4 @@
+#include <iostream>
 #include <vector>
 #include <cmath>
 #include "histogram.hpp"
@@ -35,6 +36,20 @@ void histogram(
         float dist = dx*dx + dy*dy + dz*dz;
         if (dist<rmaxsq) {
           int bindex = static_cast<int>(sqrt(dist)/dr);
+          if (bindex==0) {
+            cout << offset << " ";
+            cout << dx << " ";
+            cout << dy << " ";
+            cout << dz << " ";
+            cout << dr << " ";
+            cout << selfHist << " ";
+            cout << x1[i] << " ";
+            cout << y1[i] << " ";
+            cout << z1[i] << " ";
+            cout << x2[j] << " ";
+            cout << y2[j] << " ";
+            cout << z2[j] << endl;
+          }
           hist[bindex] += 1;
         }
       }

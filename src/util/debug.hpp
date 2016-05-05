@@ -2,12 +2,12 @@
 #define DEBUG_HPP
 
 #include <iostream>
-#include <armadillo>
-
-template<class T>
-void print_arma(T t) {
-      t.print(std::cout);
-}
+// #include <armadillo>
+// 
+// template<class T>
+// void print_arma(T t) {
+//       t.print(std::cout);
+// }
 
 #define LOC() ( std::cerr << "Code was terminated at " << __FILE__ << ":" << __LINE__ << std::endl)
 

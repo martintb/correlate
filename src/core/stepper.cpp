@@ -13,6 +13,7 @@
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 
+#include "debug.hpp"
 #include "Timer.hpp"
 #include "Config.hpp"
 #include "Chunker.hpp"
@@ -29,25 +30,19 @@ void stepper(Config *conf) {
   //############################//
   //### INITIAL FILE READING ###//
   //############################//
-  vector<string> sel1,sel2;
   AtomGroup::ptr AG,AG1,AG2; // only root will have initalized AG,AG1,AG2
   vector<int> mpi_intbuf(6,-1);
   timer.tic("io");
+  conf->print("============= READ FILES =============");
   if (conf->isRoot()) {
     conf->buildPaths();
-    AG = make_shared<AtomGroup>(conf->xmlPath,conf->dcdPath);
-    AG->readFiles();
-    conf->print("============= XML INFO =============");
-    AG->xptr->contains();
-    conf->print("------------------------------------");
-    AG->xptr->printFileInfo();
-    conf->print("============= DCD INFO =============");
-    AG->dptr->contains();
-    conf->print("------------------------------------");
-    AG->dptr->printFileInfo();
+    AG = AtomGroup::make(conf->topoPath,conf->trjPath);
 
+    vector<string> sel1,sel2;
     boost::split(sel1,conf->type1,boost::is_any_of(", "),boost::token_compress_on);
     boost::split(sel2,conf->type2,boost::is_any_of(", "),boost::token_compress_on);
+    AG1 = AG->select_types(sel1);
+    AG2 = AG->select_types(sel2);
 
     bool selfHist;
     if (
@@ -59,13 +54,27 @@ void stepper(Config *conf) {
     } else {
       selfHist = conf->type1.compare(conf->type2)==0;
     }
-    int natoms1 = AG->check_select_size(sel1); //natoms1
-    int natoms2 = AG->check_select_size(sel2); //natoms2
+    int natoms1 = AG1->natoms; //natoms1
+    int natoms2 = AG2->natoms; //natoms2
     int frame_start = conf->frame_start; //frame_start
     int frame_step = conf->frame_step; //frame_step
     int frame_end = conf->frame_end; //frame_end
-    if (frame_end == -1) 
-      frame_end = AG->dptr->numFrames;
+
+    // Handle negative frame start/stop
+    if (frame_end == -1) {
+      frame_end = AG->numFrames;
+    }
+    if (frame_start<0) {
+      if ((frame_end+frame_start)<0){
+        cerr << "==> Not enough frames for end-referenced frame_start: ";
+        cerr << conf->frame_start << endl;
+        cerr << "==> Setting frame_start to 0!";
+        frame_start = 0;
+      } else {
+        frame_start = frame_end + frame_start;
+      }
+    }
+
 
     mpi_intbuf[0] = selfHist;
     mpi_intbuf[1] = natoms1;
@@ -113,8 +122,7 @@ void stepper(Config *conf) {
   vector<float> x1,y1,z1;
   vector<float> x2,y2,z2;
   vector<int> mol1,mol2;
-  vector<float> mol1f,mol2f;
-  vector<float> masterMol1f,masterMol2f;
+  vector<int> masterMol1,masterMol2;
   unsigned long pair_count=0;
 
   conf->buildSpace();
@@ -146,28 +154,16 @@ void stepper(Config *conf) {
     if (conf->isRoot()) {
       cout << "--> Reading frame " << frame << endl;
       AG->readFrame(frame);
-      AG1 = AG->select(sel1);
-      AG2 = AG->select(sel2);
       cout << "--> Successfully read frame " << frame << endl;
 
-      masterX1 = AG1->toSTLVec(0);
-      masterY1 = AG1->toSTLVec(1);
-      masterZ1 = AG1->toSTLVec(2);
-      masterX2 = AG2->toSTLVec(0);
-      masterY2 = AG2->toSTLVec(1);
-      masterZ2 = AG2->toSTLVec(2);
-
-      masterMol1f = AG1->STLMolFloat();
-      masterMol2f = AG2->STLMolFloat();
-
-      box[0] = AG1->lx;
-      box[1] = AG1->ly;
-      box[2] = AG1->lz;
-
+      AG->getBox(box);
       cout << "--> Box (lx,ly,lz): ";
-      cout << box[0] << ", ";
-      cout << box[1] << ", ";
-      cout << box[2] << endl;
+      cout << box[0] << ", " << box[1] << ", " << box[2] << endl;
+
+      AG1->getPositions(masterX1,masterY1,masterZ1);
+      AG2->getPositions(masterX2,masterY2,masterZ2);
+      AG1->getMolecules(masterMol1);
+      AG2->getMolecules(masterMol2);
     }
     MPI::COMM_WORLD.Barrier();
     timer.toc("io",/*printSplit=*/true);
@@ -178,15 +174,11 @@ void stepper(Config *conf) {
     Chunker1.distribute( &masterX1, &x1);
     Chunker1.distribute( &masterY1, &y1);
     Chunker1.distribute( &masterZ1, &z1);
+    Chunker1.distribute( &masterMol1, &mol1);
     Chunker2.distribute( &masterX2, &x2);
     Chunker2.distribute( &masterY2, &y2);
     Chunker2.distribute( &masterZ2, &z2);
-    // distribute deals in floats, but we need the 
-    // mol numbers as ints for equality comparsons
-    Chunker1.distribute( &masterMol1f, &mol1f);
-    Chunker2.distribute( &masterMol2f, &mol2f);
-    mol1.assign(mol1f.begin(),mol1f.end());
-    mol2.assign(mol2f.begin(),mol2f.end());
+    Chunker2.distribute( &masterMol2, &mol2);
     timer.toc("comm_time",/*printSplit=*/true);
     conf->print("--> Done distributing.");
 
@@ -317,7 +309,7 @@ void stepper(Config *conf) {
   //### SCALE AND OUTPUT DATA ###//
   //#############################//
   timer.tic("io");
-  if (conf->isRoot()) {
+  if (conf->kernel != Config::printProcXYZ and conf->isRoot()) {
     conf->print("--> Scaling and writing data to disk..");
     float pair_rho;
     float natoms = natoms1+natoms2;

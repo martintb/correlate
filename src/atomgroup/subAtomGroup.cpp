@@ -13,14 +13,14 @@ subAtomGroup::subAtomGroup(AtomGroup::ptr master,vector<int> indices)
 {
   this->master = master;
   this->indices = indices;
-  numFrames = master->trj->numFrames;
+  numFrames = master->numFrames;
   natoms = indices.size();
 }
 
 
 // Similar virtuals to Reader class
 void subAtomGroup::readFrame(int frame) {
-  master->topo->readFrame(frame);
+  master->readFrame(frame);
   this->frame = frame;
 }
 
@@ -29,8 +29,11 @@ void subAtomGroup::getPositions(vector<float>&x,vector<float>&y,vector<float>&z)
   vector<float> allX;
   vector<float> allY;
   vector<float> allZ;
-  master->trj->getPositions(allX,allY,allZ);
+  master->getPositions(allX,allY,allZ);
 
+  x.clear();
+  y.clear();
+  z.clear();
   x.reserve(indices.size());
   y.reserve(indices.size());
   z.reserve(indices.size());
@@ -43,8 +46,9 @@ void subAtomGroup::getPositions(vector<float>&x,vector<float>&y,vector<float>&z)
 
 void subAtomGroup::getTypes(vector<string>&type) {
   vector<string> allType;
-  master->trj->getTypes(allType);
+  master->getTypes(allType);
 
+  type.clear();
   type.reserve(indices.size());
   for (const auto &i : indices) {
     type.push_back(allType[i]);
@@ -53,8 +57,9 @@ void subAtomGroup::getTypes(vector<string>&type) {
 
 void subAtomGroup::getMolecules(vector<int>&molecule) {
   vector<int> allMolecule;
-  master->trj->getMolecules(allMolecule);
+  master->getMolecules(allMolecule);
 
+  molecule.clear();
   molecule.reserve(indices.size());
   for (const auto &i : indices) {
     molecule.push_back(allMolecule[i]);
@@ -62,7 +67,7 @@ void subAtomGroup::getMolecules(vector<int>&molecule) {
 }
 
 void subAtomGroup::getBox(vector<float>&box) {
-  master->trj->getBox(box);
+  master->getBox(box);
 }
 
 AtomGroup::ptr subAtomGroup::select_types(vector<string> &selTypes) {

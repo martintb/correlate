@@ -19,8 +19,8 @@ bool parse_opts(int argc, char* argv[], Config *conf)
     ("help,h", "produce help message")
     ("config_file,f", po::value<string>(&config_file),"calculation configuration file")
     ("path",        po::value<string>()->default_value("./"), "path to data files")
-    ("xml",         po::value<string>(), "xml file name")
-    ("dcd",         po::value<string>(), "dcd file name")
+    ("topo",         po::value<string>(), "topology file name")
+    ("trj",         po::value<string>(), "trajectory file name")
     ("type1",       po::value<string>(), "bead type 1 for calculating correlations")
     ("type2",       po::value<string>(), "bead type 2 for calculating correlations")
     ("frame_start", po::value<int>()->default_value(0), "first frame to use in calculation")
@@ -89,17 +89,17 @@ bool parse_opts(int argc, char* argv[], Config *conf)
   conf->dx = vm["dx"].as<float>();
   conf->xmax = vm["xmax"].as<float>();
 
-  if (vm.count("xml")) {
-    conf->xml = vm["xml"].as<string>();
+  if (vm.count("topo")) {
+    conf->topo = vm["topo"].as<string>();
   } else {
-    cerr << "==> Error! Must specify xml file name via cmd line or input file." << endl;
+    cerr << "==> Error! Must specify topology file name via cmd line or input file." << endl;
     return false;
   }
 
-  if (vm.count("dcd")) {
-    conf->dcd = vm["dcd"].as<string>();
+  if (vm.count("trj")) {
+    conf->trj = vm["trj"].as<string>();
   } else {
-    cerr << "==> Error! Must specify dcd file name via cmd line or input file." << endl;
+    cerr << "==> Error! Must specify trajectory file name via cmd line or input file." << endl;
     return false;
   }
 

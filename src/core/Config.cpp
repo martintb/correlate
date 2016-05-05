@@ -24,10 +24,10 @@ Config::Config()
 
   outfile       = "";
   path       = "";
-  xml        = "";
-  dcd        = "";
-  xmlPath    = "";
-  dcdPath    = "";
+  trj        = "";
+  topo        = "";
+  trjPath    = "";
+  topoPath    = "";
   type1      = "";
   type2      = "";
   kernelStr = "";
@@ -71,8 +71,8 @@ void Config::buildSpace() {
 }
 
 void Config::buildPaths() {
-  xmlPath = path + "/" + xml;
-  dcdPath = path+ "/" + dcd;
+  topoPath = path + "/" + topo;
+  trjPath = path+ "/" + trj;
 }
 
 
@@ -108,8 +108,8 @@ void Config::print() {
 void Config::contains() { 
   std::cout << "mpi_rank:    " << mpi_rank    << std::endl;
   std::cout << "mpi_size:    " << mpi_size    << std::endl;
-  std::cout << "xml:         " << xml         << std::endl;
-  std::cout << "dcd:         " << dcd         << std::endl;
+  std::cout << "topo file:   " << topo        << std::endl;
+  std::cout << "trj file:    " << trj         << std::endl;
   std::cout << "type1:       " << type1       << std::endl;
   std::cout << "type2:       " << type2       << std::endl;
   std::cout << "frame_start: " << frame_start << std::endl;

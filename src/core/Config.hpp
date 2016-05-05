@@ -24,8 +24,8 @@ class Config
 
     std::string outfile;
     std::string type1, type2;
-    std::string path,xml,dcd;
-    std::string xmlPath,dcdPath;
+    std::string path,topo,trj;
+    std::string topoPath,trjPath;
 
 
     int frame_start;
