@@ -4,9 +4,9 @@ CORRELATE
 ## Required:
 * gcc 4.9 or greater
 * boost
- * boost_filesystem
- * boost_system
- * boost_program_options
+  * boost_filesystem
+  * boost_system
+  * boost_program_options
 
 ## Optional:
 1. rapidxml
