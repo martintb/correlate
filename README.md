@@ -2,8 +2,8 @@ CORRELATE
 
 # Dependencies:
 ## Required:
-1. gcc 4.9 or greater
-2. boost
+* gcc 4.9 or greater
+* boost
  * boost_filesystem
  * boost_system
  * boost_program_options
