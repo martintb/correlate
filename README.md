@@ -31,7 +31,7 @@ CORRELATE
   --kernel arg              kernel used for calculation
   --outfile arg (=corr.out) name of file to write output to
 ```
-###Notes:
+###Input Variables Notes:
 * the frame_start argument supports negative indexing from the last frame in the trajectory
 * the frame_end takes a -1 argument to mean the last frame int he trajectory
 * all variables can be specified either as command line arguments or in config file.
@@ -49,6 +49,11 @@ dx=0.1
 xmax=50
 outfile=calc.dat
 ```
+# Supported Topology and Trajectory Files:
+* LAMMPS Data File
+    * AtomStyle Bond
+    * Other AtomStyles are trivial to implement
+* CHARMM/LAMMPS/HOOMD style dcd file
 
 # Dependencies:
 ## Required:
