@@ -37,22 +37,22 @@ CORRELATE
 * all variables can be specified either as command line arguments or in config file.
     * Important! Note the lack of quotation marks.
 ```
-path  = ./data
-topo   = data.lj.lmpbond
-trj   = trajectory.lj.dcd
-type1 = 3
-type2 = 3
-frame_start=-25
-frame_end=-1
-kernel=rdf
-dx=0.1
-xmax=50
-outfile=calc.dat
+path          = ./data
+topo          = data.lj.lmpbond
+trj           = trajectory.lj.dcd
+type1         = 3
+type2         = 3
+frame_start   =-25
+frame_end     =-1
+kernel        =rdf
+dx            =0.1
+xmax          =50
+outfile       =calc.dat
 ```
 # Supported Topology and Trajectory Files:
 * LAMMPS Data File
     * AtomStyle Bond
-    * Other AtomStyles are trivial to implement
+    * Other AtomStyles are trivial (yet not currently) to implemented
 * CHARMM/LAMMPS/HOOMD style dcd file
 
 # Dependencies:
