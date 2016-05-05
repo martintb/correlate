@@ -78,6 +78,7 @@ void dcdReader::goToFrame(int frame=0) {
     exit(EXIT_FAILURE);
   }
   file.seekg((frame*frameBytes+headerBytes));
+  this->frame = frame;
 }
 
 void dcdReader::readFrame(int frame=0) {

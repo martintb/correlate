@@ -36,6 +36,7 @@ class Reader {
     // Variables to be used by subclasses
     int natoms;
     int numFrames;
+    int frame;
 
     int const readsFlag; //bitflags that describes what a reader reads
     enum readsValues {

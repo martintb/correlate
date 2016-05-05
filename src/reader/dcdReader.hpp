@@ -22,7 +22,6 @@ class dcdReader: public Reader  {
     std::vector<float> box;
 
     float dt;
-    int frame;
     int headerBytes; // bytes
     int frameBytes; // bytes
     int frameStart;

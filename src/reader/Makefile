@@ -1,6 +1,8 @@
 .PHONY: doc data clean test
 
 # Gather Objects for Different Cases
+MAINSRC:=$(wildcard main.cpp)
+MAINOBJ:=$(subst .cpp,.o, $(MAINSRC))
 CORESRC:=$(wildcard *.cpp)
 COREOBJ:=$(subst .cpp,.o, $(CORESRC))
 
@@ -11,6 +13,8 @@ LD=gcc
 LDFLAGS += -lboost_filesystem
 CPPFLAGS+=
 CPPFLAGS+= -std=c++11 -g -Wall
+
+
 # CPPFLAGS+= -O3 
 # CPPFLAGS+= -DARMA_NO_DEBUG
 # CPPFLAGS+= -fopenmp
@@ -22,7 +26,7 @@ CPPFLAGS+= -std=c++11 -g -Wall
 # CUDAFLAGS=-std=c++11 -arch=sm_35 -O3
 
 
-$(EXEC): $(MAINOBJ) $(COREOBJ) $(AGOBJ) $(UTILOBJ) $(KERNOBJ)
+$(EXEC): $(MAINOBJ) $(COREOBJ) 
 	$(LD) -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
 run: $(EXEC)

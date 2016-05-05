@@ -14,17 +14,16 @@ using namespace std;
 
 
 void Reader::printReaderInfo() {
-  cout << "Reader Name:" << name << endl;
-  cout << "------------" << endl;
-  cout << "BITFLAGS: " << static_cast< bitset<8> >(readsFlag)     << endl;
-  cout << "NOTHING:  "<<boolalpha<<static_cast<bool>(readsFlag & Reader::NOTHING)  << endl;
-  cout << "POSITION: "<<boolalpha<<static_cast<bool>(readsFlag & Reader::POSITION) << endl;
-  cout << "VELOCITY: "<<boolalpha<<static_cast<bool>(readsFlag & Reader::VELOCITY) << endl;
-  cout << "IMAGE:    "<<boolalpha<<static_cast<bool>(readsFlag & Reader::IMAGE)    << endl;
-  cout << "BOX:      "<<boolalpha<<static_cast<bool>(readsFlag & Reader::BOX)      << endl;
-  cout << "TYPE:     "<<boolalpha<<static_cast<bool>(readsFlag & Reader::TYPE)     << endl;
-  cout << "MOLECULE: "<<boolalpha<<static_cast<bool>(readsFlag & Reader::MOLECULE) << endl;
-  cout << "CHARGE:   "<<boolalpha<<static_cast<bool>(readsFlag & Reader::CHARGE)   << endl;
+  cout << "Extension: " << name << endl;
+  cout << "BitFlags:  " << static_cast< bitset<8> >(readsFlag)     << endl;
+  cout << "Nothing:   "<<boolalpha<<static_cast<bool>(readsFlag & Reader::NOTHING)  << endl;
+  cout << "Position:  "<<boolalpha<<static_cast<bool>(readsFlag & Reader::POSITION) << endl;
+  cout << "Velocity:  "<<boolalpha<<static_cast<bool>(readsFlag & Reader::VELOCITY) << endl;
+  cout << "Image:     "<<boolalpha<<static_cast<bool>(readsFlag & Reader::IMAGE)    << endl;
+  cout << "Box:       "<<boolalpha<<static_cast<bool>(readsFlag & Reader::BOX)      << endl;
+  cout << "Type:      "<<boolalpha<<static_cast<bool>(readsFlag & Reader::TYPE)     << endl;
+  cout << "Molecule:  "<<boolalpha<<static_cast<bool>(readsFlag & Reader::MOLECULE) << endl;
+  cout << "Charge:    "<<boolalpha<<static_cast<bool>(readsFlag & Reader::CHARGE)   << endl;
 }
 
 void Reader::fileExists(string p) {
