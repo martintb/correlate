@@ -1,9 +1,14 @@
+#include <set>// set
+#include <algorithm>// sort
 #include <iostream>
 #include <string>
 #include <vector>
 
+#include "debug.hpp"
 #include "Reader.hpp"
+#include "AtomGroup.hpp"
 #include "masterAtomGroup.hpp"
+#include "subAtomGroup.hpp"
 
 using namespace std;
 
@@ -22,27 +27,63 @@ masterAtomGroup::masterAtomGroup(string topoFile,string trjFile,bool printFileIn
     trj->printFileInfo();
   }
 
-
-
+  numFrames = trj->numFrames;
+  natoms = trj->natoms;
+  if (trj->natoms != topo->natoms) {
+    cerr << "Error! Topolgy and trajectory files have different numbers of atoms:" << endl;
+    cerr << "Topology natoms: " << topo->natoms << endl;
+    cerr << "Trajectory natoms: " << trj->natoms << endl;
+    LOC();
+    exit(EXIT_FAILURE);
+  }
 }
+
 
 // Similar virtuals to Reader class
-void masterAtomGroup::readFrame(int) {
+void masterAtomGroup::readFrame(int frame) {
   topo->readFrame(frame);
+  this->frame = frame;
 }
 
-void masterAtomGroup::getPositions(std::vector<float>&x,std::vector<float>&y,std::vector<float>&z) {
+void masterAtomGroup::getPositions(vector<float>&x,vector<float>&y,vector<float>&z) {
   trj->getPositions(x,y,z);
 }
 
-void masterAtomGroup::getTypes(std::vector<std::string>&type) {
+void masterAtomGroup::getTypes(vector<string>&type) {
   topo->getTypes(type);
 }
 
-void masterAtomGroup::getMolecules(std::vector<int>&molecule) {
+void masterAtomGroup::getMolecules(vector<int>&molecule) {
   topo->getMolecules(molecule);
 }
 
-void masterAtomGroup::getBox(std::vector<float>&box) {
+void masterAtomGroup::getBox(vector<float>&box) {
   trj->getBox(box);
+}
+
+AtomGroup::ptr masterAtomGroup::select_types(vector<string> &selTypes) {
+  cout << "BLOOP"<< endl;
+  vector<string> all_types;
+  cout << "BLOOP"<< endl;
+  vector<int> indices;
+  cout << "BLOOP"<< endl;
+  topo->getTypes(all_types);
+  cout << "BLOOP"<< endl;
+  for (const auto &selT : selTypes) {
+    for (unsigned int atomNo=0;atomNo<all_types.size();atomNo++) {
+      if (selT == all_types[atomNo]) {
+        indices.push_back(atomNo);
+      }
+    }
+  }
+  cout << "INDICES SIZE: " << indices.size() << endl;
+
+  // the indices need to be sorted to be useful
+  sort(indices.begin(),indices.end());
+
+  // there is a chance duplicate indices will be introduced, so this
+  // will remove them
+  indices.erase(unique(indices.begin(),indices.end()),indices.end());
+
+  return AtomGroup::ptr(new subAtomGroup(shared_from_this(),indices));
 }

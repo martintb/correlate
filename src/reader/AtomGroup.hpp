@@ -11,16 +11,14 @@ class AtomGroup
     typedef std::shared_ptr<AtomGroup> ptr;
     static ptr make(std::string,std::string);
 
-    bool init;
+    int natoms;
+    int numFrames;
     int frame;
-    std::string topoFile;
-    std::string trjFile;
     Reader::ptr topo;
     Reader::ptr trj;
 
-    // 
-
     // Similar virtuals to Reader class
+    virtual ptr select_types(std::vector<std::string> &selTypes)=0;
     virtual void readFrame(int)=0;
     virtual void getPositions(std::vector<float>&,std::vector<float>&,std::vector<float>&)=0;
     virtual void getTypes(std::vector<std::string>&)=0;
