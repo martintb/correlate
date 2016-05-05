@@ -35,7 +35,7 @@ CORRELATE
 * the frame_start argument supports negative indexing from the last frame in the trajectory
 * the frame_end takes a -1 argument to mean the last frame int he trajectory
 * all variables can be specified either as command line arguments or in config file.
-    *Important! Note the lack of quotation marks.
+    * Important! Note the lack of quotation marks.
 ```
 path  = ./data
 topo   = data.lj.lmpbond
@@ -63,4 +63,3 @@ outfile=calc.dat
     * for reading HOOMD-blue xml files (not implemented)
 2. CUDA
     * for gpu accelerated kernels
-
