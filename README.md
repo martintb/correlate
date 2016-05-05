@@ -34,8 +34,8 @@ CORRELATE
 ###Notes:
 * the frame_start argument supports negative indexing from the last frame in the trajectory
 * the frame_end takes a -1 argument to mean the last frame int he trajectory
-* all variables can be specified either as command line arguments or in config file
-    * config file is simply equal style arugments such as below. Note the lack of quotation marks
+* all variables can be specified either as command line arguments or in config file.
+    *Important! Note the lack of quotation marks.
 ```
 path  = ./data
 topo   = data.lj.lmpbond
