@@ -304,6 +304,19 @@ void stepper(Config *conf) {
       constant = 1.0;
     }
 
+    float cutoff;
+    if (
+        (not (conf->kernel == Config::omega))  and
+        (not (conf->kernel == Config::inter_mol_omega))
+       )
+    {
+      cutoff = box[0]/2.0;
+      cout << "--> Cutting off data at lx/2.0 = "  << cutoff << endl;
+    } else {
+      cutoff = conf->xmax;
+      cout << "--> Using full data range with xmax = "  << cutoff << endl;
+    }
+
     int width=15;
     ofstream file(conf->outfile);
     file << "#";
@@ -317,13 +330,14 @@ void stepper(Config *conf) {
       float x1 = i*conf->dx;
       float x2 = (i+1)*conf->dx;
       float vol = (4.0/3.0) * (3.14159) * (x2*x2*x2  - x1*x1*x1);
-
-      file << setw(width) << x1;
-      file << setw(width) << outVec[i]/num_frames; 
-      file << setw(width) << outVec[i]/(num_frames*vol);
-      file << setw(width) << outVec[i]/(num_frames*pair_rho*vol);
-      file << setw(width) << outVec[i]/(num_frames*natoms*x2)+constant; 
-      file << endl;
+      if (x2 < cutoff) {
+        file << setw(width) << x1;
+        file << setw(width) << outVec[i]/num_frames; 
+        file << setw(width) << outVec[i]/(num_frames*vol);
+        file << setw(width) << outVec[i]/(num_frames*pair_rho*vol);
+        file << setw(width) << outVec[i]/(num_frames*natoms*x2)+constant; 
+        file << endl;
+      }
     }
     file.close();
   }
@@ -342,7 +356,7 @@ void stepper(Config *conf) {
      cout << "\n\n";
     // cout << setw(15*6+2);
     // cout << "================================== PROC TIMINGS ==================================";
-    cout << ">>> PROC TIMINGS STATS (MINUTES) <<<";
+    cout << ">>> PROC TIMINGS STATS (MINUTES)";
     cout << endl;
   }
   timer.toc("total");

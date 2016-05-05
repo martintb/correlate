@@ -98,7 +98,7 @@ void Timer::print_stats()
     int key_width=width+5;
     cout << setw(key_width) << "name";
     cout << setw(width) << "per call avg";
-    cout << setw(width) << "per call std";
+    cout << setw(width) << "per call var";
     cout << setw(width) << "total";
     cout << setw(width) << "call count";
     cout << setw(width) << "%";
@@ -115,13 +115,13 @@ void Timer::print_stats()
     for (auto const &kv : dt ) {
       auto key = kv.first;
       float per_call_avg = avg_buf_out[i]/N;
-      float per_call_std = sqrt(avg_sq_buf_out[i]/N - (avg_buf_out[i]/N)*(avg_buf_out[i]/N));
+      float per_call_var = avg_sq_buf_out[i]/N - (avg_buf_out[i]/N)*(avg_buf_out[i]/N);
       float total        = tot_buf_out[i]/N;
       float count        = count_buf_out[i]/N;
       float perc         = 100*total/total_time;
       cout << setw(key_width) << key;
       cout << setw(width)    << per_call_avg;
-      cout << setw(width)    << per_call_std;
+      cout << setw(width)    << per_call_var;
       cout << setw(width)    << total;
       cout << setw(width)    << count;
       cout << setw(width)    << perc;
