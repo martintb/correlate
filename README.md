@@ -32,8 +32,8 @@ CORRELATE
   --outfile arg (=corr.out) name of file to write output to
 ```
 ###Input Variables Notes:
-* the frame_start argument supports negative indexing from the last frame in the trajectory
-* the frame_end takes a -1 argument to mean the last frame int he trajectory
+* frame_start supports negative indexing from the last frame in the trajectory
+* frame_end takes a -1 argument to mean the last frame in the trajectory
 * all variables can be specified either as command line arguments or in config file.
     * Important! Note the lack of quotation marks.
 ```
