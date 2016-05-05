@@ -58,11 +58,15 @@ outfile       =calc.dat
 # Dependencies:
 ## Required:
 * gcc 4.9 or greater
-    * need the stl regex library for parsing lammps data files
+    * need c++11 and std::regex support
+    * untested with other compilers, but others should work in theory
 * boost
     * boost_filesystem
     * boost_system
     * boost_program_options
+* some mpi implementation
+    * tested with OpenMPI 1.8.2 and 1.10.2
+    * other implementations of mpi may work, but are currently untested
 
 ## Optional:
 1. rapidxml
