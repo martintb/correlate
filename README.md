@@ -4,15 +4,15 @@ CORRELATE
 ## Required:
 * gcc 4.9 or greater
 * boost
-  * boost_filesystem
-  * boost_system
-  * boost_program_options
+    * boost_filesystem
+    * boost_system
+    * boost_program_options
 
 ## Optional:
 1. rapidxml
-  * for reading HOOMD-blue xml files (not implemented)
+    * for reading HOOMD-blue xml files (not implemented)
 2. CUDA
-  * for gpu accelerated kernels
+    * for gpu accelerated kernels
 
 
 # Supported Kernels:
