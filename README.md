@@ -1,5 +1,5 @@
 #**CORRELATE**
-Calculates various spatial correlation functions in real and reciprocal space. Code is MPI aware and can be used with any number of mpi processes up to the number of atoms in your *type1* group. 
+Calculates various spatial correlation functions in real and reciprocal space. Code is MPI aware and can be used with any number of MPI processes up to the number of atoms in your calculation.
 
 Example invocation:
 ```
@@ -63,10 +63,10 @@ outfile       = calc.dat
     * command line specification super-cedes the input file
 
 ## Supported Topology and Trajectory Files:
-* LAMMPS Data File
-    * AtomStyle Bond
-    * Other AtomStyles are trivial (yet not currently) to implemented
-* CHARMM/LAMMPS/HOOMD style dcd file
+* LAMMPS data file
+    * AtomStyle bond (.lmpbond)
+    * Other AtomStyles are trivial, but not currently implemented
+* CHARMM/LAMMPS/HOOMD style DCD trajectory file (.dcd)
 
 ## Dependencies:
 ### Required:
@@ -82,9 +82,9 @@ outfile       = calc.dat
 
 ### Optional:
 1. rapidxml
-    * for reading HOOMD-blue xml files (not implemented)
+    * for reading HOOMD-blue .xml files (not implemented)
 2. CUDA
-    * for gpu accelerated kernels (not implemented)
+    * for GPU accelerated kernels (not implemented)
 
 ## Build Instructions:
 ```
