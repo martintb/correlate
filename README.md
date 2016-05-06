@@ -3,8 +3,9 @@ Calculates various spatial correlation functions in real and reciprocal space. C
 
 Example invocation:
 ```
-mpirun -np 10 ./correlate --type1=A --type2=B --kernel=rdf --config_file=inputs.cfg
+mpirun -np 10 ./correlate --type1=A,C --type2=B --kernel=rdf --config_file=inputs.cfg
 ```
+This will split up a partial radial-distribution function calculation amongst 10 MPI processes and write the output to the default corr.out file. The rdf calculation will be between all atoms of type A and C with all atoms of type B. 
 
 ## Supported Calculation Kernels:
 1. **histogram**
@@ -57,6 +58,8 @@ outfile       = calc.dat
 ```
 ###Input Variables Notes:
 * Values in parenthesis represent the default used if unspecified
+* Type groups can be specified by using commas
+    * e.g. --type1=A,B or --type2=3,4,5
 * frame_start supports negative indexing from the last frame in the trajectory
 * frame_end takes a -1 argument to mean the last frame in the trajectory
 * all variables can be specified either as command line arguments or in config file or both
@@ -67,6 +70,9 @@ outfile       = calc.dat
     * AtomStyle bond (.lmpbond)
     * Other AtomStyles are trivial, but not currently implemented
 * CHARMM/LAMMPS/HOOMD style DCD trajectory file (.dcd)
+
+## General Notes
+* Currently, the output file has several columns that correspond to different normalization of the output histogram. Only the column labeled according to you specified calculation may have any meaning i.e. use the rdf column for rdf calculations and the omega column for omega calculations. This is on the list of things to improve in future updates. 
 
 ## Dependencies:
 ### Required:
