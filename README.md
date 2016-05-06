@@ -21,6 +21,8 @@ mpirun -np 10 ./correlate --type1=A --type2=B --kernel=rdf --config_file=inputs.
     * Print the xyz coordinates of each mpi process (debugging tool)
 
 ## Input Variables:
+### via command line:
+note the double (--) vs single (-) dashes
 ```
   -h [ --help ]             produce help message
   -f [ --config_file ] arg  optional configuration file
@@ -38,24 +40,28 @@ mpirun -np 10 ./correlate --type1=A --type2=B --kernel=rdf --config_file=inputs.
   --kernel arg              kernel used for calculation
   --outfile arg (=corr.out) name of file to write output to
 ```
-###Input Variables Notes:
-* frame_start supports negative indexing from the last frame in the trajectory
-* frame_end takes a -1 argument to mean the last frame in the trajectory
-* all variables can be specified either as command line arguments or in config file.
-    * Important! Note the lack of quotation marks.
+### via configiration file:
+note the lack of quotation marks for strings
 ```
 path          = ./data
 topo          = data.lj.lmpbond
 trj           = trajectory.lj.dcd
 type1         = 3
 type2         = 3
-frame_start   =-25
-frame_end     =-1
-kernel        =rdf
-dx            =0.1
-xmax          =50
-outfile       =calc.dat
+frame_start   = -25
+frame_end     = -1
+kernel        = rdf
+dx            = 0.1
+xmax          = 50
+outfile       = calc.dat
 ```
+###Input Variables Notes:
+* Values in parenthesis represent the default used if unspecified
+* frame_start supports negative indexing from the last frame in the trajectory
+* frame_end takes a -1 argument to mean the last frame in the trajectory
+* all variables can be specified either as command line arguments or in config file or both
+    * command line specification super-cedes the input file
+
 ## Supported Topology and Trajectory Files:
 * LAMMPS Data File
     * AtomStyle Bond
