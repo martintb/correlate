@@ -1,5 +1,12 @@
-CORRELATE
-# Supported Calculation Kernels:
+#**CORRELATE**
+Calculates various spatial correlation functions in real and reciprocal space. Code is MPI aware and can be used with any number of mpi processes up to the number of atoms in your *type1* group. 
+
+Example invocation:
+```
+mpirun -np 10 ./correlate --type1=A --type2=B --kernel=rdf --config_file=inputs.cfg
+```
+
+## Supported Calculation Kernels:
 1. **histogram**
     * radial distance histogram of atom positions
 2. **rdf**
@@ -13,7 +20,7 @@ CORRELATE
 6. **printProcXYZ**
     * Print the xyz coordinates of each mpi process (debugging tool)
 
-# Input Variables:
+## Input Variables:
 ```
   -h [ --help ]             produce help message
   -f [ --config_file ] arg  optional configuration file
@@ -49,27 +56,40 @@ dx            =0.1
 xmax          =50
 outfile       =calc.dat
 ```
-# Supported Topology and Trajectory Files:
+## Supported Topology and Trajectory Files:
 * LAMMPS Data File
     * AtomStyle Bond
     * Other AtomStyles are trivial (yet not currently) to implemented
 * CHARMM/LAMMPS/HOOMD style dcd file
 
-# Dependencies:
-## Required:
-* gcc 4.9 or greater
-    * need c++11 and std::regex support
-    * untested with other compilers, but others should work in theory
+## Dependencies:
+### Required:
+* cpp compiler with c++11 and std::regex support
+    * tested with gcc 4.9.3
 * boost
     * boost_filesystem
     * boost_system
     * boost_program_options
-* some mpi implementation
+* an implementation of MPI
     * tested with OpenMPI 1.8.2 and 1.10.2
-    * other implementations of mpi may work, but are currently untested
 
-## Optional:
+
+### Optional:
 1. rapidxml
     * for reading HOOMD-blue xml files (not implemented)
 2. CUDA
-    * for gpu accelerated kernels
+    * for gpu accelerated kernels (not implemented)
+
+## Build Instructions:
+```
+make -j6
+```
+Correlate doesn't currently have an install routine set up. Just copy or symlink the correlate executable to directory you need it in. 
+
+## Future Features
+* Support for GPU based kernels via CUDA
+* Support for full CPU + GPU simultaneous operation
+    * User should be able to select fraction of system to be calculated on GPU
+* Cleaner output handling
+    * frame-by-frame output
+    * remove extraneous output from file (e.g. no omega column for rdf output)
