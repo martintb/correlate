@@ -102,6 +102,13 @@ Correlate doesn't currently have an install routine set up. Just copy or symlink
 * Support for GPU based kernels via CUDA
 * Support for full CPU + GPU simultaneous operation
     * User should be able to select fraction of system to be calculated on GPU
-* Cleaner output handling
+* Collapse inter/intra routines using function pointers to a comparison function
+* KernelSwitch Function
+    * selects the appropriate kernel based on the Config::KernelValue
+    * Also handles the aformentioned function pointers
+* Writer Class
+    * Holds both types of output arrays and cleanly handles the use of both
+    * Cleanly handles the gathering of data across processes
+    * Cleaner output handling
     * frame-by-frame output
     * remove extraneous output from file (e.g. no omega column for rdf output)
