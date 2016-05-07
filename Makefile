@@ -20,7 +20,7 @@ KERNOBJ:=$(filter-out src/kernel/$(MAINOBJ),$(subst .cpp,.o, $(KERNSRC)))
 CUDASRC:=$(wildcard src/cu/*.cu)
 CUDAOBJ:=$(filter-out src/cu/$(MAINOBJ),$(subst .cpp,.o, $(CUDASRC)))
 
-EXEC=corr
+EXEC=correlate
 CC=mpicc
 CXX=mpicxx
 LD=mpicxx

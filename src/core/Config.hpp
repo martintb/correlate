@@ -47,6 +47,7 @@ class Config
       inter_mol_rdf,
       omega,
       inter_mol_omega,
+      intra_mol_omega,
     };
 
     const std::vector<std::string> KernelMap = 
@@ -57,6 +58,7 @@ class Config
       "inter_mol_rdf",
       "omega",
       "inter_mol_omega",
+      "intra_mol_omega",
     };
     bool setKernelFromStr();
     std::string kernelStr;

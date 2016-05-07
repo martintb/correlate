@@ -79,7 +79,8 @@ void Config::sync()
   // decide what type of histogram we have
   if (
       kernel == Config::inter_mol_rdf or
-      kernel == Config::inter_mol_omega
+      kernel == Config::inter_mol_omega or
+      kernel == Config::intra_mol_omega
      ) 
   {
     selfHist = false;
@@ -173,6 +174,8 @@ bool Config::setKernelFromStr() {
     kernel = KernelType::omega;
   } else if (kernelStr.compare("inter_mol_omega")==0) {
     kernel = KernelType::inter_mol_omega;
+  } else if (kernelStr.compare("intra_mol_omega")==0) {
+    kernel = KernelType::intra_mol_omega;
   } else {
     cerr << "Error! Kernel string not recognized." << endl;
     cerr << "Kernel string: " << kernelStr << endl;

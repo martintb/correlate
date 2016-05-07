@@ -114,7 +114,8 @@ void stepper(Config *conf) {
     procVecInt.assign(conf->xsize,0);
   } else if (
               conf->kernel == Config::omega or
-              conf->kernel == Config::inter_mol_omega
+              conf->kernel == Config::inter_mol_omega or
+              conf->kernel == Config::intra_mol_omega
             ) {
     procVecFloat.assign(conf->xsize,0.0f);
   }
@@ -225,6 +226,18 @@ void stepper(Config *conf) {
                       mol1,mol2,
                       box, conf->xmax,conf->dx,pair_count);
 
+    //###################//
+    //### intra_omega ###//
+    //###################//
+    } else if (conf->kernel == Config::intra_mol_omega) {
+      conf->print("--> Calling kernel: intra_mol_omega");
+      pair_count=0;
+      intra_mol_omega(procVecFloat,
+                      x1,y1,z1,
+                      x2,y2,z2,
+                      mol1,mol2,
+                      box, conf->xmax,conf->dx,pair_count);
+
     //##############//
     //### ERROR! ###//
     //##############//
@@ -264,7 +277,8 @@ void stepper(Config *conf) {
     outVec.assign(allVecInt.begin(),allVecInt.end());
   } else if (
               conf->kernel == Config::omega or
-              conf->kernel == Config::inter_mol_omega
+              conf->kernel == Config::inter_mol_omega or
+              conf->kernel == Config::intra_mol_omega
             ) 
   {
     MPI::COMM_WORLD.Reduce(&procVecFloat.front(),&allVecFloat.front(),procVecFloat.size(),
@@ -275,7 +289,8 @@ void stepper(Config *conf) {
   unsigned long all_pair_count = 0;
   if ( 
       conf->kernel == Config::inter_mol_rdf or
-      conf->kernel == Config::inter_mol_omega
+      conf->kernel == Config::inter_mol_omega or
+      conf->kernel == Config::intra_mol_omega
      ) 
   {
     MPI::COMM_WORLD.Reduce(&pair_count,&all_pair_count,1, MPI::UNSIGNED_LONG,MPI::SUM,0);
@@ -307,7 +322,8 @@ void stepper(Config *conf) {
     float cutoff;
     if (
         (not (conf->kernel == Config::omega))  and
-        (not (conf->kernel == Config::inter_mol_omega))
+        (not (conf->kernel == Config::inter_mol_omega)) and
+        (not (conf->kernel == Config::intra_mol_omega))
        )
     {
       cutoff = box[0]/2.0;
