@@ -53,6 +53,7 @@ class lmpBaseReader: public Reader  {
     virtual void getImages(std::vector<int>&,std::vector<int>&,std::vector<int>&)=0;
     virtual void getTypes(std::vector<std::string>&)=0;
     virtual void getMolecules(std::vector<int>&)=0;
+    virtual void getCharge(std::vector<float>&)=0;
     virtual void getBox(std::vector<float>&)=0;
     virtual void getVelocities(std::vector<float>&,std::vector<float>&,std::vector<float>&)=0;
 

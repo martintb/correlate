@@ -1,5 +1,5 @@
-#ifndef LMPBOND_READER_HPP
-#define LMPBOND_READER_HPP
+#ifndef LMPMOLECULAR_READER_HPP
+#define LMPMOLECULAR_READER_HPP
 
 #include <fstream>
 #include <string>
@@ -8,13 +8,13 @@
 
 #include "lmpBaseReader.hpp"
 
-class lmpBondReader: public lmpBaseReader {
+class lmpMolecularReader: public lmpBaseReader {
 
   public:
-    typedef std::shared_ptr<lmpBondReader> ptr;
+    typedef std::shared_ptr<lmpMolecularReader> ptr;
     std::string fileName;
-    lmpBondReader(std::string);
-    ~lmpBondReader() {};
+    lmpMolecularReader(std::string);
+    ~lmpMolecularReader() {};
 
     //Virtual File getters
     // If reader doesn't support this datatype

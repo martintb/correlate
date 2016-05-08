@@ -37,6 +37,8 @@ void Reader::fileExists(string p) {
 
 map<string,string> Reader::extInfo = { 
                                         {".lmpbond","LAMMPS structure file w/ AtomStyle Bond"},
+                                        {".lmpfull","LAMMPS structure file w/ AtomStyle Full"},
+                                        {".lmpmolecular","LAMMPS structure file w/ AtomStyle Molecular"},
                                         {".dcd","DCD trajectory file"},
                                      };
 
@@ -53,6 +55,10 @@ Reader::ptr Reader::get(string fileName) {
     return Reader::ptr(new dcdReader(fileName));
   } else if (p.extension().compare(".lmpbond")==0) {
     return Reader::ptr(new lmpBondReader(fileName));
+  } else if (p.extension().compare(".lmpfull")==0) {
+    return Reader::ptr(new lmpFullReader(fileName));
+  } else if (p.extension().compare(".lmpmolecular")==0) {
+    return Reader::ptr(new lmpMolecularReader(fileName));
   } else {
     cerr << "Error! File extension not recognized!" << endl;
     cerr << "File extension: " << p.extension() << endl;

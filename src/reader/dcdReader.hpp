@@ -44,6 +44,7 @@ class dcdReader: public Reader  {
     virtual void getImages(std::vector<int>&,std::vector<int>&,std::vector<int>&) {};
     virtual void getTypes(std::vector<std::string>&) {};
     virtual void getMolecules(std::vector<int>&) {};
+    virtual void getCharge(std::vector<float>&) {};
 
 
   private:
