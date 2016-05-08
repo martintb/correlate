@@ -48,6 +48,10 @@ map<string,string> Reader::extInfo = {
                                         {".lmpfull","LAMMPS structure file w/ AtomStyle Full"},
                                         {".lmpmolecular","LAMMPS structure file w/ AtomStyle Molecular"},
                                         {".dcd","DCD trajectory file"},
+#ifdef XML
+                                        {".xml","HOOMD-Blue based XML structure file"},
+#endif 
+
                                      };
 
 void Reader::printReaderList() {

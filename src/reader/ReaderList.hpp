@@ -6,7 +6,7 @@
 #include "lmpFullReader.hpp"
 
 #ifdef XML
-#include "XML.hpp"
+#include "xmlReader.hpp"
 #endif
 
 #endif
