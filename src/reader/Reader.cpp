@@ -51,9 +51,9 @@ map<string,string> Reader::extInfo = {
                                      };
 
 void Reader::printReaderList() {
-  cout << "The following readers are available (hopefully): " << endl;
+  cout << "The following readers are available: " << endl;
   for (auto &i : Reader::extInfo) {
-    cout << setw(10) << i.first << " " << i.second << endl;
+    cout << setw(15) << i.first << " " << i.second << endl;
   }
 }
 

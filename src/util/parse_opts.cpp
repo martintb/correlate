@@ -4,6 +4,7 @@
 #include <boost/program_options.hpp>
 namespace po = boost::program_options;
 
+#include "Reader.hpp"
 #include "Config.hpp"
 
 using namespace std;
@@ -50,6 +51,8 @@ bool parse_opts(int argc, char* argv[], Config *conf)
   // If help was requested, print command options and exit
   if (vm.count("help")) {
     cout << opt << endl;
+    cout << endl;
+    Reader::printReaderList();
     exit(0);
   }
 
