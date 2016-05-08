@@ -7,5 +7,5 @@
 using namespace std;
 
 AtomGroup::ptr AtomGroup::make(string topoFile,string trjFile) {
-  return AtomGroup::ptr( new masterAtomGroup(topoFile,trjFile));
+  return make_shared<masterAtomGroup>(topoFile,trjFile);
 }

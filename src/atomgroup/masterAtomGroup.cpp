@@ -80,5 +80,5 @@ AtomGroup::ptr masterAtomGroup::select_types(vector<string> &selTypes) {
   // will remove them
   indices.erase(unique(indices.begin(),indices.end()),indices.end());
 
-  return AtomGroup::ptr(new subAtomGroup(shared_from_this(),indices));
+  return make_shared<subAtomGroup>(shared_from_this(),indices);
 }

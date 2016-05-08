@@ -63,14 +63,19 @@ void Reader::printReaderList() {
 
 Reader::ptr Reader::get(string fileName) {
   boost::filesystem::path p(fileName);
+
   if (p.extension().compare(".dcd")==0) {
-    return Reader::ptr(new dcdReader(fileName));
+    return make_shared<dcdReader>(fileName);
+
   } else if (p.extension().compare(".lmpbond")==0) {
-    return Reader::ptr(new lmpBondReader(fileName));
+    return make_shared<lmpBondReader>(fileName);
+
   } else if (p.extension().compare(".lmpfull")==0) {
-    return Reader::ptr(new lmpFullReader(fileName));
+    return make_shared<lmpFullReader>(fileName);
+
   } else if (p.extension().compare(".lmpmolecular")==0) {
-    return Reader::ptr(new lmpMolecularReader(fileName));
+    return make_shared<lmpMolecularReader>(fileName);
+
   } else {
     cerr << "Error! File extension not recognized!" << endl;
     cerr << "File extension: " << p.extension() << endl;
