@@ -16,6 +16,9 @@ class lmpFullReader: public lmpBaseReader {
     lmpFullReader(std::string);
     ~lmpFullReader() {};
 
+    const int AtomCols1 = 10; //with image data
+    const int AtomCols2 = 7; //with-out image data
+
     //Virtual File getters
     // If reader doesn't support this datatype
     // just define an empty function call. The caller

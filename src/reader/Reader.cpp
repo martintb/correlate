@@ -5,6 +5,7 @@
 #include <string>
 #include <cstring>
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include "debug.hpp"
 #include "Reader.hpp"
@@ -33,6 +34,13 @@ void Reader::fileExists(string p) {
     LOC();
     exit(EXIT_FAILURE);
   }
+}
+
+vector<string> Reader::splitStr(string in,string delim) {
+  vector<string> out;
+  boost::trim(in);
+  boost::split(out,in,boost::is_any_of(delim));
+  return out;
 }
 
 map<string,string> Reader::extInfo = { 

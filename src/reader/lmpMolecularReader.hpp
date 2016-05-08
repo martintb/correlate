@@ -16,6 +16,9 @@ class lmpMolecularReader: public lmpBaseReader {
     lmpMolecularReader(std::string);
     ~lmpMolecularReader() {};
 
+    const int AtomCols1 = 9; //with image data
+    const int AtomCols2 = 6; //with-out image data
+
     //Virtual File getters
     // If reader doesn't support this datatype
     // just define an empty function call. The caller

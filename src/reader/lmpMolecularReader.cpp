@@ -43,9 +43,32 @@ lmpMolecularReader::lmpMolecularReader(string fileName) :
   z.resize(natoms);
 
   goToSection(f,"Atoms");
+  string line;
+  getline(f,line);
+  auto splitLine = splitStr(line," ");
+  int ncols = splitLine.size();
+  if (ncols == AtomCols1) {
+    cout << "--> Reading AtomStyle Molecular w/ image data" << endl;
+  } else if (ncols==AtomCols2) {
+    cout << "--> Reading AtomStyle Molecular w/out image data" << endl;
+  } else {
+    cerr << "Error! There are two options for the number of cols in AtomStyle Molecular data file:" << endl;
+    cerr << "with image flags: " << AtomCols1 << endl;
+    cerr << "no   image flags: " << AtomCols2 << endl;
+    cerr << "number of columns found: " << ncols << endl;
+    cerr << "Line: " << line << endl;
+    LOC();
+    exit(EXIT_FAILURE);
+  }
+
+  goToSection(f,"Atoms");
   float id;
   for (int i=0;i<natoms;i++) {
-    f >> id >> molecule[i] >> type[i] >> x[i] >> y[i] >> z[i] >> ix[i] >> iy[i] >> iz[i];
+    if (ncols == AtomCols1) {
+      f >> id >> molecule[i] >> type[i] >> x[i] >> y[i] >> z[i] >> ix[i] >> iy[i] >> iz[i];
+    } else if (ncols==AtomCols2) {
+      f >> id >> molecule[i] >> type[i] >> x[i] >> y[i] >> z[i];
+    }
   }
   f.close();
 }

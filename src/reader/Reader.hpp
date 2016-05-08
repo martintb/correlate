@@ -14,6 +14,7 @@ class Reader {
     std::string const name; // name of subclasses
     void printReaderInfo();
     void fileExists(std::string);
+    std::vector<std::string> splitStr(std::string in,std::string delim);
 
     static ptr get(std::string);
     static void printReaderList();
