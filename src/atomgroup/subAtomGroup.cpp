@@ -31,16 +31,13 @@ void subAtomGroup::getPositions(vector<float>&x,vector<float>&y,vector<float>&z)
   vector<float> allZ;
   master->getPositions(allX,allY,allZ);
 
-  x.clear();
-  y.clear();
-  z.clear();
-  x.reserve(indices.size());
-  y.reserve(indices.size());
-  z.reserve(indices.size());
-  for (const auto &i : indices) {
-    x.push_back(allX[i]);
-    y.push_back(allY[i]);
-    z.push_back(allZ[i]);
+  x.resize(indices.size());
+  y.resize(indices.size());
+  z.resize(indices.size());
+  for (int i=0;i<indices.size();i++) {
+    x[i] = allX[ indices[i] ];
+    y[i] = allY[ indices[i] ];
+    z[i] = allZ[ indices[i] ];
   }
 }
 
@@ -48,10 +45,9 @@ void subAtomGroup::getTypes(vector<string>&type) {
   vector<string> allType;
   master->getTypes(allType);
 
-  type.clear();
-  type.reserve(indices.size());
-  for (const auto &i : indices) {
-    type.push_back(allType[i]);
+  type.resize(indices.size());
+  for (int i=0;i<indices.size();i++) {
+    type[i] = allType[ indices[i] ];
   }
 }
 
@@ -59,10 +55,9 @@ void subAtomGroup::getMolecules(vector<int>&molecule) {
   vector<int> allMolecule;
   master->getMolecules(allMolecule);
 
-  molecule.clear();
-  molecule.reserve(indices.size());
-  for (const auto &i : indices) {
-    molecule.push_back(allMolecule[i]);
+  molecule.resize(indices.size());
+  for (int i=0;i<indices.size();i++) {
+    molecule[i] = allMolecule[ indices[i] ];
   }
 }
 
