@@ -18,7 +18,9 @@ This will split up a partial radial-distribution function calculation amongst 10
     * inter molecular radial distribution function
 5. **inter_mol_omega**
     * inter molecular structure factor calculator
-6. **printProcXYZ**
+6. **intra_mol_omega**
+    * intra molecular structure factor calculator
+7. **printProcXYZ**
     * Print the xyz coordinates of each mpi process (debugging tool)
 
 ## Input Variables:
@@ -66,9 +68,9 @@ outfile       = calc.dat
     * command line specification super-cedes the input file
 
 ## Supported Topology and Trajectory Files:
-* LAMMPS data file
-    * AtomStyle bond (.lmpbond)
-    * Other AtomStyles are trivial, but not currently implemented
+* LAMMPS data file w/ AtomStyle Bond (.lmpbond)
+* LAMMPS data file w/ AtomStyle Full (.lmpfull)
+* LAMMPS data file w/ AtomStyle Molecular (.lmpmolecular)
 * CHARMM/LAMMPS/HOOMD style DCD trajectory file (.dcd)
 
 ## General Notes
@@ -86,7 +88,7 @@ outfile       = calc.dat
     * tested with OpenMPI 1.8.2 and 1.10.2
 
 
-### Optional:
+### Future Optional Dependencies:
 1. rapidxml
     * for reading HOOMD-blue .xml files (not implemented)
 2. CUDA
