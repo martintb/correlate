@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <iomanip>
 #include <memory>
 
 #include "Config.hpp"
@@ -159,6 +160,13 @@ void Config::contains() {
   std::cout << "xmax:        " << xmax                 << std::endl;
   std::cout << "xsize:       " << xsize                << std::endl;
   std::cout << "selfHist:    " <<boolalpha<< selfHist  << std::endl;
+}
+
+void Config::printKernelList() {
+  cout << "The following calculation kernels are available: " << endl;
+  for (const auto &i : KernelMap) {
+    cout << setw(15) << i << endl;
+  }
 }
 
 bool Config::setKernelFromStr() {

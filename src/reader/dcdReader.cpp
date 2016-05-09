@@ -79,8 +79,8 @@ void dcdReader::goToFrame(int frame=0) {
     exit(EXIT_FAILURE);
   }
   
-  int byteTargetInt =  frame*frameBytes+headerBytes;
   long byteTarget =  frame*frameBytes+headerBytes;
+  // int byteTargetInt =  frame*frameBytes+headerBytes;
   // cout << "byteTargetInt: " << byteTargetInt << endl;
   // cout << "byteTargetLong: " << byteTarget << endl;
   file.seekg(byteTarget);

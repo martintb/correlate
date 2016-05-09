@@ -64,6 +64,7 @@ class Config
     };
     bool setKernelFromStr();
     std::string kernelStr;
+    void printKernelList();
     KernelType kernel;
     
 

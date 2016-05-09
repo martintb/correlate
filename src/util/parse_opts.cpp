@@ -53,6 +53,8 @@ bool parse_opts(int argc, char* argv[], Config *conf)
     cout << opt << endl;
     cout << endl;
     Reader::printReaderList();
+    cout << endl;
+    conf->printKernelList();
     exit(0);
   }
 
