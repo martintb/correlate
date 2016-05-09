@@ -368,11 +368,14 @@ void stepper(Config *conf) {
   conf->print("================ ALL DONE ================");
   MPI::COMM_WORLD.Barrier();
 
+  conf->print("============= CONFIGURATION REMINDER =============");
+  conf->print(0);
+
   if (conf->isRoot()) {
      cout << "\n\n";
     // cout << setw(15*6+2);
     // cout << "================================== PROC TIMINGS ==================================";
-    cout << ">>> PROC TIMINGS STATS (MINUTES)";
+    cout << ">>> PROC TIMING STATS (MINUTES)";
     cout << endl;
   }
   timer.toc("total");
