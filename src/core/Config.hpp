@@ -2,11 +2,13 @@
 #define CONFIG_HPP
 
 #include <string>
+#include <memory>
 #include "Chunker.hpp"
 
 class Config 
 {
   public:
+    typedef std::shared_ptr<Config> ptr;
     Config();
     ~Config();
     void setTopoFile(std::string,std::string);

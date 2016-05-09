@@ -22,11 +22,11 @@ class dcdReader: public Reader  {
     std::vector<float> box;
 
     float dt;
-    int headerBytes; // bytes
-    int frameBytes; // bytes
-    int frameStart;
-    int frameEnd;
-    int frameSkip;
+    long headerBytes; // bytes
+    long frameBytes; // bytes
+    long frameStart;
+    long frameEnd;
+    long frameSkip;
     char remarks[80];
     char timestamp[80];
 

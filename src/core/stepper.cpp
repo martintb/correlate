@@ -360,9 +360,9 @@ void stepper(Config *conf) {
   MPI::COMM_WORLD.Barrier();
   timer.toc("postprocess",/*printSplit=*/true);
 
-  if (AG1) AG1.reset();
-  if (AG2) AG2.reset();
-  if (AG)  AG.reset();
+  // if (AG1) AG1.reset();
+  // if (AG2) AG2.reset();
+  // if (AG)  AG.reset();
 
 
   conf->print("================ ALL DONE ================");

@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <cstdint>
+#include <limits>
 
 #include "dcdReader.hpp"
 #include "debug.hpp"
@@ -77,7 +78,12 @@ void dcdReader::goToFrame(int frame=0) {
     cerr << "Requested Frame Number:  " << frame << endl;
     exit(EXIT_FAILURE);
   }
-  file.seekg((frame*frameBytes+headerBytes));
+  
+  int byteTargetInt =  frame*frameBytes+headerBytes;
+  long byteTarget =  frame*frameBytes+headerBytes;
+  // cout << "byteTargetInt: " << byteTargetInt << endl;
+  // cout << "byteTargetLong: " << byteTarget << endl;
+  file.seekg(byteTarget);
   this->frame = frame;
 }
 
