@@ -50,6 +50,7 @@ bool parse_opts(int argc, char* argv[], Config *conf)
   
   // If help was requested, print command options and exit
   if (vm.count("help")) {
+    cout << endl;
     cout << opt << endl;
     cout << endl;
     Reader::printReaderList();

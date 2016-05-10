@@ -15,13 +15,15 @@ class Config
     void setTrjFile(std::string,std::string);
     void buildSpace();
     bool isRoot();
-    void print();
-    void print(int);
     void contains();
     void sync();
     void syncString(std::string&);
-    void print(std::string);
     std::vector<int> readFiles();
+
+    void print();
+    void print(int);
+    void print(std::string);
+    void printHeader(std::string);
 
     int mpi_rank;
     int mpi_size;

@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
     cout << endl;
   }
 
-  conf.print("============ PARSE INPUT ============");
+  conf.printHeader("PARSE INPUT");
   bool success=false; //assume failure
   if (conf.isRoot()) {
     bool success1=false;

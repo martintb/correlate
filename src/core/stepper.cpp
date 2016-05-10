@@ -18,7 +18,7 @@ namespace fs = boost::filesystem;
 #include "Config.hpp"
 #include "Chunker.hpp"
 #include "AtomGroup.hpp"
-#include "kernels.hpp"
+#include "kernel_switcher.hpp"
 
 using namespace std;
 
@@ -86,9 +86,11 @@ void stepper(Config *conf) {
   //###############################//
   Chunker Chunker1(conf->natoms1,conf->mpi_size);
   Chunker Chunker2(conf->natoms2,1);
-  conf->print("============= CHUNK1 INFO =============");
+  // conf->print("============= CHUNK1 INFO =============");
+  conf->printHeader("CHUNK1 INFO");
   Chunker1.print();
-  conf->print("============= CHUNK2 INFO =============");
+  // conf->print("============= CHUNK2 INFO =============");
+  conf->printHeader("CHUNK2 INFO");
   Chunker2.print();
 
   //#######################//
@@ -123,7 +125,8 @@ void stepper(Config *conf) {
   //##################//
   //### FRAME LOOP ###//
   //##################//
-  conf->print("============= FRAME LOOP =============");
+  // conf->print("============= FRAME LOOP =============");
+  conf->printHeader("FRAME LOOP");
   ostringstream oss;
   oss << "> Starting frame loop with (start/stop/step): ";
   oss << "(" << conf->frame_start << "/" << conf->frame_end << "/" << conf->frame_step << ")";
@@ -165,90 +168,18 @@ void stepper(Config *conf) {
     timer.toc("comm",/*printSplit=*/true);
     conf->print("--> Done distributing.");
 
-    //####################//
-    //### printProcXYZ ###//
-    //####################//
     timer.tic("kernel");
-    if (conf->kernel == Config::printProcXYZ) {
-      conf->print("--> Calling kernel: printProcXYZ");
-      printProcXYZ(frame,"xyz1",x1,y1,z1);
-      printProcXYZ(frame,"xyz2",x2,y2,z2);
-      
-    //#####################//
-    //### histogram/rdf ###//
-    //#####################//
-    } else if (conf->kernel == Config::histogram or conf->kernel == Config::rdf) {
-      conf->print("--> Calling kernel: histogram/rdf");
-      int offset = Chunker1.mindex_list[conf->mpi_rank];
-      histogram(procVecInt,
-                x1,y1,z1,
-                x2,y2,z2,
-                box,
-                conf->selfHist,
-                conf->xmax,conf->dx,
-                offset);
-
-    //###########################//
-    //### inter_histogram/rdf ###//
-    //###########################//
-    } else if (conf->kernel == Config::inter_mol_rdf) {
-      conf->print("--> Calling kernel: inter_mol_rdf");
-      pair_count=0;
-      inter_mol_histogram(procVecInt,
-                          x1,y1,z1,
-                          x2,y2,z2,
-                          mol1,mol2,
-                          box, conf->xmax,conf->dx,pair_count);
-
-    //#############//
-    //### omega ###//
-    //#############//
-    } else if (conf->kernel == Config::omega) {
-      conf->print("--> Calling kernel: omega");
-      int offset = Chunker1.mindex_list[conf->mpi_rank];
-      omega(procVecFloat,
-            x1,y1,z1,
-            x2,y2,z2,
-            box,
-            conf->selfHist,
-            conf->xmax,conf->dx,
-            offset);
-
-    //###################//
-    //### inter_omega ###//
-    //###################//
-    } else if (conf->kernel == Config::inter_mol_omega) {
-      conf->print("--> Calling kernel: inter_mol_omega");
-      pair_count=0;
-      inter_mol_omega(procVecFloat,
-                      x1,y1,z1,
-                      x2,y2,z2,
-                      mol1,mol2,
-                      box, conf->xmax,conf->dx,pair_count);
-
-    //###################//
-    //### intra_omega ###//
-    //###################//
-    } else if (conf->kernel == Config::intra_mol_omega) {
-      conf->print("--> Calling kernel: intra_mol_omega");
-      pair_count=0;
-      intra_mol_omega(procVecFloat,
-                      x1,y1,z1,
-                      x2,y2,z2,
-                      mol1,mol2,
-                      box, conf->xmax,conf->dx,pair_count);
-
-    //##############//
-    //### ERROR! ###//
-    //##############//
-    } else {
-      if (conf->isRoot()) {
-        cerr << "==> Error! Stepper() is not set up for this kernel." << endl;
-        LOC();
-      }
-      MPI::Finalize();
-      exit(EXIT_FAILURE);
-    }
+    int offset = Chunker1.mindex_list[conf->mpi_rank];
+    kernel_switcher( 
+                     conf,
+                     procVecInt, 
+                     procVecFloat,
+                     x1, y1, z1,
+                     x2, y2, z2,
+                     mol1, mol2,
+                     box, offset, pair_count,
+                     frame
+                    );
     timer.toc("kernel",/*printSplit=*/true);
 
 
@@ -258,7 +189,8 @@ void stepper(Config *conf) {
   }
   conf->print("> Done! Frame loop finished successfully!");
 
-  conf->print("============= POSTPROCESSING =============");
+  // conf->print("============= POSTPROCESSING =============");
+  conf->printHeader("POSTPROCESSING");
   //##############################//
   //### GATHER FRAME LOOP DATA ###//
   //##############################//
@@ -365,16 +297,15 @@ void stepper(Config *conf) {
   // if (AG)  AG.reset();
 
 
-  conf->print("================ ALL DONE ================");
+  conf->printHeader("ALL DONE");
   MPI::COMM_WORLD.Barrier();
 
-  conf->print("============= CONFIGURATION REMINDER =============");
+  conf->print("\n");
+  conf->print(">>> CONFIGURATION");
   conf->print(0);
 
   if (conf->isRoot()) {
-     cout << "\n\n";
-    // cout << setw(15*6+2);
-    // cout << "================================== PROC TIMINGS ==================================";
+    cout << "\n\n";
     cout << ">>> PROC TIMING STATS (MINUTES)";
     cout << endl;
   }

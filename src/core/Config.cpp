@@ -118,6 +118,15 @@ bool Config::isRoot() {
   return (mpi_rank==0);
 }
 
+void Config::printHeader(string str) { 
+  if (this->isRoot()) {
+    cout << "================== ";
+    cout << str;
+    cout << " ==================";
+    cout << endl;
+  }
+}
+
 void Config::print(string str) { 
   if (this->isRoot()) {
     cout << str << endl;
