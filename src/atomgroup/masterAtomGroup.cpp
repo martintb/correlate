@@ -4,6 +4,9 @@
 #include <string>
 #include <vector>
 
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp> 
+
 #include "debug.hpp"
 #include "Reader.hpp"
 #include "AtomGroup.hpp"
@@ -59,6 +62,13 @@ void masterAtomGroup::getMolecules(vector<int>&molecule) {
 
 void masterAtomGroup::getBox(vector<float>&box) {
   trj->getBox(box);
+}
+
+
+AtomGroup::ptr masterAtomGroup::select_types(string &selStr) {
+  vector<string> selVec;
+  boost::split(selVec,selStr,boost::is_any_of(", "),boost::token_compress_on);
+  return select_types(selVec);
 }
 
 AtomGroup::ptr masterAtomGroup::select_types(vector<string> &selTypes) {

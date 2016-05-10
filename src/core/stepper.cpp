@@ -1,17 +1,10 @@
+#include <mpi.h>
 #include <iostream> //cout, endl
 #include <fstream> //ofstream
 #include <iomanip> //setw
-#include <algorithm>
-#include <memory>
-#include <mpi.h>
 #include <string>
 #include <vector>
 #include <sstream> // ostringstream
-
-#include <boost/algorithm/string/classification.hpp> 
-#include <boost/algorithm/string/split.hpp>
-#include <boost/filesystem.hpp>
-namespace fs = boost::filesystem;
 
 #include "debug.hpp"
 #include "Timer.hpp"
@@ -33,15 +26,12 @@ void stepper(Config *conf) {
   AtomGroup::ptr AG,AG1,AG2; // only root will have initalized AG,AG1,AG2
   vector<int> mpi_intbuf(6,-1);
   timer.tic("init");
-  conf->print("============= FILE INFO =============");
+  conf->printHeader("FILE INFO");
   if (conf->isRoot()) {
     AG = AtomGroup::make(conf->topoPath,conf->trjPath);
 
-    vector<string> sel1,sel2;
-    boost::split(sel1,conf->type1,boost::is_any_of(", "),boost::token_compress_on);
-    boost::split(sel2,conf->type2,boost::is_any_of(", "),boost::token_compress_on);
-    AG1 = AG->select_types(sel1);
-    AG2 = AG->select_types(sel2);
+    AG1 = AG->select_types(conf->type1);
+    AG2 = AG->select_types(conf->type2);
 
     // Handle negative frame start/stop
     int frame_end = conf->frame_end; //frame_end
@@ -69,7 +59,7 @@ void stepper(Config *conf) {
   MPI::COMM_WORLD.Barrier();
   conf->sync();
 
-  conf->print("============= CONFIGURATION =============");
+  conf->printHeader("CONFIGURATION");
   conf->print(0);
 
   if (conf->natoms1<=0 or conf->natoms2<=0) {
@@ -86,10 +76,8 @@ void stepper(Config *conf) {
   //###############################//
   Chunker Chunker1(conf->natoms1,conf->mpi_size);
   Chunker Chunker2(conf->natoms2,1);
-  // conf->print("============= CHUNK1 INFO =============");
   conf->printHeader("CHUNK1 INFO");
   Chunker1.print();
-  // conf->print("============= CHUNK2 INFO =============");
   conf->printHeader("CHUNK2 INFO");
   Chunker2.print();
 

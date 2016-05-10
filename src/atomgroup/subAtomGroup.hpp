@@ -15,6 +15,7 @@ class subAtomGroup : public AtomGroup {
     std::vector<int> indices;
 
     // Similar virtuals to Reader class
+    virtual AtomGroup::ptr select_types(std::string &selStr);
     virtual AtomGroup::ptr select_types(std::vector<std::string> &selTypes);
     virtual void readFrame(int);
     virtual void getPositions(std::vector<float>&,std::vector<float>&,std::vector<float>&);

@@ -13,6 +13,7 @@ class masterAtomGroup : public AtomGroup ,
     typedef std::shared_ptr<masterAtomGroup> ptr;
     masterAtomGroup(std::string,std::string,bool printFileInfo=true);
     ~masterAtomGroup() {};
+    virtual AtomGroup::ptr select_types(std::string &selStr);
     virtual AtomGroup::ptr select_types(std::vector<std::string> &selTypes);
 
     bool init;

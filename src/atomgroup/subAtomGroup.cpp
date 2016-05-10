@@ -65,6 +65,10 @@ void subAtomGroup::getBox(vector<float>&box) {
   master->getBox(box);
 }
 
+AtomGroup::ptr subAtomGroup::select_types(string &selStr) {
+  return (master->select_types(selStr));
+}
+
 AtomGroup::ptr subAtomGroup::select_types(vector<string> &selTypes) {
   return (master->select_types(selTypes));
 }

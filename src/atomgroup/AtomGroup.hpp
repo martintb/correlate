@@ -18,6 +18,7 @@ class AtomGroup
     Reader::ptr trj;
 
     // Similar virtuals to Reader class
+    virtual ptr select_types(std::string &selStr)=0;
     virtual ptr select_types(std::vector<std::string> &selTypes)=0;
     virtual void readFrame(int)=0;
     virtual void getPositions(std::vector<float>&,std::vector<float>&,std::vector<float>&)=0;
