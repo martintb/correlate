@@ -4,3 +4,4 @@ lj/
 *dat
 data/*dcd
 data/*xml
+src/util/version.cpp

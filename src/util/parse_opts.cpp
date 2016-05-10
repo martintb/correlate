@@ -12,7 +12,7 @@ using namespace std;
 
 bool parse_opts(int argc, char* argv[], Config *conf) 
 {
-  cout << "Attempting to parse command line and configure file options..." << endl;
+  cout << "--> Attempting to parse command line and configure file options..." << endl;
 
   string config_file;
   po::options_description opt("Calculation Configuration Options");
@@ -129,6 +129,6 @@ bool parse_opts(int argc, char* argv[], Config *conf)
     return false;
   }
 
-  cout << "Success! Command line and configure file options successfully parsed." << endl;
+  cout << "--> Success! Command line and configure file options successfully parsed." << endl;
   return true; // If we've made it this far, assume success
 }
