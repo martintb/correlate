@@ -171,7 +171,7 @@ void stepper(Config::ptr &conf) {
 
   if (conf->isRoot()) {
     cout << "\n\n";
-    cout << ">>> PROC TIMING STATS (MINUTES)";
+    cout << ">>> PROC TIMING STATS (SECONDS)";
     cout << endl;
   }
   timer.toc("total");

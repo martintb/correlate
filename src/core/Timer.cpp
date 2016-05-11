@@ -44,15 +44,15 @@ void Timer::toc(string key,bool printSplit)
   }
 
   Timer::time_point t1 = chrono::high_resolution_clock::now();
-  dt[key] += fmins(t1-t0[key]).count();
+  dt[key] += fsecs(t1-t0[key]).count();
   counts[key] += 1;
 
   if ((mpi_rank==0) and printSplit) {
     cout << ">>> root proc ";
     cout << key;
     cout << " split: ";
-    cout << fmins(t1-t0[key]).count();
-    cout << " minutes" << endl;
+    cout << fsecs(t1-t0[key]).count();
+    cout << " seconds" << endl;
   };
 }
 
@@ -92,7 +92,7 @@ void Timer::print_stats()
 
   if (mpi_rank==0) {
     auto t1 = chrono::high_resolution_clock::now();
-    float total_time = fmins(t1-total_t0).count();
+    float total_time = fsecs(t1-total_t0).count();
 
     int width=15;
     int key_width=width+5;
