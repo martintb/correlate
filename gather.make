@@ -11,6 +11,9 @@ ifeq ($(MAKE_XML),false)
 	READEROBJ:=$(filter-out src/reader/xmlReader.o,$(READEROBJ))
 endif
 
+WRITERSRC:=$(wildcard src/writer/*.cpp)
+WRITEROBJ:=$(filter-out src/writer/main.o,$(subst .cpp,.o, $(WRITERSRC)))
+
 UTILSRC:=$(wildcard src/util/*.cpp)
 UTILOBJ:=$(filter-out src/util/main.o,$(subst .cpp,.o, $(UTILSRC)))
 

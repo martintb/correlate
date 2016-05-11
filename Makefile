@@ -13,7 +13,17 @@ CPPFLAGS+= -O3
 include gather.make
 include cuda.make
 
-$(EXEC): src/util/version.o $(MAINOBJ) $(COREOBJ) $(AGOBJ) $(READEROBJ) $(UTILOBJ) $(KERNOBJ)
+
+DEPS=src/util/version.o
+DEPS+= $(MAINOBJ)
+DEPS+= $(COREOBJ)
+DEPS+= $(AGOBJ)
+DEPS+= $(READEROBJ)
+DEPS+= $(WRITEROBJ)
+DEPS+= $(UTILOBJ)
+DEPS+= $(KERNOBJ)
+
+$(EXEC): $(DEPS)
 	$(LD) -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
 src/util/version.cpp: .git/HEAD .git/index
