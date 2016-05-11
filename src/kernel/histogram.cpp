@@ -8,7 +8,8 @@ void histogram(
                 vector<unsigned long> &hist,
                 vector<float> &x1, vector<float> &y1, vector<float> &z1,
                 vector<float> &x2, vector<float> &y2, vector<float> &z2,
-                vector<float> &box, bool selfHist,float rmax,float dr,int offset
+                vector<float> &box, bool selfHist,float rmax,float dr,int offset,
+                unsigned long &pair_count
               )
 {
 
@@ -25,6 +26,8 @@ void histogram(
   for (int i=0;i<natoms1;i++) {
     for (int j=0;j<natoms2;j++) {
       if (not (selfHist and (i+offset)==j)) {
+        pair_count+=1;
+
         float dx = abs(x1[i] - x2[j]);
         float dy = abs(y1[i] - y2[j]);
         float dz = abs(z1[i] - z2[j]);
@@ -36,20 +39,6 @@ void histogram(
         float dist = dx*dx + dy*dy + dz*dz;
         if (dist<rmaxsq) {
           int bindex = static_cast<int>(sqrt(dist)/dr);
-          if (bindex==0) {
-            cout << offset << " ";
-            cout << dx << " ";
-            cout << dy << " ";
-            cout << dz << " ";
-            cout << dr << " ";
-            cout << selfHist << " ";
-            cout << x1[i] << " ";
-            cout << y1[i] << " ";
-            cout << z1[i] << " ";
-            cout << x2[j] << " ";
-            cout << y2[j] << " ";
-            cout << z2[j] << endl;
-          }
           hist[bindex] += 1;
         }
       }

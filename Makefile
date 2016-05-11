@@ -6,7 +6,7 @@ CC=mpicc
 CXX=mpicxx
 LD=mpicxx
 LDLIBS+= -lboost_filesystem -lboost_system -lboost_program_options
-CPPFLAGS+= -Isrc/kernel -Isrc/util -Isrc/atomgroup -Isrc/core -Isrc/reader
+CPPFLAGS+= -Isrc/core -Isrc/atomgroup -Isrc/reader -Isrc/writer -Isrc/kernel -Isrc/util 
 CPPFLAGS+= -fdiagnostics-color=always -std=c++11 -g -Wall
 CPPFLAGS+= -O3 
 

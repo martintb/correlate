@@ -1,5 +1,6 @@
-#include <string>
 #include <mpi.h>
+#include <string>
+#include <memory>
 
 #include <boost/program_options.hpp>
 namespace po = boost::program_options;
@@ -10,14 +11,15 @@ namespace po = boost::program_options;
 
 using namespace std;
 
-void stepper(Config *conf); // forward declaration rather than mini hpp
+void stepper(Config::ptr &conf); // forward declaration rather than mini hpp
 
 int main(int argc, char* argv[]) 
 {
   MPI::Init();
 
-  Config conf; // each proc carries a "configuration" object
-  if (conf.isRoot()) {
+  Config::ptr conf = make_shared<Config>(); // each proc carries a "configuration" object
+
+  if (conf->isRoot()) {
     cout << "#################################################" << endl;
     cout << ">>>>>>>>>>>>>>>>>>> CORRELATE <<<<<<<<<<<<<<<<<<<" << endl;
     cout << "#################################################" << endl;
@@ -30,14 +32,14 @@ int main(int argc, char* argv[])
     cout << endl;
   }
 
-  conf.printHeader("PARSE INPUT");
+  conf->printHeader("PARSE INPUT");
   bool success=false; //assume failure
-  if (conf.isRoot()) {
+  if (conf->isRoot()) {
     bool success1=false;
     bool success2=false;
-    success1 = parse_opts(argc,argv,&conf);
+    success1 = parse_opts(argc,argv,conf);
     if (success1)
-      success2 = conf.setKernelFromStr();
+      success2 = conf->setKernelFromStr();
     success = (success1 and success2);
   }
 
@@ -49,7 +51,7 @@ int main(int argc, char* argv[])
     return EXIT_FAILURE;
   } 
 
-  stepper(&conf);
+  stepper(conf);
 
   MPI::Finalize(); // must be called by all procs before exiting
   return EXIT_SUCCESS;

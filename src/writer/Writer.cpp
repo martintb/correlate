@@ -18,7 +18,7 @@ Writer::Writer(Config::ptr conf) {
   this->conf = conf;
 }
 
-Writer::ptr Writer::get(Config::ptr conf) {
+Writer::ptr Writer::get(Config::ptr &conf) {
   if (
       conf->kernel == Config::histogram or 
       conf->kernel == Config::rdf or
@@ -40,7 +40,6 @@ Writer::ptr Writer::get(Config::ptr conf) {
     MPI::Finalize();
     exit(EXIT_FAILURE);
   }
-
 }
 
 void Writer::buildCoeff() {
@@ -51,7 +50,7 @@ void Writer::buildCoeff() {
   float ly = box[1]/step_count;
   float lz = box[2]/step_count;
   float box_volume = lx*ly*lz;
-  float pair_rho = pair_count_master/box_volume;
+  float pair_rho = pair_count_master/box_volume/step_count;
 
   coeffAdd.assign(conf->xsize,0.0f);
   coeffMult.assign(conf->xsize,1.0f);

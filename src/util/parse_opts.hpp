@@ -4,6 +4,6 @@
 #include "Config.hpp"
 
 
-bool parse_opts(int argc, char* argv[],Config *conf);
+bool parse_opts(int argc, char* argv[],Config::ptr &conf);
 
 #endif

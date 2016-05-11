@@ -10,7 +10,7 @@ namespace po = boost::program_options;
 using namespace std;
 
 
-bool parse_opts(int argc, char* argv[], Config *conf) 
+bool parse_opts(int argc, char* argv[], Config::ptr &conf) 
 {
   cout << "--> Attempting to parse command line and configure file options..." << endl;
 

@@ -8,7 +8,8 @@ void inter_mol_omega(
                       vector<float> &x1, vector<float> &y1, vector<float> &z1,
                       vector<float> &x2, vector<float> &y2, vector<float> &z2,
                       vector<int> &mol1, vector<int> &mol2,
-                      vector<float> &box, float qmax,float dq,unsigned long &pair_count
+                      vector<float> &box, float qmax,float dq,
+                      unsigned long &pair_count
                     )
 {
 

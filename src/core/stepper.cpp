@@ -11,11 +11,12 @@
 #include "Config.hpp"
 #include "Chunker.hpp"
 #include "AtomGroup.hpp"
+#include "Writer.hpp"
 #include "kernel_switcher.hpp"
 
 using namespace std;
 
-void stepper(Config *conf) {
+void stepper(Config::ptr &conf) {
 
   Timer timer;
   timer.tic("total");
@@ -91,29 +92,11 @@ void stepper(Config *conf) {
   vector<float> x2,y2,z2;
   vector<int> mol1,mol2;
   vector<int> masterMol1,masterMol2;
-  unsigned long pair_count=0;
-
-  vector<unsigned long> procVecInt;
-  vector<float> procVecFloat;
-  if (
-      conf->kernel == Config::histogram or 
-      conf->kernel == Config::rdf or
-      conf->kernel == Config::inter_mol_rdf
-     ) 
-  {
-    procVecInt.assign(conf->xsize,0);
-  } else if (
-              conf->kernel == Config::omega or
-              conf->kernel == Config::inter_mol_omega or
-              conf->kernel == Config::intra_mol_omega
-            ) {
-    procVecFloat.assign(conf->xsize,0.0f);
-  }
+  auto writer = Writer::get(conf);
 
   //##################//
   //### FRAME LOOP ###//
   //##################//
-  // conf->print("============= FRAME LOOP =============");
   conf->printHeader("FRAME LOOP");
   ostringstream oss;
   oss << "> Starting frame loop with (start/stop/step): ";
@@ -159,14 +142,14 @@ void stepper(Config *conf) {
     timer.tic("kernel");
     int offset = Chunker1.mindex_list[conf->mpi_rank];
     kernel_switcher( 
+                     frame,
                      conf,
-                     procVecInt, 
-                     procVecFloat,
+                     writer,
                      x1, y1, z1,
                      x2, y2, z2,
                      mol1, mol2,
-                     box, offset, pair_count,
-                     frame
+                     box, 
+                     offset
                     );
     timer.toc("kernel",/*printSplit=*/true);
 
@@ -177,116 +160,10 @@ void stepper(Config *conf) {
   }
   conf->print("> Done! Frame loop finished successfully!");
 
-  // conf->print("============= POSTPROCESSING =============");
   conf->printHeader("POSTPROCESSING");
-  //##############################//
-  //### GATHER FRAME LOOP DATA ###//
-  //##############################//
-  vector<unsigned long> allVecInt(conf->xsize,0);
-  vector<float> allVecFloat(conf->xsize,0.0f);
-  vector<float> outVec;
-  conf->print("--> Gathering data from each proc...");
-  if ( 
-       conf->kernel == Config::histogram or 
-       conf->kernel == Config::rdf or
-       conf->kernel == Config::inter_mol_rdf
-     ) 
-  {
-    MPI::COMM_WORLD.Reduce(&procVecInt.front(),&allVecInt.front(),procVecInt.size(),
-                         MPI::UNSIGNED_LONG,MPI::SUM,0);
-    outVec.assign(allVecInt.begin(),allVecInt.end());
-  } else if (
-              conf->kernel == Config::omega or
-              conf->kernel == Config::inter_mol_omega or
-              conf->kernel == Config::intra_mol_omega
-            ) 
-  {
-    MPI::COMM_WORLD.Reduce(&procVecFloat.front(),&allVecFloat.front(),procVecFloat.size(),
-                         MPI::FLOAT,MPI::SUM,0);
-    outVec.assign(allVecFloat.begin(),allVecFloat.end());
-  }
-
-  unsigned long all_pair_count = 0;
-  if ( 
-      conf->kernel == Config::inter_mol_rdf or
-      conf->kernel == Config::inter_mol_omega or
-      conf->kernel == Config::intra_mol_omega
-     ) 
-  {
-    MPI::COMM_WORLD.Reduce(&pair_count,&all_pair_count,1, MPI::UNSIGNED_LONG,MPI::SUM,0);
-  }
-
-  //#############################//
-  //### SCALE AND OUTPUT DATA ###//
-  //#############################//
-  timer.tic("postprocess");
-  if (conf->kernel != Config::printProcXYZ and conf->isRoot()) {
-    conf->print("--> Scaling and writing data to disk..");
-    float pair_rho;
-    float natoms = conf->natoms1+conf->natoms2;
-    float box_volume = box[0]*box[1]*box[2];
-
-    if (conf->kernel == Config::inter_mol_rdf) {
-      pair_rho = all_pair_count/box_volume;
-    } else if (conf->selfHist) {
-      pair_rho = conf->natoms1*(conf->natoms2-1)/box_volume;
-    } else {
-      pair_rho = conf->natoms1*conf->natoms2/box_volume;
-    }
-
-    float constant = 0;
-    if (conf->selfHist) {
-      constant = 1.0;
-    }
-
-    float cutoff;
-    if (
-        (not (conf->kernel == Config::omega))  and
-        (not (conf->kernel == Config::inter_mol_omega)) and
-        (not (conf->kernel == Config::intra_mol_omega))
-       )
-    {
-      cutoff = box[0]/2.0;
-      cout << "--> Cutting off data at lx/2.0 = "  << cutoff << endl;
-    } else {
-      cutoff = conf->xmax;
-      cout << "--> Using full data range with xmax = "  << cutoff << endl;
-    }
-
-    int width=15;
-    ofstream file(conf->outfile);
-    file << "#";
-    file << setw(width-1)<< "x";
-    file << setw(width)  << "hist";
-    file << setw(width)  << "conc";
-    file << setw(width)  << "rdf";
-    file << setw(width)  << "omega";
-    file << endl;
-    for (int i=0;i<conf->xsize;i++) {
-      float x1 = i*conf->dx;
-      float x2 = (i+1)*conf->dx;
-      float vol = (4.0/3.0) * (3.14159) * (x2*x2*x2  - x1*x1*x1);
-      if (x2 < cutoff) {
-        file << setw(width) << x1;
-        file << setw(width) << outVec[i]/num_frames; 
-        file << setw(width) << outVec[i]/(num_frames*vol);
-        file << setw(width) << outVec[i]/(num_frames*pair_rho*vol);
-        file << setw(width) << outVec[i]/(num_frames*natoms*x2)+constant; 
-        file << endl;
-      }
-    }
-    file.close();
-  }
-  MPI::COMM_WORLD.Barrier();
-  timer.toc("postprocess",/*printSplit=*/true);
-
-  // if (AG1) AG1.reset();
-  // if (AG2) AG2.reset();
-  // if (AG)  AG.reset();
-
+  writer->write();
 
   conf->printHeader("ALL DONE");
-  MPI::COMM_WORLD.Barrier();
 
   conf->print("\n");
   conf->print(">>> CONFIGURATION");
@@ -298,5 +175,7 @@ void stepper(Config *conf) {
     cout << endl;
   }
   timer.toc("total");
+
+  MPI::COMM_WORLD.Barrier();
   timer.print_stats();
 }

@@ -12,7 +12,7 @@ class Writer {
     typedef std::shared_ptr<Writer> ptr;
     Writer(Config::ptr);
     ~Writer() {};
-    static ptr get(Config::ptr);
+    static ptr get(Config::ptr&);
 
 
     Config::ptr conf;
