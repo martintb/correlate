@@ -100,9 +100,12 @@ void Writer::write() {
     file << setw(width)  << conf->KernelMap[conf->kernel];
     file << endl;
     for (int i=0;i<conf->xsize;i++) {
-      file << setw(width) << (i*conf->dx);
-      file << setw(width) << vecMaster[i]*coeffMult[i] + coeffAdd[i]; 
-      file << endl;
+      float x = i*conf->dx;
+      if (x<cutoff) {
+        file << setw(width) << x;
+        file << setw(width) << vecMaster[i]*coeffMult[i] + coeffAdd[i]; 
+        file << endl;
+      }
     }
     file.close();
   }
