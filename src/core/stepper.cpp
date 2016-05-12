@@ -163,9 +163,6 @@ void stepper(Config::ptr &conf) {
   }
   conf->print("> Done! Frame loop finished successfully!");
 
-  conf->printHeader("POSTPROCESSING");
-  // writer->write();
-
   conf->printHeader("ALL DONE");
 
   conf->print("\n");

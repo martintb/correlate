@@ -34,6 +34,7 @@ class Writer {
     void write(bool vertical=true,bool reset=true);
     void writeHorizontal(bool);
     void writeVertical(bool);
+    void writeHeader(int);
 
     virtual void reset()=0;
     virtual void gather()=0;
