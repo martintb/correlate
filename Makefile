@@ -6,7 +6,7 @@ CC=mpicc
 CXX=mpicxx
 LD=mpicxx
 LDLIBS+= -lboost_filesystem -lboost_system -lboost_program_options
-CPPFLAGS+= -Isrc/core -Isrc/atomgroup -Isrc/reader -Isrc/writer -Isrc/kernel -Isrc/util 
+CPPFLAGS+= -Isrc/core -Isrc/atomgroup -Isrc/reader -Isrc/writer -Isrc/file -Isrc/kernel -Isrc/util 
 CPPFLAGS+= -fdiagnostics-color=always -std=c++11 -g -Wall
 CPPFLAGS+= -O3 
 
@@ -20,6 +20,7 @@ DEPS+= $(COREOBJ)
 DEPS+= $(AGOBJ)
 DEPS+= $(READEROBJ)
 DEPS+= $(WRITEROBJ)
+DEPS+= $(FILEOBJ)
 DEPS+= $(UTILOBJ)
 DEPS+= $(KERNOBJ)
 
@@ -37,4 +38,4 @@ gdb: $(EXEC)
 	gdb -x gdbinit $(EXEC)
 
 clean:
-	rm -f $(EXEC) $(AGOBJ) $(READEROBJ) $(MAINOBJ) $(UTILOBJ) $(CUDAOBJ) $(KERNOBJ) $(COREOBJ)
+	rm -f $(EXEC) $(DEPS)

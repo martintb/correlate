@@ -4,6 +4,9 @@
 #include <string>
 #include <memory>
 #include "Chunker.hpp"
+#include "File.hpp"
+#include "inFile.hpp"
+#include "outFile.hpp"
 
 class Config 
 {
@@ -11,9 +14,6 @@ class Config
     typedef std::shared_ptr<Config> ptr;
     Config();
     ~Config();
-    void setTopoFile(std::string,std::string);
-    void setTrjFile(std::string,std::string);
-    void buildSpace();
     bool isRoot();
     void contains();
     void sync();
@@ -28,10 +28,12 @@ class Config
     int mpi_rank;
     int mpi_size;
 
-    std::string output_file;
-    int output_freq;
     std::string type1, type2;
-    std::string topoPath,trjPath;
+    File::ptr topo_file;
+    File::ptr trj_file;
+    File::ptr output_file;
+    int output_freq;
+    int overwrite;
 
     int natoms1;
     int natoms2;

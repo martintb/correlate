@@ -6,6 +6,9 @@ namespace po = boost::program_options;
 
 #include "Reader.hpp"
 #include "Config.hpp"
+#include "File.hpp"
+#include "inFile.hpp"
+#include "outFile.hpp"
 
 using namespace std;
 
@@ -27,15 +30,17 @@ bool parse_opts(int argc, char* argv[], Config::ptr &conf)
 
   po::options_description fileInOpt("File Reading");
   fileInOpt.add_options()
-    ("path",        po::value<string>()->default_value("./"), "path to data files")
+    ("input_path",        po::value<string>()->default_value("./"), "path to input data files")
     ("topo",        po::value<string>(),                      "topology file name")
     ("trj",         po::value<string>(),                      "trajectory file name")
   ;
 
   po::options_description fileOutOpt("File Writing");
   fileOutOpt.add_options()
+    ("output_path",        po::value<string>()->default_value("./"), "path to ouput files")
     ("output_file",    po::value<string>()->default_value("calc.dat"), "file to write results to")
     ("output_freq",    po::value<int>()->default_value(-1), "frequency of writing data to file")
+    ("overwrite",    po::bool_switch()->default_value(false), "overwrite existing output files")
   ;
 
   po::options_description calcOpt("Calculation");
@@ -102,29 +107,36 @@ bool parse_opts(int argc, char* argv[], Config::ptr &conf)
   /*transfer parameters into conf structure*/
 
   // No need to error check opts with default values
-  conf->output_file = vm["output_file"].as<string>();
   conf->output_freq = vm["output_freq"].as<int>();
   conf->frame_start = vm["frame_start"].as<int>();
   conf->frame_end   = vm["frame_end"].as<int>();
-  cout << "1" << endl;
   conf->frame_step  = vm["frame_step"].as<int>();
-  cout << "1" << endl;
   conf->nthreads    = vm["nthreads"].as<int>();
-  cout << "1" << endl;
   conf->dx          = vm["dx"].as<float>();
-  cout << "1" << endl;
   conf->xmax        = vm["xmax"].as<float>();
-  cout << "1" << endl;
+  conf->overwrite   = vm["overwrite"].as<bool>();
+
+  conf->output_file =  make_shared<outFile>(
+                                            vm["output_path"].as<string>(),
+                                            vm["output_file"].as<string>(),
+                                            vm["overwrite"].as<bool>()
+                                           );
 
   if (vm.count("topo")) {
-    conf->setTopoFile(vm["path"].as<string>(),vm["topo"].as<string>());
+    conf->topo_file =  make_shared<inFile>(
+                                            vm["input_path"].as<string>(),
+                                            vm["topo"].as<string>()
+                                          );
   } else {
     cerr << "==> Error! Must specify topology file name via cmd line or input file." << endl;
     return false;
   }
 
   if (vm.count("trj")) {
-    conf->setTrjFile(vm["path"].as<string>(),vm["trj"].as<string>());
+    conf->trj_file =  make_shared<inFile>(
+                                          vm["input_path"].as<string>(),
+                                          vm["trj"].as<string>()
+                                         );
   } else {
     cerr << "==> Error! Must specify trajectory file name via cmd line or input file." << endl;
     return false;

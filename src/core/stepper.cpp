@@ -27,7 +27,7 @@ void stepper(Config::ptr &conf) {
   timer.tic("init");
   conf->printHeader("FILE INFO");
   if (conf->isRoot()) {
-    AG = AtomGroup::make(conf->topoPath,conf->trjPath);
+    AG = AtomGroup::make(conf->topo_file->path.string(),conf->trj_file->path.string());
 
     AG1 = AG->select_types(conf->type1);
     AG2 = AG->select_types(conf->type2);
@@ -107,7 +107,6 @@ void stepper(Config::ptr &conf) {
   oss << "> Starting frame loop with (start/stop/step): ";
   oss << "(" << conf->frame_start << "/" << conf->frame_end << "/" << conf->frame_step << ")";
   conf->print(oss.str());
-  int num_frames = 0;
   timer.toc("init",/*printSplit=*/true);
   for (int frame=conf->frame_start;frame<conf->frame_end;frame+=conf->frame_step) 
   {
@@ -160,7 +159,6 @@ void stepper(Config::ptr &conf) {
 
 
     timer.toc("frame loop",/*printSplit=*/true);
-    num_frames++;
     conf->print("-----------------------------------------------------------");
   }
   conf->print("> Done! Frame loop finished successfully!");

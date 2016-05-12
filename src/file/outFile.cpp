@@ -15,7 +15,7 @@ outFile::outFile(const string &basePath,const string &fileName,bool overwrite) :
   this->overwrite = overwrite;
   if ((not overwrite) and (this->exists())) {
     bfs::path newPath = nextPath(path);
-    cout << "--> File Exists! Renaming output file: ";
+    cout << "--> File Exists! Changing output_file: ";
     cout << path << " ==> " << newPath << endl;
     this->path = newPath;
   } 
@@ -26,7 +26,7 @@ outFile::outFile(const string &fullPath,bool overwrite) : File(fullPath)
   this->overwrite = overwrite;
   if ((not overwrite) and (this->exists())) {
     bfs::path newPath = nextPath(path);
-    cout << "--> File Exists! Renaming output file: ";
+    cout << "--> File Exists! Changing output_file: ";
     cout << path << " ==> " << newPath << endl;
     this->path = newPath;
   }

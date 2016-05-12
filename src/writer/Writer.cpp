@@ -102,7 +102,7 @@ void Writer::writeHorizontal(bool reset) {
     }
 
     int width=15;
-    ofstream file(conf->output_file,std::ofstream::app);
+    ofstream file(conf->output_file->path.string(),std::ofstream::app);
     // file << "#";
     // file << setw(width-1)<< "x";
     // file << setw(width)  << conf->KernelMap[conf->kernel];
@@ -149,7 +149,7 @@ void Writer::writeVertical(bool reset) {
     }
 
     int width=15;
-    ofstream file(conf->output_file);
+    ofstream file(conf->output_file->path.string());
     file << "#";
     file << setw(width-1)<< "x";
     file << setw(width)  << conf->KernelMap[conf->kernel];

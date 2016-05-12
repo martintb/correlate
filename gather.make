@@ -14,6 +14,9 @@ endif
 WRITERSRC:=$(wildcard src/writer/*.cpp)
 WRITEROBJ:=$(filter-out src/writer/main.o,$(subst .cpp,.o, $(WRITERSRC)))
 
+FILESRC:=$(wildcard src/file/*.cpp)
+FILEOBJ:=$(filter-out src/file/main.o,$(subst .cpp,.o, $(FILESRC)))
+
 UTILSRC:=$(wildcard src/util/*.cpp)
 UTILOBJ:=$(filter-out src/util/main.o,$(subst .cpp,.o, $(UTILSRC)))
 

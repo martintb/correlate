@@ -25,13 +25,11 @@ Config::Config()
   xmax = -1.0f;
   xsize = 0;
   output_freq    = -1;
-  output_file    = "";
-  trjPath    = "";
-  topoPath   = "";
   type1      = "";
   type2      = "";
   kernelStr  = "";
   selfHist = false;
+  overwrite = false;
 }
 
 Config::~Config() {
@@ -39,7 +37,7 @@ Config::~Config() {
 
 void Config::sync()
 {
-  vector<int> ibuf(8,0);
+  vector<int> ibuf(9,0);
   if (this->isRoot()) {
     ibuf[0] = frame_start;
     ibuf[1] = frame_step;
@@ -49,6 +47,7 @@ void Config::sync()
     ibuf[5] = natoms1;
     ibuf[6] = natoms2;
     ibuf[7] = output_freq;
+    ibuf[8] = overwrite;
   }
   MPI::COMM_WORLD.Bcast(&ibuf.front(),ibuf.size(),MPI::INT,0);
   frame_start = ibuf[0];
@@ -59,6 +58,7 @@ void Config::sync()
   natoms1     = ibuf[5];
   natoms2     = ibuf[6];
   output_freq = ibuf[7];
+  overwrite = static_cast<bool>(ibuf[8]);
 
   vector<float> fbuf(2,0.0f);
   if (this->isRoot()) {
@@ -72,13 +72,28 @@ void Config::sync()
     xsize = static_cast<int>(xmax/dx);
   }
 
+  string outputStr;
+  string trjStr;
+  string topoStr;
+  if (this->isRoot()) {
+    outputStr = output_file->path.string();
+    trjStr    = trj_file->path.string();
+    topoStr   = topo_file->path.string();
+  }
   MPI::COMM_WORLD.Barrier();
-  syncString(output_file);
-  syncString(trjPath);
-  syncString(topoPath);
+  syncString(outputStr);
+  syncString(trjStr);
+  syncString(topoStr);
+  if (not this->isRoot()) {
+    output_file = make_shared<outFile>(outputStr,overwrite);
+    trj_file    = make_shared<inFile>(trjStr);
+    topo_file   = make_shared<inFile>(topoStr);
+  }
+
   syncString(type1);
   syncString(type2);
   syncString(kernelStr);
+  this->setKernelFromStr();
 
   // decide what type of histogram we have
   if (
@@ -107,15 +122,6 @@ void Config::syncString(string &str) {
     delete[] buf;
   }
 }
-
-void Config::setTopoFile(string path,string topo) {
-  topoPath = path + "/" + topo;
-}
-
-void Config::setTrjFile(string path,string trj) {
-  trjPath = path + "/" + trj;
-}
-
 
 bool Config::isRoot() { 
   return (mpi_rank==0);
@@ -156,24 +162,25 @@ void Config::print() {
 }
 
 void Config::contains() { 
-  std::cout << "mpi_rank:    " << mpi_rank    << std::endl;
-  std::cout << "mpi_size:    " << mpi_size    << std::endl;
-  std::cout << "topo file:   " << topoPath    << std::endl;
-  std::cout << "trj file:    " << trjPath     << std::endl;
-  std::cout << "output file: " << output_file << std::endl;
-  std::cout << "output freq: " << output_freq << std::endl;
-  std::cout << "type1:       " << type1       << std::endl;
-  std::cout << "type2:       " << type2       << std::endl;
-  std::cout << "natoms1:     " << natoms1     << std::endl;
-  std::cout << "natoms2:     " << natoms2     << std::endl;
-  std::cout << "frame_start: " << frame_start << std::endl;
-  std::cout << "frame_end:   " << frame_end   << std::endl;
-  std::cout << "frame_step:  " << frame_step  << std::endl;
-  std::cout << "kernel:      " << KernelMap[kernel]    << std::endl;
-  std::cout << "dx:          " << dx                   << std::endl;
-  std::cout << "xmax:        " << xmax                 << std::endl;
-  std::cout << "xsize:       " << xsize                << std::endl;
-  std::cout << "selfHist:    " <<boolalpha<< selfHist  << std::endl;
+  cout << "mpi_rank:    " << mpi_rank             << endl;
+  cout << "mpi_size:    " << mpi_size             << endl;
+  cout << "topo file:   " << topo_file->path      << endl;
+  cout << "trj file:    " << trj_file->path       << endl;
+  cout << "output file: " << output_file->path    << endl;
+  cout << "output freq: " << output_freq          << endl;
+  cout << "overwrite:   " << output_freq          << endl;
+  cout << "type1:       " << type1                << endl;
+  cout << "type2:       " << type2                << endl;
+  cout << "natoms1:     " << natoms1              << endl;
+  cout << "natoms2:     " << natoms2              << endl;
+  cout << "frame_start: " << frame_start          << endl;
+  cout << "frame_end:   " << frame_end            << endl;
+  cout << "frame_step:  " << frame_step           << endl;
+  cout << "kernel:      " << KernelMap[kernel]    << endl;
+  cout << "dx:          " << dx                   << endl;
+  cout << "xmax:        " << xmax                 << endl;
+  cout << "xsize:       " << xsize                << endl;
+  cout << "selfHist:    " << boolalpha<<selfHist  << endl;
 }
 
 void Config::printKernelList() {
