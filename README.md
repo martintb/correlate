@@ -27,36 +27,63 @@ This will split up a partial radial-distribution function calculation amongst 10
 ### via command line:
 note the double (--) vs single (-) dashes
 ```
-  -h [ --help ]             produce help message
-  -f [ --config_file ] arg  optional configuration file
-  --path arg (=./)          path to data files
-  --topo arg                topology file name
-  --trj arg                 trajectory file name
-  --type1 arg               bead type 1 for calculating correlations
-  --type2 arg               bead type 2 for calculating correlations
-  --frame_start arg (=0)    first frame to use in calculation
-  --frame_end arg (=-1)     last frame to use in calculation
-  --frame_step arg (=1)     interval between used frames
-  --nthreads arg (=1)       number of threads per mpi process
-  --dx arg (=0.100000001)   grid size for output
-  --xmax arg (=100)         largest value in output grid
-  --kernel arg              kernel used for calculation
-  --outfile arg (=corr.out) name of file to write output to
+Base Options:
+  -h [ --help ]                  produce help message
+  -f [ --config_file ] arg       optional configuration file
+  --kernel arg                   calculation kernel
+  --type1 arg                    bead type 1 (e.g A or A,B)
+  --type2 arg                    bead type 2
+  --nthreads arg (=1)            placeholder pending future threading support
+
+File Reading:
+  --input_path arg (=./)         path to input data files
+  --topo arg                     topology file name
+  --trj arg                      trajectory file name
+
+File Writing:
+  --output_path arg (=./)        path to ouput files
+  --output_file arg (=calc.dat)  file to write results to
+  --output_freq arg (=-1)        frequency of writing data to file
+  --overwrite                    overwrite existing output files
+
+Calculation:
+  --frame_start arg (=0)         first frame to use in calculation
+  --frame_end arg (=-1)          last frame to use in calculation
+  --frame_step arg (=1)          interval between used frames
+  --dx arg (=0.100000001)        grid size for output (real or kspace)
+  --xmax arg (=100)              largest value in output grid (real or kspace)
+
+
+The following readers are available:
+.dcd            DCD trajectory file
+.lmpbond        LAMMPS structure file w/ AtomStyle Bond
+.lmpfull        LAMMPS structure file w/ AtomStyle Full
+.lmpmolecular   LAMMPS structure file w/ AtomStyle Molecular
+
+The following calculation kernels are available:
+printProcXYZ
+histogram
+rdf
+inter_mol_rdf
+omega
+inter_mol_omega
+intra_mol_omega
 ```
 ### via configiration file:
 note the lack of quotation marks for strings
 ```
-path          = ./data
+input_path    = ./data/
 topo          = data.lj.lmpbond
 trj           = trajectory.lj.dcd
 type1         = 3
 type2         = 3
-frame_start   = -25
+frame_start   = -10
 frame_end     = -1
 kernel        = rdf
 dx            = 0.1
-xmax          = 50
-outfile       = calc.dat
+xmax          = 100
+output_file   = calc.dat
+output_freq   = 1
 ```
 ###Input Variables Notes:
 * Values in parenthesis represent the default used if unspecified
