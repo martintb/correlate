@@ -31,9 +31,9 @@ class Writer {
     void buildCoeff();
 
     std::string nextFileName(std::vector<std::string>&);
-    void write();
-    void writeHorizontal();
-    void writeVertical();
+    void write(bool vertical=true,bool reset=true);
+    void writeHorizontal(bool);
+    void writeVertical(bool);
 
     virtual void reset()=0;
     virtual void gather()=0;

@@ -1,7 +1,5 @@
 #include <mpi.h>
 #include <iostream> //cout, endl
-#include <fstream> //ofstream
-#include <iomanip> //setw
 #include <string>
 #include <vector>
 #include <sstream> // ostringstream
@@ -51,11 +49,16 @@ void stepper(Config::ptr &conf) {
         frame_start = frame_end + frame_start;
       }
     }
+    int output_freq = conf->output_freq; 
+    if (output_freq==-1) {
+      output_freq = (frame_end-frame_start)/conf->frame_step;
+    }
 
     conf->natoms1 = AG1->natoms;
     conf->natoms2 = AG2->natoms;
     conf->frame_start = frame_start;
     conf->frame_end = frame_end;
+    conf->output_freq = output_freq;
   }
   MPI::COMM_WORLD.Barrier();
   conf->sync();
@@ -71,6 +74,8 @@ void stepper(Config::ptr &conf) {
     MPI::Finalize();
     exit(EXIT_FAILURE);
   }
+
+
 
   //###############################//
   //### INTIALIZE DATA CHUNKERS ###//
@@ -161,7 +166,7 @@ void stepper(Config::ptr &conf) {
   conf->print("> Done! Frame loop finished successfully!");
 
   conf->printHeader("POSTPROCESSING");
-  writer->write();
+  // writer->write();
 
   conf->printHeader("ALL DONE");
 

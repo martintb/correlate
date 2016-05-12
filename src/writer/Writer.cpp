@@ -74,7 +74,15 @@ void Writer::buildCoeff() {
   }
 }
 
-void Writer::write() {
+void Writer::write(bool vertical,bool reset) {
+  if (not vertical) {
+    writeHorizontal(reset);
+  } else {
+    writeVertical(reset);
+  }
+}
+
+void Writer::writeHorizontal(bool reset) {
   gather(); // fill vecMaster with data from all procs
   if (conf->isRoot()) {
     buildCoeff();
@@ -94,7 +102,54 @@ void Writer::write() {
     }
 
     int width=15;
-    ofstream file(conf->outfile);
+    ofstream file(conf->output_file,std::ofstream::app);
+    // file << "#";
+    // file << setw(width-1)<< "x";
+    // file << setw(width)  << conf->KernelMap[conf->kernel];
+    // file << endl;
+    for (int i=0;i<conf->xsize;i++) {
+      float x = i*conf->dx;
+      if (x<cutoff) {
+        file << setw(width) << x;
+      }
+    }
+    file << endl;
+    for (int i=0;i<conf->xsize;i++) {
+      float x = i*conf->dx;
+      if (x<cutoff) {
+        file << setw(width) << vecMaster[i]*coeffMult[i] + coeffAdd[i]; 
+      }
+    }
+    file << endl;
+    file.close();
+  }
+  MPI::COMM_WORLD.Barrier();
+
+  if (reset)
+    this->reset(); //reset counters and arrays
+}
+
+void Writer::writeVertical(bool reset) {
+  gather(); // fill vecMaster with data from all procs
+  if (conf->isRoot()) {
+    buildCoeff();
+
+    float cutoff;
+    if (
+        conf->kernel == Config::histogram or 
+        conf->kernel == Config::rdf or
+        conf->kernel == Config::inter_mol_rdf
+       )
+    {
+      cutoff = box[0]/(step_count*2.0);
+      cout << "--> Cutting off data at lx/2.0 = "  << cutoff << endl;
+    } else {
+      cutoff = conf->xmax;
+      cout << "--> Using full data range with xmax = "  << cutoff << endl;
+    }
+
+    int width=15;
+    ofstream file(conf->output_file);
     file << "#";
     file << setw(width-1)<< "x";
     file << setw(width)  << conf->KernelMap[conf->kernel];
@@ -111,6 +166,7 @@ void Writer::write() {
   }
   MPI::COMM_WORLD.Barrier();
 
-  this->reset(); //reset counters and arrays
+  if (reset)
+    this->reset(); //reset counters and arrays
 }
 

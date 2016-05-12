@@ -1,3 +1,4 @@
+#include <mpi.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -28,8 +29,8 @@ pathvec gather_files(string path_str, string regex_str)
              boost::filesystem::directory_iterator(), 
              back_inserter(v1));
 
-        sort(v1.begin(), v1.end());             // sort, since directory iteration
-                                              // is not ordered on some file systems
+        sort(v1.begin(), v1.end());               // sort, since directory iteration
+                                                  // is not ordered on some file systems
 
         boost::smatch what;
         for (pathvec::const_iterator it(v1.begin()), it_end(v1.end()); it != it_end; ++it) {
@@ -45,8 +46,11 @@ pathvec gather_files(string path_str, string regex_str)
       cerr << "Does not exist: " << p << endl;
     }
   } catch (const boost::filesystem::filesystem_error& ex) {
-    cerr << ex.what() << endl;
-    LOC();
+    if (MPI::COMM_WORLD.Get_rank()==0) {
+      cerr << ex.what() << endl;
+      LOC();
+    }
+    MPI::Finalize(); // must be called by all procs before exiting
     exit(EXIT_FAILURE);
   }
 

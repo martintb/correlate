@@ -28,7 +28,8 @@ class Config
     int mpi_rank;
     int mpi_size;
 
-    std::string outfile;
+    std::string output_file;
+    int output_freq;
     std::string type1, type2;
     std::string topoPath,trjPath;
 

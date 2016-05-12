@@ -19,10 +19,6 @@ void kernel_switcher(
                      vector<float> &box, int offset
                     )
 {
-  writer->step_count+=1;
-  writer->box[0]+=box[0];
-  writer->box[1]+=box[1];
-  writer->box[2]+=box[2];
                       
   //####################//
   //### printProcXYZ ###//
@@ -114,5 +110,13 @@ void kernel_switcher(
     }
     MPI::Finalize();
     exit(EXIT_FAILURE);
+  }
+
+  writer->step_count+=1;
+  writer->box[0]+=box[0];
+  writer->box[1]+=box[1];
+  writer->box[2]+=box[2];
+  if (writer->step_count == static_cast<unsigned long>(conf->output_freq)) {
+    writer->write(false,true);
   }
 }

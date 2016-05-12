@@ -24,7 +24,8 @@ Config::Config()
   dx = -1.0f;
   xmax = -1.0f;
   xsize = 0;
-  outfile    = "";
+  output_freq    = -1;
+  output_file    = "";
   trjPath    = "";
   topoPath   = "";
   type1      = "";
@@ -38,7 +39,7 @@ Config::~Config() {
 
 void Config::sync()
 {
-  vector<int> ibuf(7,0);
+  vector<int> ibuf(8,0);
   if (this->isRoot()) {
     ibuf[0] = frame_start;
     ibuf[1] = frame_step;
@@ -47,6 +48,7 @@ void Config::sync()
     ibuf[4] = kernel;
     ibuf[5] = natoms1;
     ibuf[6] = natoms2;
+    ibuf[7] = output_freq;
   }
   MPI::COMM_WORLD.Bcast(&ibuf.front(),ibuf.size(),MPI::INT,0);
   frame_start = ibuf[0];
@@ -56,6 +58,7 @@ void Config::sync()
   kernel      = static_cast<KernelType>(ibuf[4]);
   natoms1     = ibuf[5];
   natoms2     = ibuf[6];
+  output_freq = ibuf[7];
 
   vector<float> fbuf(2,0.0f);
   if (this->isRoot()) {
@@ -70,7 +73,7 @@ void Config::sync()
   }
 
   MPI::COMM_WORLD.Barrier();
-  syncString(outfile);
+  syncString(output_file);
   syncString(trjPath);
   syncString(topoPath);
   syncString(type1);
@@ -157,6 +160,8 @@ void Config::contains() {
   std::cout << "mpi_size:    " << mpi_size    << std::endl;
   std::cout << "topo file:   " << topoPath    << std::endl;
   std::cout << "trj file:    " << trjPath     << std::endl;
+  std::cout << "output file: " << output_file << std::endl;
+  std::cout << "output freq: " << output_freq << std::endl;
   std::cout << "type1:       " << type1       << std::endl;
   std::cout << "type2:       " << type2       << std::endl;
   std::cout << "natoms1:     " << natoms1     << std::endl;

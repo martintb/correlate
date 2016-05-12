@@ -10,7 +10,7 @@ void intWriter::reset() {
   pair_count = 0;
   pair_count_master = 0;
   box.assign(3,0.0f);
-  vecMaster.assign(conf->xsize,0.0);
+  // vecMaster.assign(conf->xsize,0.0);
   vecInt.assign(conf->xsize,0);
 }
 
@@ -21,6 +21,7 @@ void intWriter::gather() {
                          MPI::UNSIGNED_LONG,MPI::SUM,0);
     vecMaster.assign(allVecInt.begin(),allVecInt.end());
 
+    pair_count_master = 0;
     MPI::COMM_WORLD.Reduce(&pair_count,&pair_count_master,1, MPI::UNSIGNED_LONG,MPI::SUM,0);
 }
 

@@ -15,24 +15,40 @@ bool parse_opts(int argc, char* argv[], Config::ptr &conf)
   cout << "--> Attempting to parse command line and configure file options..." << endl;
 
   string config_file;
-  po::options_description opt("Calculation Configuration Options");
-  opt.add_options()
+  po::options_description baseOpt("Base Options");
+  baseOpt.add_options()
     ("help,h", "produce help message")
     ("config_file,f", po::value<string>(&config_file),"optional configuration file")
-    ("path",        po::value<string>()->default_value("./"), "path to data files")
-    ("topo",         po::value<string>(), "topology file name")
-    ("trj",         po::value<string>(), "trajectory file name")
-    ("type1",       po::value<string>(), "bead type 1 for calculating correlations")
-    ("type2",       po::value<string>(), "bead type 2 for calculating correlations")
-    ("frame_start", po::value<int>()->default_value(0), "first frame to use in calculation")
-    ("frame_end",    po::value<int>()->default_value(-1), "last frame to use in calculation")
-    ("frame_step",  po::value<int>()->default_value(1), "interval between used frames")
-    ("nthreads",    po::value<int>()->default_value(1), "number of threads per mpi process")
-    ("dx",    po::value<float>()->default_value(0.1), "grid size for output")
-    ("xmax",  po::value<float>()->default_value(100), "largest value in output grid")
-    ("kernel",    po::value<string>(), "kernel used for calculation")
-    ("outfile",    po::value<string>()->default_value("corr.out"), "name of file to write output to")
+    ("kernel",        po::value<string>(), "calculation kernel")
+    ("type1",         po::value<string>(), "bead type 1 (e.g A or A,B)")
+    ("type2",         po::value<string>(), "bead type 2")
+    ("nthreads",      po::value<int>()->default_value(1),"placeholder pending future threading support")
   ;
+
+  po::options_description fileInOpt("File Reading");
+  fileInOpt.add_options()
+    ("path",        po::value<string>()->default_value("./"), "path to data files")
+    ("topo",        po::value<string>(),                      "topology file name")
+    ("trj",         po::value<string>(),                      "trajectory file name")
+  ;
+
+  po::options_description fileOutOpt("File Writing");
+  fileOutOpt.add_options()
+    ("output_file",    po::value<string>()->default_value("calc.dat"), "file to write results to")
+    ("output_freq",    po::value<int>()->default_value(-1), "frequency of writing data to file")
+  ;
+
+  po::options_description calcOpt("Calculation");
+  calcOpt.add_options()
+    ("frame_start", po::value<int>()->default_value(0),   "first frame to use in calculation")
+    ("frame_end",   po::value<int>()->default_value(-1), "last frame to use in calculation")
+    ("frame_step",  po::value<int>()->default_value(1),   "interval between used frames")
+    ("dx",          po::value<float>()->default_value(0.1), "grid size for output (real or kspace)")
+    ("xmax",        po::value<float>()->default_value(100), "largest value in output grid (real or kspace)")
+  ;
+
+  po::options_description opt("All Options");
+  opt.add(baseOpt).add(fileInOpt).add(fileOutOpt).add(calcOpt);
 
   
   cout << "--> Attempting to parse command line variables..." << endl;
@@ -86,13 +102,19 @@ bool parse_opts(int argc, char* argv[], Config::ptr &conf)
   /*transfer parameters into conf structure*/
 
   // No need to error check opts with default values
-  conf->outfile = vm["outfile"].as<string>();
+  conf->output_file = vm["output_file"].as<string>();
+  conf->output_freq = vm["output_freq"].as<int>();
   conf->frame_start = vm["frame_start"].as<int>();
-  conf->frame_end = vm["frame_end"].as<int>();
-  conf->frame_step = vm["frame_step"].as<int>();
-  conf->nthreads = vm["nthreads"].as<int>();
-  conf->dx = vm["dx"].as<float>();
-  conf->xmax = vm["xmax"].as<float>();
+  conf->frame_end   = vm["frame_end"].as<int>();
+  cout << "1" << endl;
+  conf->frame_step  = vm["frame_step"].as<int>();
+  cout << "1" << endl;
+  conf->nthreads    = vm["nthreads"].as<int>();
+  cout << "1" << endl;
+  conf->dx          = vm["dx"].as<float>();
+  cout << "1" << endl;
+  conf->xmax        = vm["xmax"].as<float>();
+  cout << "1" << endl;
 
   if (vm.count("topo")) {
     conf->setTopoFile(vm["path"].as<string>(),vm["topo"].as<string>());
