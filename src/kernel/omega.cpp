@@ -35,7 +35,7 @@ void omega(
         if (dy>by2) dy-=by;
         if (dz>bz2) dz-=bz;
         float dist = sqrt(dx*dx + dy*dy + dz*dz);
-        for (int k=0;k<kmax;k+=1) {
+        for (int k=1;k<=kmax;k++) {
           hist[k] += sin(k*dq*dist)/dist;
         }
       }

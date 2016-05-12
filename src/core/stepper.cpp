@@ -165,12 +165,12 @@ void stepper(Config::ptr &conf) {
 
   conf->printHeader("ALL DONE");
 
-  conf->print("\n");
+  conf->print(" ");
   conf->print(">>> CONFIGURATION");
   conf->print(0);
 
   if (conf->isRoot()) {
-    cout << "\n\n";
+    cout << "\n";
     cout << ">>> PROC TIMING STATS (SECONDS)";
     cout << endl;
   }

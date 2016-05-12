@@ -44,7 +44,12 @@ Writer::ptr Writer::get(Config::ptr &conf) {
 }
 
 void Writer::buildCoeff() {
-  float tot_natoms = conf->natoms1+conf->natoms2;
+  float tot_natoms;
+  if (conf->selfHist) {
+    tot_natoms = conf->natoms1;
+  } else {
+    tot_natoms = conf->natoms1+conf->natoms2;
+  }
 
   // process incremental box data
   float lx = box[0]/step_count;

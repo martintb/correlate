@@ -10,8 +10,7 @@ void floatWriter::reset() {
   pair_count = 0;
   pair_count_master = 0;
   box.assign(3,0.0f);
-  // vecMaster.assign(conf->xsize,0);
-  vecFloat.assign(conf->xsize,0);
+  vecFloat.assign(conf->xsize,0.0f);
 }
 
 

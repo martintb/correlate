@@ -8,7 +8,8 @@ void intra_mol_omega(
                       vector<float> &x1, vector<float> &y1, vector<float> &z1,
                       vector<float> &x2, vector<float> &y2, vector<float> &z2,
                       vector<int> &mol1, vector<int> &mol2,
-                      vector<float> &box, float qmax,float dq,unsigned long &pair_count
+                      vector<float> &box, float qmax,float dq,
+                      unsigned long &pair_count
                     )
 {
 
@@ -34,7 +35,7 @@ void intra_mol_omega(
         if (dy>by2) dy-=by;
         if (dz>bz2) dz-=bz;
         float dist = sqrt(dx*dx + dy*dy + dz*dz);
-        for (int k=0;k<kmax;k+=1) {
+        for (int k=1;k<=kmax;k++) {
           hist[k] += sin(k*dq*dist)/dist;
         }
       }

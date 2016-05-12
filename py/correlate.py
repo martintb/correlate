@@ -210,18 +210,18 @@ for i,TP in enumerate(analyze.trials.loop(trialDict,repSelect=['0','L100'])):
     fullRDFDD[pair] = {'x':corr_data[0],'y':corr_data[1:]}
     os.remove(tempFile)
 
-    cmd = ''
-    print '.:: Setting up the following command to calculate the intra-molecular rdf:'
-    cmd_list[-3]=' --dx={}'.format(dr)
-    cmd_list[-2]=' --xmax={}'.format(rmax)
-    cmd_list[-1]=' --kernel={}'.format('intra_mol_rdf')
-    for cmd_chunk in cmd_list:
-      cmd += cmd_chunk
-      print '\t',cmd_chunk
-    subprocess.check_call(shlex.split(cmd))
-    corr_data = np.loadtxt(tempFile)
-    intraRDFDD[pair] = {'x':corr_data[0],'y':corr_data[1:]}
-    os.remove(tempFile)
+    ## cmd = ''
+    ## print '.:: Setting up the following command to calculate the intra-molecular rdf:'
+    ## cmd_list[-3]=' --dx={}'.format(dr)
+    ## cmd_list[-2]=' --xmax={}'.format(rmax)
+    ## cmd_list[-1]=' --kernel={}'.format('intra_mol_rdf')
+    ## for cmd_chunk in cmd_list:
+    ##   cmd += cmd_chunk
+    ##   print '\t',cmd_chunk
+    ## subprocess.check_call(shlex.split(cmd))
+    ## corr_data = np.loadtxt(tempFile)
+    ## intraRDFDD[pair] = {'x':corr_data[0],'y':corr_data[1:]}
+    ## os.remove(tempFile)
 
     cmd = ''
     print '.:: Setting up the following command to calculate the inter-molecular rdf:'
