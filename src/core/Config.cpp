@@ -168,7 +168,7 @@ void Config::contains() {
   cout << "trj file:    " << trj_file->path       << endl;
   cout << "output file: " << output_file->path    << endl;
   cout << "output freq: " << output_freq          << endl;
-  cout << "overwrite:   " << output_freq          << endl;
+  cout << "overwrite:   " << boolalpha<<overwrite << endl;
   cout << "type1:       " << type1                << endl;
   cout << "type2:       " << type2                << endl;
   cout << "natoms1:     " << natoms1              << endl;
