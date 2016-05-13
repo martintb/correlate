@@ -46,7 +46,7 @@ bfs::path File::nextPath(bfs::path oldPath) {
   }
 
   // find max file number
-  int max_file_number=1;
+  int max_file_number=0;
   if (file_numbers.size()>0) {
     max_file_number = *max_element(file_numbers.begin(),file_numbers.end());
   }
