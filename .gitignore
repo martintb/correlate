@@ -6,3 +6,4 @@ lj/
 data/*dcd
 data/*xml
 src/util/version.cpp
+sandbox/*/exec
