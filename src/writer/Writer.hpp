@@ -35,6 +35,7 @@ class Writer {
     void writeHorizontal(bool);
     void writeVertical(bool);
     void writeHeader(int);
+    bool file_opened;
 
     virtual void reset()=0;
     virtual void gather()=0;
