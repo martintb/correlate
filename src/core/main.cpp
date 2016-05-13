@@ -1,6 +1,8 @@
 #include <mpi.h>
 #include <string>
 #include <memory>
+#include <chrono> // now()
+#include <ctime>  //ctime()
 
 #include <boost/program_options.hpp>
 namespace po = boost::program_options;
@@ -17,19 +19,28 @@ int main(int argc, char* argv[])
 {
   MPI::Init();
 
-  Config::ptr conf = make_shared<Config>(); // each proc carries a "configuration" object
+  time_t now = chrono::system_clock::to_time_t(chrono::system_clock::now());
+  string date = ctime(&now);
+  int gcc_major   = __GNUC__;
+  int gcc_minor   = __GNUC_MINOR__;
+  int gcc_patch   = __GNUC_PATCHLEVEL__;
+  int boost_major = BOOST_VERSION/100000;
+  int boost_minor = BOOST_VERSION/100 % 1000;
+  int boost_patch = BOOST_VERSION % 1000;
+  int ompi_major = OMPI_MAJOR_VERSION;
+  int ompi_minor = OMPI_MINOR_VERSION;
+  int ompi_patch = OMPI_RELEASE_VERSION;
 
+  Config::ptr conf = make_shared<Config>(); // each proc carries a "configuration" object
   if (conf->isRoot()) {
     cout << "#################################################" << endl;
     cout << ">>>>>>>>>>>>>>>>>>> CORRELATE <<<<<<<<<<<<<<<<<<<" << endl;
     cout << "#################################################" << endl;
-    cout << "==> Version: " << version << endl;
-    cout << "==> Build Date: " << build_date << endl;
-    cout << "==> GCC Version: ";
-    cout << __GNUC__ << ".";
-    cout << __GNUC_MINOR__ << ".";
-    cout << __GNUC_PATCHLEVEL__ << endl;
-    cout << endl;
+    cout << "==> Version:         "<<version<<endl;
+    cout << "==> Build Date:      "<<build_date<<endl;
+    cout << "==> GCC Version:     "<<gcc_major<<"."<<gcc_minor<< "."<< gcc_patch << endl;
+    cout << "==> Boost Version:   "<<boost_major<<"."<< boost_minor<<"."<< boost_patch<< endl;
+    cout << "==> OpenMPI Version: "<<ompi_major<<"."<<ompi_minor<<"."<<ompi_patch<< endl;
   }
 
   conf->printHeader("PARSE INPUT");
