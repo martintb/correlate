@@ -14,13 +14,7 @@ This will split up a partial radial-distribution function calculation amongst 10
     * radial distribution function
 3. **omega**
     * structure factor calculation via sin(kr)/kr summation
-4. **inter_mol_rdf**
-    * inter molecular radial distribution function
-5. **inter_mol_omega**
-    * inter molecular structure factor calculator
-6. **intra_mol_omega**
-    * intra molecular structure factor calculator
-7. **printProcXYZ**
+4. **printProcXYZ**
     * Print the xyz coordinates of each mpi process (debugging tool)
 
 ## Input Variables:
@@ -31,6 +25,8 @@ Base Options:
   -h [ --help ]                  produce help message
   -f [ --config_file ] arg       optional configuration file
   --kernel arg                   calculation kernel
+  --intra                        restrict calculation to intra-molecular pairs
+  --inter                        restrict calculation to inter-molecular pairs
   --type1 arg                    bead type 1 (e.g A or A,B)
   --type2 arg                    bead type 2
   --nthreads arg (=1)            placeholder pending future threading support
@@ -64,10 +60,7 @@ The following calculation kernels are available:
 printProcXYZ
 histogram
 rdf
-inter_mol_rdf
 omega
-inter_mol_omega
-intra_mol_omega
 ```
 ### via configiration file:
 note the lack of quotation marks for strings
@@ -79,9 +72,11 @@ type1         = 3
 type2         = 3
 frame_start   = -10
 frame_end     = -1
-kernel        = rdf
+kernel        = omega
+intra         = True
+overwrite     = True
 dx            = 0.1
-xmax          = 100
+xmax          = 6.2
 output_file   = calc.dat
 output_freq   = 1
 ```
@@ -99,9 +94,6 @@ output_freq   = 1
 * LAMMPS data file w/ AtomStyle Full (.lmpfull)
 * LAMMPS data file w/ AtomStyle Molecular (.lmpmolecular)
 * CHARMM/LAMMPS/HOOMD style DCD trajectory file (.dcd)
-
-## General Notes
-* Currently, the output file has several columns that correspond to different normalization of the output histogram. Only the column labeled according to you specified calculation may have any meaning i.e. use the rdf column for rdf calculations and the omega column for omega calculations. This is on the list of things to improve in future updates. 
 
 ## Dependencies:
 ### Required:
