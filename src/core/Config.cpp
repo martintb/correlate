@@ -198,6 +198,8 @@ bool Config::setKernelFromStr() {
     kernel = KernelType::rdf;
   } else if (kernelStr.compare("inter_mol_rdf")==0) {
     kernel = KernelType::inter_mol_rdf;
+  } else if (kernelStr.compare("intra_mol_rdf")==0) {
+    kernel = KernelType::intra_mol_rdf;
   } else if (kernelStr.compare("omega")==0) {
     kernel = KernelType::omega;
   } else if (kernelStr.compare("inter_mol_omega")==0) {

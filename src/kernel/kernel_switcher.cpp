@@ -1,4 +1,5 @@
 #include <mpi.h>
+#include <functional>
 #include <vector>
 #include <string>
 
@@ -19,6 +20,64 @@ void kernel_switcher(
                      vector<float> &box, int offset
                     )
 {
+
+  // construct comparison lambda
+  function<bool (int i, int j)> compare;
+  bool selfHist = conf->selfHist;
+  //#############//
+  //### INTRA ###//
+  //#############//
+  if (
+       conf->kernel == Config::intra_mol_rdf or
+       conf->kernel == Config::intra_mol_omega
+     )
+  {
+    conf->print("--> Constructing intra-molecular lambda");
+    compare = [&] (int i,int j) {
+      bool test1 = (mol1[i] == mol2[j]); // intra molecular
+      bool test2 = (not (selfHist and (i+offset)==j)); // not same bead
+      return (test1 and test2);
+    };
+
+  //#############//
+  //### INTER ###//
+  //#############//
+  } else if (
+              conf->kernel == Config::inter_mol_rdf or
+              conf->kernel == Config::inter_mol_omega
+            )
+  {
+    conf->print("--> Constructing inter-molecular lambda");
+    compare = [&] (int i,int j) {
+      bool test1 = (mol1[i] != mol2[j]); // inter molecular
+      return test1;
+    };
+
+  //#############//
+  //### FULL ###//
+  //#############//
+  } else if (
+              conf->kernel == Config::histogram or
+              conf->kernel == Config::rdf or
+              conf->kernel == Config::omega
+            )
+  {
+    conf->print("--> Constructing full lambda");
+    compare = [&] (int i,int j) {
+      bool test1 = (not (selfHist and (i+offset)==j)); // not same bead
+      return test1;
+    };
+  } else {
+
+  //################//
+  //### CATCHALL ###//
+  //################//
+    conf->print("--> Constructing catch-all lambda (this is probably an error)");
+    compare = [] (int i,int j) {
+      return true;
+    };
+  };
+         
                       
   //####################//
   //### printProcXYZ ###//
@@ -31,75 +90,39 @@ void kernel_switcher(
   //#####################//
   //### histogram/rdf ###//
   //#####################//
-  } else if (conf->kernel == Config::histogram or conf->kernel == Config::rdf) {
+  } else if (
+             conf->kernel == Config::histogram  or
+             conf->kernel == Config::rdf or
+             conf->kernel == Config::inter_mol_rdf or
+             conf->kernel == Config::intra_mol_rdf
+            ) 
+  {
     conf->print("--> Calling kernel: histogram/rdf");
     histogram(writer->vecInt,
+              writer->pair_count,
               x1,y1,z1,
               x2,y2,z2,
               box,
-              conf->selfHist,
-              conf->xmax,
-              conf->dx,
-              offset,
-              writer->pair_count);
-
-  //###########################//
-  //### inter_histogram/rdf ###//
-  //###########################//
-  } else if (conf->kernel == Config::inter_mol_rdf) {
-    conf->print("--> Calling kernel: inter_mol_rdf");
-    inter_mol_histogram(writer->vecInt,
-                        x1,y1,z1,
-                        x2,y2,z2,
-                        mol1,mol2,
-                        box, 
-                        conf->xmax,
-                        conf->dx,
-                        writer->pair_count);
+              conf->xmax, conf->dx,
+              compare);
 
   //#############//
   //### omega ###//
   //#############//
-  } else if (conf->kernel == Config::omega) {
+  } else if (
+             conf->kernel == Config::omega or
+             conf->kernel == Config::inter_mol_omega or
+             conf->kernel == Config::intra_mol_omega
+            ) 
+  {
     conf->print("--> Calling kernel: omega");
     omega(writer->vecFloat,
+          writer->pair_count,
           x1,y1,z1,
           x2,y2,z2,
           box,
-          conf->selfHist,
-          conf->xmax,
-          conf->dx,
-          offset,
-          writer->pair_count);
-
-  //###################//
-  //### inter_omega ###//
-  //###################//
-  } else if (conf->kernel == Config::inter_mol_omega) {
-    conf->print("--> Calling kernel: inter_mol_omega");
-    inter_mol_omega(writer->vecFloat,
-                    x1,y1,z1,
-                    x2,y2,z2,
-                    mol1,mol2,
-                    box, 
-                    conf->xmax,
-                    conf->dx,
-                    writer->pair_count);
-
-  //###################//
-  //### intra_omega ###//
-  //###################//
-  } else if (conf->kernel == Config::intra_mol_omega) {
-    conf->print("--> Calling kernel: intra_mol_omega");
-    intra_mol_omega(writer->vecFloat,
-                    x1,y1,z1,
-                    x2,y2,z2,
-                    mol1,mol2,
-                    box, 
-                    conf->xmax,
-                    conf->dx,
-                    conf->selfHist,offset,
-                    writer->pair_count);
+          conf->xmax, conf->dx,
+          compare);
 
   //##############//
   //### ERROR! ###//

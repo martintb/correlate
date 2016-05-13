@@ -1,11 +1,14 @@
 #ifndef HISTOGRAM_CPP
 #define HISTOGRAM_CPP
+#include <functional>
 #include <vector>
 void histogram(
                 std::vector<unsigned long> &hist,
-                std::vector<float> &x1, std::vector<float> &y1, std::vector<float> &z1,
-                std::vector<float> &x2, std::vector<float> &y2, std::vector<float> &z2,
-                std::vector<float> &box, bool selfHist, float rmax, float dr, int offset,
-                unsigned long &pair_count
+                unsigned long &pair_count,
+                const std::vector<float> &x1, const std::vector<float> &y1, const std::vector<float> &z1,
+                const std::vector<float> &x2, const std::vector<float> &y2, const std::vector<float> &z2,
+                const std::vector<float> &box, 
+                const float rmax, const float dr,
+                const std::function<bool (int i, int j)>&
               );
 #endif

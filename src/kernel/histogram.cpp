@@ -6,10 +6,12 @@
 using namespace std;
 void histogram(
                 vector<unsigned long> &hist,
-                vector<float> &x1, vector<float> &y1, vector<float> &z1,
-                vector<float> &x2, vector<float> &y2, vector<float> &z2,
-                vector<float> &box, bool selfHist,float rmax,float dr,int offset,
-                unsigned long &pair_count
+                unsigned long &pair_count,
+                const vector<float> &x1, const vector<float> &y1, const vector<float> &z1,
+                const vector<float> &x2, const vector<float> &y2, const vector<float> &z2,
+                const vector<float> &box, 
+                const float rmax, const float dr,
+                const std::function<bool (int i, int j)> &compare
               )
 {
 
@@ -25,7 +27,7 @@ void histogram(
 
   for (int i=0;i<natoms1;i++) {
     for (int j=0;j<natoms2;j++) {
-      if (not (selfHist and (i+offset)==j)) {
+      if (compare(i,j)) {
         pair_count+=1;
 
         float dx = abs(x1[i] - x2[j]);

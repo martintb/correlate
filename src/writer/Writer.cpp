@@ -23,7 +23,8 @@ Writer::ptr Writer::get(Config::ptr &conf) {
   if (
       conf->kernel == Config::histogram or 
       conf->kernel == Config::rdf or
-      conf->kernel == Config::inter_mol_rdf
+      conf->kernel == Config::inter_mol_rdf or
+      conf->kernel == Config::intra_mol_rdf
      ) 
   {
     return make_shared<intWriter>(conf);
@@ -98,7 +99,8 @@ void Writer::writeVertical(bool reset) {
     if (
         conf->kernel == Config::histogram or 
         conf->kernel == Config::rdf or
-        conf->kernel == Config::inter_mol_rdf
+        conf->kernel == Config::inter_mol_rdf or
+        conf->kernel == Config::intra_mol_rdf
        )
     {
       cutoff = box[0]/(step_count*2.0);
@@ -139,7 +141,8 @@ void Writer::writeHorizontal(bool reset) {
     if (
         conf->kernel == Config::histogram or 
         conf->kernel == Config::rdf or
-        conf->kernel == Config::inter_mol_rdf
+        conf->kernel == Config::inter_mol_rdf or
+        conf->kernel == Config::intra_mol_rdf
        )
     {
       cutoff = box[0]/(step_count*2.0);
