@@ -7,6 +7,7 @@ void intra_mol_omega(
                 std::vector<float> &x2, std::vector<float> &y2, std::vector<float> &z2,
                 std::vector<int> &mol1, std::vector<int> &mol2,
                 std::vector<float> &box, float qmax, float dq, 
+                bool selfHist, int offset,
                 unsigned long &pair_count
               );
 #endif

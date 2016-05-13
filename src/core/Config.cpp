@@ -98,13 +98,12 @@ void Config::sync()
   // decide what type of histogram we have
   if (
       kernel == Config::inter_mol_rdf or
-      kernel == Config::inter_mol_omega or
-      kernel == Config::intra_mol_omega
+      kernel == Config::inter_mol_omega
      ) 
   {
     selfHist = false;
   } else {
-    selfHist = type1.compare(type2)==0;
+    selfHist = (type1.compare(type2)==0);
   }
 }
 

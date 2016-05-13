@@ -98,6 +98,7 @@ void kernel_switcher(
                     box, 
                     conf->xmax,
                     conf->dx,
+                    conf->selfHist,offset,
                     writer->pair_count);
 
   //##############//

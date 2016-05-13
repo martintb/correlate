@@ -15,12 +15,12 @@ void floatWriter::reset() {
 
 
 void floatWriter::gather() {
-    vector<unsigned long> allVecFloat(conf->xsize,0);
-    MPI::COMM_WORLD.Reduce(&vecFloat.front(),&allVecFloat.front(),vecFloat.size(),
-                         MPI::FLOAT,MPI::SUM,0);
-    vecMaster.assign(allVecFloat.begin(),allVecFloat.end());
+  vector<float> allVecFloat(conf->xsize,0);
+  MPI::COMM_WORLD.Reduce(&vecFloat.front(),&allVecFloat.front(),vecFloat.size(),
+                       MPI::FLOAT,MPI::SUM,0);
+  vecMaster.assign(allVecFloat.begin(),allVecFloat.end());
 
-    pair_count_master=0;
-    MPI::COMM_WORLD.Reduce(&pair_count,&pair_count_master,1, MPI::UNSIGNED_LONG,MPI::SUM,0);
+  pair_count_master=0;
+  MPI::COMM_WORLD.Reduce(&pair_count,&pair_count_master,1, MPI::UNSIGNED_LONG,MPI::SUM,0);
 }
 
