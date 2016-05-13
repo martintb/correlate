@@ -158,14 +158,27 @@ void Writer::writeHeader(int cutoff) {
   time_t now = chrono::system_clock::to_time_t(chrono::system_clock::now());
   string date = ctime(&now);
 
-  file << "# -------------------------------------------------------------------------" << endl;
-  file << "# >>> CORRELATE <<<" << endl;
-  file << "# -------------------------------------------------------------------------" << endl;
-  file << "# ==> Version: " << version << endl;
-  file << "# ==> GCC Version:  "<< __GNUC__ << "." << __GNUC_MINOR__ << "."<< __GNUC_PATCHLEVEL__ << endl;
-  file << "# ==> Build Date: " << build_date << endl;
-  file << "# ==> File Creation:  " << date; // date already has newline
-  file << "# -------------------------------------------------------------------------" << endl;
+  int gcc_major   = __GNUC__;
+  int gcc_minor   = __GNUC_MINOR__;
+  int gcc_patch   = __GNUC_PATCHLEVEL__;
+  int boost_major = BOOST_VERSION/100000;
+  int boost_minor = BOOST_VERSION/100 % 1000;
+  int boost_patch = BOOST_VERSION % 1000;
+  int ompi_major = OMPI_MAJOR_VERSION;
+  int ompi_minor = OMPI_MINOR_VERSION;
+  int ompi_patch = OMPI_RELEASE_VERSION;
+
+
+  file << "# --------------------------------------------------------------------------" << endl;
+  file << "#                             >>> CORRELATE <<<" << endl;
+  file << "# --------------------------------------------------------------------------" << endl;
+  file << "# ==> Correlate Version: " << version << endl;
+  file << "# ==> GCC Version:       " << gcc_major << "." << gcc_minor << "."<< gcc_patch << endl;
+  file << "# ==> Boost Version:     " << boost_major << "." << boost_minor << "."<< boost_patch << endl;
+  file << "# ==> OpenMPI Version:   " << ompi_major << "." << ompi_minor << "."<< ompi_patch << endl;
+  file << "# ==> Build Date:        " << build_date << endl;
+  file << "# ==> File Creation:     " << date; // date already has newline
+  file << "# --------------------------------------------------------------------------" << endl;
   file << "# topo file   = " << conf->topo_file->path      << endl;
   file << "# trj file    = " << conf->trj_file->path       << endl;
   file << "# output file = " << conf->output_file->path    << endl;
@@ -185,9 +198,10 @@ void Writer::writeHeader(int cutoff) {
   file << "# kernel      = " << conf->Config::KernelMap[conf->kernel]  << endl;
   file << "# intra       = " << boolalpha<<conf->intra     << endl;
   file << "# inter       = " << boolalpha<<conf->inter     << endl;
-  file << "# -------------------------------------------------------------------------" << endl;
-  file << "# --> First row is the grid bin edges (either fourier or real space)" << endl;
-  file << "# --> Each subsequent row is the data calculated over output_freq timesteps" << endl;
+  file << "# --------------------------------------------------------------------------" << endl;
+  file << "# --> First row below the grid bin edges (either fourier or real space)" << endl;
+  file << "# --> Subsequent rows are data chunks calculated over output_freq timesteps" << endl;
+  file << "# --------------------------------------------------------------------------" << endl;
 
   for (int i=0;i<conf->xsize;i++) {
     float x = i*conf->dx;
