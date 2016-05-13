@@ -23,6 +23,8 @@ bool parse_opts(int argc, char* argv[], Config::ptr &conf)
     ("help,h", "produce help message")
     ("config_file,f", po::value<string>(&config_file),"optional configuration file")
     ("kernel",        po::value<string>(), "calculation kernel")
+    ("intra",  po::bool_switch()->default_value(false), "restrict calculation to intra-molecular pairs")
+    ("inter",  po::bool_switch()->default_value(false), "restrict calculation to inter-molecular pairs")
     ("type1",         po::value<string>(), "bead type 1 (e.g A or A,B)")
     ("type2",         po::value<string>(), "bead type 2")
     ("nthreads",      po::value<int>()->default_value(1),"placeholder pending future threading support")
@@ -106,6 +108,7 @@ bool parse_opts(int argc, char* argv[], Config::ptr &conf)
 
   /*transfer parameters into conf structure*/
 
+
   // No need to error check opts with default values
   conf->output_freq = vm["output_freq"].as<int>();
   conf->frame_start = vm["frame_start"].as<int>();
@@ -115,6 +118,12 @@ bool parse_opts(int argc, char* argv[], Config::ptr &conf)
   conf->dx          = vm["dx"].as<float>();
   conf->xmax        = vm["xmax"].as<float>();
   conf->overwrite   = vm["overwrite"].as<bool>();
+  conf->inter       = vm["inter"].as<bool>();
+  conf->intra       = vm["intra"].as<bool>();
+  if (conf->inter and conf->intra) {
+    cerr << "Error! Cannot have intra and inter specified simultaneously." << endl;
+    return false;
+  }
 
   conf->output_file =  make_shared<outFile>(
                                             vm["output_path"].as<string>(),

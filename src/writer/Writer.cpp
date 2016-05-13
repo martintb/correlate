@@ -20,21 +20,12 @@ Writer::Writer(Config::ptr conf) {
 }
 
 Writer::ptr Writer::get(Config::ptr &conf) {
-  if (
-      conf->kernel == Config::histogram or 
-      conf->kernel == Config::rdf or
-      conf->kernel == Config::inter_mol_rdf or
-      conf->kernel == Config::intra_mol_rdf
-     ) 
-  {
+  if ( conf->kernel == Config::histogram or conf->kernel == Config::rdf) {
     return make_shared<intWriter>(conf);
-  } else if (
-              conf->kernel == Config::omega or
-              conf->kernel == Config::inter_mol_omega or
-              conf->kernel == Config::intra_mol_omega
-            ) 
-  {
+
+  } else if ( conf->kernel == Config::omega ) {
     return make_shared<floatWriter>(conf);
+
   } else {
     cerr << "Error! Writer not fully set up for this kernel!" << endl;
     cerr << "Kernel: " << conf->KernelMap[conf->kernel] << endl;
@@ -69,12 +60,7 @@ void Writer::buildCoeff() {
     {
       coeffMult[i]*=1.0/(step_count*vol*pair_rho);
     } 
-    else if (
-               conf->kernel == Config::omega or
-               conf->kernel == Config::inter_mol_omega or
-               conf->kernel == Config::intra_mol_omega
-              )
-    {
+    else if ( conf->kernel == Config::omega) {
       if (conf->selfHist) coeffAdd[i] += 1.0;
       coeffMult[i]*=1.0/(step_count*tot_natoms*x2);
     }
@@ -96,13 +82,7 @@ void Writer::writeVertical(bool reset) {
     buildCoeff();
 
     float cutoff;
-    if (
-        conf->kernel == Config::histogram or 
-        conf->kernel == Config::rdf or
-        conf->kernel == Config::inter_mol_rdf or
-        conf->kernel == Config::intra_mol_rdf
-       )
-    {
+    if ( conf->kernel == Config::histogram or conf->kernel == Config::rdf) {
       cutoff = box[0]/(step_count*2.0);
       cout << "--> Cutting off data at lx/2.0 = "  << cutoff << endl;
     } else {
@@ -138,13 +118,7 @@ void Writer::writeHorizontal(bool reset) {
     buildCoeff();
 
     float cutoff;
-    if (
-        conf->kernel == Config::histogram or 
-        conf->kernel == Config::rdf or
-        conf->kernel == Config::inter_mol_rdf or
-        conf->kernel == Config::intra_mol_rdf
-       )
-    {
+    if ( conf->kernel == Config::histogram or conf->kernel == Config::rdf) {
       cutoff = box[0]/(step_count*2.0);
       cout << "--> Cutting off data at lx/2.0 = "  << cutoff << endl;
     } else {

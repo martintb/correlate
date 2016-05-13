@@ -4,11 +4,13 @@
 #include <map>
 #include <chrono>
 #include <string>
+#include <memory>
 
 
 class Timer
 {
   public:
+    typedef std::shared_ptr<Timer> ptr;
     Timer();
     ~Timer();
 

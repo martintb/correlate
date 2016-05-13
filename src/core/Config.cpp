@@ -28,8 +28,10 @@ Config::Config()
   type1      = "";
   type2      = "";
   kernelStr  = "";
-  selfHist = false;
-  overwrite = false;
+  selfHist   = false;
+  overwrite  = false;
+  intra      = false;
+  inter      = false;
 }
 
 Config::~Config() {
@@ -37,29 +39,39 @@ Config::~Config() {
 
 void Config::sync()
 {
-  vector<int> ibuf(9,0);
+  // ###########################
+  // ### TRANSFER INTS/BOOLS ###
+  // ###########################
+  vector<int> ibuf(11,0);
   if (this->isRoot()) {
-    ibuf[0] = frame_start;
-    ibuf[1] = frame_step;
-    ibuf[2] = frame_end;
-    ibuf[3] = nthreads;
-    ibuf[4] = kernel;
-    ibuf[5] = natoms1;
-    ibuf[6] = natoms2;
-    ibuf[7] = output_freq;
-    ibuf[8] = overwrite;
+    ibuf[0]  = frame_start;
+    ibuf[1]  = frame_step;
+    ibuf[2]  = frame_end;
+    ibuf[3]  = nthreads;
+    ibuf[4]  = natoms1;
+    ibuf[5]  = natoms2;
+    ibuf[6]  = output_freq;
+    ibuf[7]  = kernel;
+    ibuf[8]  = overwrite;
+    ibuf[9]  = intra;
+    ibuf[10] = inter;
   }
   MPI::COMM_WORLD.Bcast(&ibuf.front(),ibuf.size(),MPI::INT,0);
   frame_start = ibuf[0];
   frame_step  = ibuf[1];
   frame_end   = ibuf[2];
   nthreads    = ibuf[3];
-  kernel      = static_cast<KernelType>(ibuf[4]);
-  natoms1     = ibuf[5];
-  natoms2     = ibuf[6];
-  output_freq = ibuf[7];
-  overwrite = static_cast<bool>(ibuf[8]);
+  natoms1     = ibuf[4];
+  natoms2     = ibuf[5];
+  output_freq = ibuf[6];
+  kernel      = static_cast<KernelType>(ibuf[7]);
+  overwrite   = static_cast<bool>(ibuf[8]);
+  intra       = static_cast<bool>(ibuf[9]);
+  inter       = static_cast<bool>(ibuf[10]);
 
+  // #######################
+  // ### TRANSFER FLOATS ###
+  // #######################
   vector<float> fbuf(2,0.0f);
   if (this->isRoot()) {
     fbuf[0] = dx;
@@ -70,8 +82,15 @@ void Config::sync()
   xmax  = fbuf[1];
   if (dx>0 and xmax>0) {
     xsize = static_cast<int>(xmax/dx);
+  } else {
+    cerr << "Error! dx and xmax must be >0." << endl;
+    MPI::Finalize(); // must be called by all procs before exiting
+    exit(EXIT_FAILURE);
   }
 
+  // #############################
+  // ### TRANSFER FILE STRINGS ###
+  // #############################
   string outputStr;
   string trjStr;
   string topoStr;
@@ -90,17 +109,16 @@ void Config::sync()
     topo_file   = make_shared<inFile>(topoStr);
   }
 
+  // ########################
+  // ### TRANSFER STRINGS ###
+  // ########################
   syncString(type1);
   syncString(type2);
   syncString(kernelStr);
   this->setKernelFromStr();
 
   // decide what type of histogram we have
-  if (
-      kernel == Config::inter_mol_rdf or
-      kernel == Config::inter_mol_omega
-     ) 
-  {
+  if (inter) {
     selfHist = false;
   } else {
     selfHist = (type1.compare(type2)==0);
@@ -180,6 +198,8 @@ void Config::contains() {
   cout << "xmax:        " << xmax                 << endl;
   cout << "xsize:       " << xsize                << endl;
   cout << "selfHist:    " << boolalpha<<selfHist  << endl;
+  cout << "intra:       " << boolalpha<<intra     << endl;
+  cout << "inter:       " << boolalpha<<inter     << endl;
 }
 
 void Config::printKernelList() {
@@ -196,16 +216,8 @@ bool Config::setKernelFromStr() {
     kernel = KernelType::histogram;
   } else if (kernelStr.compare("rdf")==0) {
     kernel = KernelType::rdf;
-  } else if (kernelStr.compare("inter_mol_rdf")==0) {
-    kernel = KernelType::inter_mol_rdf;
-  } else if (kernelStr.compare("intra_mol_rdf")==0) {
-    kernel = KernelType::intra_mol_rdf;
   } else if (kernelStr.compare("omega")==0) {
     kernel = KernelType::omega;
-  } else if (kernelStr.compare("inter_mol_omega")==0) {
-    kernel = KernelType::inter_mol_omega;
-  } else if (kernelStr.compare("intra_mol_omega")==0) {
-    kernel = KernelType::intra_mol_omega;
   } else {
     cerr << "Error! Kernel string not recognized." << endl;
     cerr << "Kernel string: " << kernelStr << endl;

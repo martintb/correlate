@@ -45,17 +45,15 @@ class Config
     float xmax;
     int xsize;
     bool selfHist;
+    bool inter;
+    bool intra;
 
 
     enum KernelType {
       printProcXYZ,
       histogram,
       rdf,
-      inter_mol_rdf,
-      intra_mol_rdf,
       omega,
-      inter_mol_omega,
-      intra_mol_omega,
     };
 
     const std::vector<std::string> KernelMap = 
@@ -63,11 +61,7 @@ class Config
       "printProcXYZ",
       "histogram",
       "rdf",
-      "inter_mol_rdf",
-      "intra_mol_rdf",
       "omega",
-      "inter_mol_omega",
-      "intra_mol_omega",
     };
     bool setKernelFromStr();
     std::string kernelStr;

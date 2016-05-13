@@ -21,17 +21,16 @@ void kernel_switcher(
                     )
 {
 
+  //############################//
+  //>>> LAMBDA CONSTRUCTION  <<<//
+  //############################//
   // construct comparison lambda
   function<bool (int i, int j)> compare;
   bool selfHist = conf->selfHist;
   //#############//
   //### INTRA ###//
   //#############//
-  if (
-       conf->kernel == Config::intra_mol_rdf or
-       conf->kernel == Config::intra_mol_omega
-     )
-  {
+  if (conf->intra) {
     conf->print("--> Constructing intra-molecular lambda");
     compare = [&] (int i,int j) {
       bool test1 = (mol1[i] == mol2[j]); // intra molecular
@@ -42,11 +41,7 @@ void kernel_switcher(
   //#############//
   //### INTER ###//
   //#############//
-  } else if (
-              conf->kernel == Config::inter_mol_rdf or
-              conf->kernel == Config::inter_mol_omega
-            )
-  {
+  } else if (conf->inter) {
     conf->print("--> Constructing inter-molecular lambda");
     compare = [&] (int i,int j) {
       bool test1 = (mol1[i] != mol2[j]); // inter molecular
@@ -68,7 +63,6 @@ void kernel_switcher(
       return test1;
     };
   } else {
-
   //################//
   //### CATCHALL ###//
   //################//
@@ -77,7 +71,10 @@ void kernel_switcher(
       return true;
     };
   };
-         
+
+  //#########################//
+  //>>> KERNEL SWITCHING  <<<//
+  //#########################//
                       
   //####################//
   //### printProcXYZ ###//
@@ -92,9 +89,7 @@ void kernel_switcher(
   //#####################//
   } else if (
              conf->kernel == Config::histogram  or
-             conf->kernel == Config::rdf or
-             conf->kernel == Config::inter_mol_rdf or
-             conf->kernel == Config::intra_mol_rdf
+             conf->kernel == Config::rdf
             ) 
   {
     conf->print("--> Calling kernel: histogram/rdf");
@@ -109,12 +104,7 @@ void kernel_switcher(
   //#############//
   //### omega ###//
   //#############//
-  } else if (
-             conf->kernel == Config::omega or
-             conf->kernel == Config::inter_mol_omega or
-             conf->kernel == Config::intra_mol_omega
-            ) 
-  {
+  } else if ( conf->kernel == Config::omega) {
     conf->print("--> Calling kernel: omega");
     omega(writer->vecFloat,
           writer->pair_count,
@@ -136,6 +126,9 @@ void kernel_switcher(
     exit(EXIT_FAILURE);
   }
 
+  //###################//
+  //>>> DATA OUTPUT <<<//
+  //###################//
   writer->step_count+=1;
   writer->box[0]+=box[0];
   writer->box[1]+=box[1];
