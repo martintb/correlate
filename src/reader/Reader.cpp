@@ -49,7 +49,7 @@ map<string,string> Reader::extInfo = {
                                         {".lmpmolecular","LAMMPS topology file w/ AtomStyle Molecular"},
                                         {".dcd","DCD trajectory file"},
                                         {".topo","Simple 2-Column (Type,Molecule) Topology File"},
-                                        {".xml","HOOMD-Blue based XML topology file"},
+                                        {".xml","HOOMD-Blue topology file (optional molecule section is supported)"},
                                      };
 
 void Reader::printReaderList() {

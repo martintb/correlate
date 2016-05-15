@@ -29,7 +29,6 @@ Base Options:
   --inter                        restrict calculation to inter-molecular pairs
   --type1 arg                    bead type 1 (e.g A or A,B)
   --type2 arg                    bead type 2
-  --nthreads arg (=1)            placeholder pending future threading support
 
 File Reading:
   --input_path arg (=./)         path to input data files
@@ -56,6 +55,7 @@ The following readers are available:
 .lmpfull        LAMMPS structure file w/ AtomStyle Full
 .lmpmolecular   LAMMPS structure file w/ AtomStyle Molecular
 .topo           Simple 2-Column (Type,Molecule) Topology File
+.xml            HOOMD-Blue topology file (optional molecule section is supported)
 
 The following calculation kernels are available:
 printProcXYZ
@@ -96,6 +96,7 @@ output_freq   = 1
 * LAMMPS data file w/ AtomStyle Molecular (.lmpmolecular)
 * CHARMM/LAMMPS/HOOMD style DCD trajectory file (.dcd)
 * Simple 2-Column (Type,Molecule) Topology File (.topo)
+* HOOMD-Blue xml files (with optional molecule section supported) (.xml)
 
 ## Dependencies:
 ### Required:
@@ -110,8 +111,6 @@ output_freq   = 1
 
 
 ### Future Optional Dependencies:
-1. rapidxml
-    * for reading HOOMD-blue .xml files (not implemented)
 2. CUDA
     * for GPU accelerated kernels (not implemented)
 
