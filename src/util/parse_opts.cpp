@@ -26,8 +26,7 @@ bool parse_opts(int argc, char* argv[], Config::ptr &conf)
     ("intra",  po::bool_switch()->default_value(false), "restrict calculation to intra-molecular pairs")
     ("inter",  po::bool_switch()->default_value(false), "restrict calculation to inter-molecular pairs")
     ("type1",         po::value<string>(), "bead type 1 (e.g A or A,B)")
-    ("type2",         po::value<string>(), "bead type 2")
-    ("nthreads",      po::value<int>()->default_value(1),"placeholder pending future threading support")
+    ("type2",         po::value<string>(), "bead type 2 (e.g A or C,D)")
   ;
 
   po::options_description fileInOpt("File Reading");
@@ -114,7 +113,6 @@ bool parse_opts(int argc, char* argv[], Config::ptr &conf)
   conf->frame_start = vm["frame_start"].as<int>();
   conf->frame_end   = vm["frame_end"].as<int>();
   conf->frame_step  = vm["frame_step"].as<int>();
-  conf->nthreads    = vm["nthreads"].as<int>();
   conf->dx          = vm["dx"].as<float>();
   conf->xmax        = vm["xmax"].as<float>();
   conf->overwrite   = vm["overwrite"].as<bool>();

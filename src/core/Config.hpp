@@ -40,7 +40,7 @@ class Config
     int frame_start;
     int frame_end;
     int frame_step;
-    int nthreads;
+    int nthreads; //placeholder
     float dx;
     float xmax;
     int xsize;

@@ -131,7 +131,7 @@ void Writer::writeHeader(int cutoff) {
   file << "# intra       = " << boolalpha<<conf->intra     << endl;
   file << "# inter       = " << boolalpha<<conf->inter     << endl;
   file << "# --------------------------------------------------------------------------" << endl;
-  file << "# --> First row below the grid bin edges (either fourier or real space)" << endl;
+  file << "# --> First row below is the grid bin edges (either fourier or real space)" << endl;
   file << "# --> Subsequent rows are data chunks calculated over output_freq timesteps" << endl;
   file << "# --------------------------------------------------------------------------" << endl;
 

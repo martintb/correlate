@@ -115,7 +115,7 @@ void Config::sync()
   syncString(type1);
   syncString(type2);
   syncString(kernelStr);
-  this->setKernelFromStr();
+  // this->setKernelFromStr();
 
   // decide what type of histogram we have
   if (inter) {

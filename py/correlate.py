@@ -15,9 +15,9 @@ trialDict = analyze.trials.parse(trial_path,RE,sort=SI,makeDict=True)
 
 
 #think of better names for these variables 
-rmax = 45
+rmax = 50
 dr = 0.1
-N = int(45.0/dr)
+N = int(rmax/dr)
 dk = np.pi/((N+1)*dr)
 kmax = N*dk
 num_frames_to_sample = 125
@@ -186,6 +186,7 @@ for i,TP in enumerate(analyze.trials.loop(trialDict,repSelect=['0','L100'])):
     cmd_list=  ['mpirun correlate']
     cmd_list+= [' --output_file={}'.format(tempFile)]
     cmd_list+= [' --output_freq={}'.format(frames_per_chunk)]
+    cmd_list+= [' --overwrite']
     cmd_list+= [' --input_path={}'.format(TP.make())]
     cmd_list+= [' --topo={}'.format('data.lmpbond')]
     cmd_list+= [' --trj={}'.format('trajectory.eq.dcd')]
@@ -196,12 +197,14 @@ for i,TP in enumerate(analyze.trials.loop(trialDict,repSelect=['0','L100'])):
     cmd_list+= [' --dx={}'.format(dr)]
     cmd_list+= [' --xmax={}'.format(rmax)]
     cmd_list+= [' --kernel={}'.format('rdf')]
+    cmd_list+= ['']
 
     cmd = ''
     print '.:: Setting up the following command to calculate the full rdf:'
-    cmd_list[-3]=' --dx={}'.format(dr)
-    cmd_list[-2]=' --xmax={}'.format(rmax)
-    cmd_list[-1]=' --kernel={}'.format('rdf')
+    cmd_list[-4]=' --dx={}'.format(dr)
+    cmd_list[-3]=' --xmax={}'.format(rmax)
+    cmd_list[-2]=' --kernel={}'.format('rdf')
+    cmd_list[-1]=''
     for cmd_chunk in cmd_list:
       cmd += cmd_chunk
       print '\t',cmd_chunk
@@ -210,24 +213,12 @@ for i,TP in enumerate(analyze.trials.loop(trialDict,repSelect=['0','L100'])):
     fullRDFDD[pair] = {'x':corr_data[0],'y':corr_data[1:]}
     os.remove(tempFile)
 
-    ## cmd = ''
-    ## print '.:: Setting up the following command to calculate the intra-molecular rdf:'
-    ## cmd_list[-3]=' --dx={}'.format(dr)
-    ## cmd_list[-2]=' --xmax={}'.format(rmax)
-    ## cmd_list[-1]=' --kernel={}'.format('intra_mol_rdf')
-    ## for cmd_chunk in cmd_list:
-    ##   cmd += cmd_chunk
-    ##   print '\t',cmd_chunk
-    ## subprocess.check_call(shlex.split(cmd))
-    ## corr_data = np.loadtxt(tempFile)
-    ## intraRDFDD[pair] = {'x':corr_data[0],'y':corr_data[1:]}
-    ## os.remove(tempFile)
-
     cmd = ''
     print '.:: Setting up the following command to calculate the inter-molecular rdf:'
-    cmd_list[-3]=' --dx={}'.format(dr)
-    cmd_list[-2]=' --xmax={}'.format(rmax)
-    cmd_list[-1]=' --kernel={}'.format('inter_mol_rdf')
+    cmd_list[-4]=' --dx={}'.format(dr)
+    cmd_list[-3]=' --xmax={}'.format(rmax)
+    cmd_list[-2]=' --kernel={}'.format('rdf')
+    cmd_list[-1]=' --inter'
     for cmd_chunk in cmd_list:
       cmd += cmd_chunk
       print '\t',cmd_chunk
@@ -238,23 +229,11 @@ for i,TP in enumerate(analyze.trials.loop(trialDict,repSelect=['0','L100'])):
 
 
     cmd = ''
-    print '.:: Setting up the following command to calculate the full omega:'
-    cmd_list[-3]=' --dx={}'.format(dk)
-    cmd_list[-2]=' --xmax={}'.format(kmax)
-    cmd_list[-1]=' --kernel={}'.format('omega')
-    for cmd_chunk in cmd_list:
-      cmd += cmd_chunk
-      print '\t',cmd_chunk
-    subprocess.check_call(shlex.split(cmd))
-    corr_data = np.loadtxt(tempFile)
-    fullOmegaDD[pair] = {'x':corr_data[0],'y':corr_data[1:]}
-    os.remove(tempFile)
-
-    cmd = ''
     print '.:: Setting up the following command to calculate the intra-molecular omega:'
-    cmd_list[-3]=' --dx={}'.format(dk)
-    cmd_list[-2]=' --xmax={}'.format(kmax)
-    cmd_list[-1]=' --kernel={}'.format('intra_mol_omega')
+    cmd_list[-4]=' --dx={}'.format(dk)
+    cmd_list[-3]=' --xmax={}'.format(kmax)
+    cmd_list[-2]=' --kernel={}'.format('omega')
+    cmd_list[-1]=' --intra'
     for cmd_chunk in cmd_list:
       cmd += cmd_chunk
       print '\t',cmd_chunk
@@ -263,18 +242,6 @@ for i,TP in enumerate(analyze.trials.loop(trialDict,repSelect=['0','L100'])):
     intraOmegaDD[pair] = {'x':corr_data[0],'y':corr_data[1:]}
     os.remove(tempFile)
 
-    cmd = ''
-    print '.:: Setting up the following command to calculate the inter-molecular omega:'
-    cmd_list[-3]=' --dx={}'.format(dk)
-    cmd_list[-2]=' --xmax={}'.format(kmax)
-    cmd_list[-1]=' --kernel={}'.format('inter_mol_omega')
-    for cmd_chunk in cmd_list:
-      cmd += cmd_chunk
-      print '\t',cmd_chunk
-    subprocess.check_call(shlex.split(cmd))
-    corr_data = np.loadtxt(tempFile)
-    interOmegaDD[pair] = {'x':corr_data[0],'y':corr_data[1:]}
-    os.remove(tempFile)
 
 
   newdict={}
