@@ -6,6 +6,7 @@
 #include <vector>
 #include <memory>
 
+#include "NotProvidedException.hpp"
 #include "Reader.hpp"
 
 class topoReader: public Reader  {
@@ -29,11 +30,21 @@ class topoReader: public Reader  {
     virtual void getTypes(std::vector<std::string>&);
 
     //Virtuals not used by this class
-    virtual void getVelocities(std::vector<float>&,std::vector<float>&,std::vector<float>&) {};
-    virtual void getImages(std::vector<int>&,std::vector<int>&,std::vector<int>&) {};
-    virtual void getCharge(std::vector<float>&) {};
-    virtual void getPositions(std::vector<float>&,std::vector<float>&,std::vector<float>&) {};
-    virtual void getBox(std::vector<float>&) {};
+    virtual void getVelocities(std::vector<float>&,std::vector<float>&,std::vector<float>&) {
+      throw NotProvidedException("topoReader","velocities");
+    };
+    virtual void getImages(std::vector<int>&,std::vector<int>&,std::vector<int>&) {
+      throw NotProvidedException("topoReader","image flags");
+    };
+    virtual void getCharge(std::vector<float>&) {
+      throw NotProvidedException("topoReader","charges");
+    };
+    virtual void getPositions(std::vector<float>&,std::vector<float>&,std::vector<float>&) {
+      throw NotProvidedException("topoReader","positions");
+    };
+    virtual void getBox(std::vector<float>&) {
+      throw NotProvidedException("topoReader","box lengths");
+    };
 
 
 

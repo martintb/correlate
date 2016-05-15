@@ -7,25 +7,24 @@ namespace po = boost::program_options;
 #include "AtomGroup.hpp"
 #include "Config.hpp"
 #include "parse_opts.hpp"
+#include "NotProvidedException.hpp"
 
 using namespace std;
-
-void stepper(Config *conf); // forward declaration rather than mini hpp
 
 int main(int argc, char* argv[]) 
 {
   MPI::Init();
 
-  Config conf; // each proc carries a "configuration" object
+  Config::ptr conf = make_shared<Config>(); // each proc carries a "configuration" object
 
-  conf.print("============ PARSE INPUT ============");
+  conf->print("============ PARSE INPUT ============");
   bool success=false; //assume failure
-  if (conf.isRoot()) {
+  if (conf->isRoot()) {
     bool success1=false;
     bool success2=false;
-    success1 = parse_opts(argc,argv,&conf);
+    success1 = parse_opts(argc,argv,conf);
     if (success1)
-      success2 = conf.setKernelFromStr();
+      success2 = conf->setKernelFromStr();
     success = (success1 and success2);
   }
 
@@ -38,11 +37,12 @@ int main(int argc, char* argv[])
   } 
 
   int frame = 380;
-  AtomGroup::ptr AG = AtomGroup::make(conf.topoPath,conf.trjPath);
+  auto AG = AtomGroup::make(conf->topo_file->path.string(),conf->trj_file->path.string());
   AG->readFrame(frame);
   cout << "--> Successfully read frame " << frame << endl;
 
   vector<float> x1,y1,z1;
+  vector<float> vx1,vy1,vz1;
   vector<float> box(3,-1.0f);
   AG->getBox(box);
   cout << "--> Box (lx,ly,lz): ";
@@ -59,6 +59,10 @@ int main(int argc, char* argv[])
   cout << "y1[end] = " <<y1[y1.size()-1] << endl;
   cout << "z1[end] = " <<z1[z1.size()-1] << endl;
 
+  AG->topo->getVelocities(vx1,vy1,vz1);
+  cout << "vx1Size: " << vx1.size() << endl;
+  cout << "vy1Size: " << vy1.size() << endl;
+  cout << "vz1Size: " << vz1.size() << endl;
 
   MPI::Finalize(); // must be called by all procs before exiting
   return EXIT_SUCCESS;

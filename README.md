@@ -55,6 +55,7 @@ The following readers are available:
 .lmpbond        LAMMPS structure file w/ AtomStyle Bond
 .lmpfull        LAMMPS structure file w/ AtomStyle Full
 .lmpmolecular   LAMMPS structure file w/ AtomStyle Molecular
+.topo           Simple 2-Column (Type,Molecule) Topology File
 
 The following calculation kernels are available:
 printProcXYZ
@@ -94,6 +95,7 @@ output_freq   = 1
 * LAMMPS data file w/ AtomStyle Full (.lmpfull)
 * LAMMPS data file w/ AtomStyle Molecular (.lmpmolecular)
 * CHARMM/LAMMPS/HOOMD style DCD trajectory file (.dcd)
+* Simple 2-Column (Type,Molecule) Topology File (.topo)
 
 ## Dependencies:
 ### Required:

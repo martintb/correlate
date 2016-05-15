@@ -6,6 +6,7 @@
 #include <vector>
 #include <memory>
 
+#include "NotProvidedException.hpp"
 #include "lmpBaseReader.hpp"
 
 class lmpBondReader: public lmpBaseReader {
@@ -21,8 +22,7 @@ class lmpBondReader: public lmpBaseReader {
 
     //Virtual File getters
     // If reader doesn't support this datatype
-    // just define an empty function call. The caller
-    // is required to check if its reference has be changed
+    // throw an exception
     virtual void readFrame(int);
     virtual void printFileInfo();
     virtual void getPositions(std::vector<float>&,std::vector<float>&,std::vector<float>&);
@@ -30,8 +30,12 @@ class lmpBondReader: public lmpBaseReader {
     virtual void getTypes(std::vector<std::string>&);
     virtual void getMolecules(std::vector<int>&);
     virtual void getBox(std::vector<float>&);
-    virtual void getCharge(std::vector<float>&) {};
-    virtual void getVelocities(std::vector<float>&,std::vector<float>&,std::vector<float>&) {};
+    virtual void getCharge(std::vector<float>&) {
+      throw NotProvidedException("lmpBondReader","charges");
+    };
+    virtual void getVelocities(std::vector<float>&,std::vector<float>&,std::vector<float>&) {
+      throw NotProvidedException("lmpBondReader","velocities");
+    };
 
   private:
 

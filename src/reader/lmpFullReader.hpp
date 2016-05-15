@@ -6,6 +6,7 @@
 #include <vector>
 #include <memory>
 
+#include "NotProvidedException.hpp"
 #include "lmpBaseReader.hpp"
 
 class lmpFullReader: public lmpBaseReader {
@@ -31,7 +32,10 @@ class lmpFullReader: public lmpBaseReader {
     virtual void getMolecules(std::vector<int>&);
     virtual void getBox(std::vector<float>&);
     virtual void getCharge(std::vector<float>&);
-    virtual void getVelocities(std::vector<float>&,std::vector<float>&,std::vector<float>&) {};
+    virtual void getVelocities(std::vector<float>&,std::vector<float>&,std::vector<float>&) {
+      throw NotProvidedException("lmpFullReader","velocities");
+    };
+
 
   private:
 

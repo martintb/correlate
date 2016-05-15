@@ -6,6 +6,7 @@
 #include <vector>
 #include <memory>
 
+#include "NotProvidedException.hpp"
 #include "Reader.hpp"
 
 class dcdReader: public Reader  {
@@ -40,11 +41,21 @@ class dcdReader: public Reader  {
     virtual void getBox(std::vector<float>&);
 
     //Virtuals not used by this class
-    virtual void getVelocities(std::vector<float>&,std::vector<float>&,std::vector<float>&) {};
-    virtual void getImages(std::vector<int>&,std::vector<int>&,std::vector<int>&) {};
-    virtual void getTypes(std::vector<std::string>&) {};
-    virtual void getMolecules(std::vector<int>&) {};
-    virtual void getCharge(std::vector<float>&) {};
+    virtual void getVelocities(std::vector<float>&,std::vector<float>&,std::vector<float>&) {
+      throw NotProvidedException("dcdReader","velocities");
+    };
+    virtual void getImages(std::vector<int>&,std::vector<int>&,std::vector<int>&) {
+      throw NotProvidedException("dcdReader","images");
+    };
+    virtual void getTypes(std::vector<std::string>&) {
+      throw NotProvidedException("dcdReader","types");
+    };
+    virtual void getMolecules(std::vector<int>&) {
+      throw NotProvidedException("dcdReader","molecule numbers");
+    };
+    virtual void getCharge(std::vector<float>&) {
+      throw NotProvidedException("dcdReader","charges");
+    };
 
 
   private:
