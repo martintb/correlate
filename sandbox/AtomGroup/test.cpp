@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
     return EXIT_FAILURE;
   } 
 
-  int frame = 380;
+  int frame = 10;
   auto AG = AtomGroup::make(conf->topo_file->path.string(),conf->trj_file->path.string());
   AG->readFrame(frame);
   cout << "--> Successfully read frame " << frame << endl;
@@ -59,10 +59,20 @@ int main(int argc, char* argv[])
   cout << "y1[end] = " <<y1[y1.size()-1] << endl;
   cout << "z1[end] = " <<z1[z1.size()-1] << endl;
 
-  AG->topo->getVelocities(vx1,vy1,vz1);
-  cout << "vx1Size: " << vx1.size() << endl;
-  cout << "vy1Size: " << vy1.size() << endl;
-  cout << "vz1Size: " << vz1.size() << endl;
+  vector<string> tt;
+  AG->getTypes(tt);
+  cout << "Type Size: " << tt.size() << endl;
+  cout << "tt[0] = " << tt[0] << endl;
+  cout << "tt[10] = " << tt[10] << endl;
+  cout << "tt[100] = " << tt[100] << endl;
+
+  vector<int> mm;
+  AG->getMolecules(mm);
+  cout << "Molecule Size: " << mm.size() << endl;
+  cout << "mm[0] = " << mm[0] << endl;
+  cout << "mm[10] = " << mm[10] << endl;
+  cout << "mm[100] = " << mm[100] << endl;
+
 
   MPI::Finalize(); // must be called by all procs before exiting
   return EXIT_SUCCESS;

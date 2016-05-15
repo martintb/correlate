@@ -5,9 +5,6 @@
 #include "lmpMolecularReader.hpp"
 #include "lmpFullReader.hpp"
 #include "topoReader.hpp"
-
-#ifdef XML
 #include "xmlReader.hpp"
-#endif
 
 #endif

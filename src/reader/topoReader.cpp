@@ -18,6 +18,7 @@ topoReader::topoReader(string fileName) :
 {
   this->fileExists(fileName);
   this->fileName = fileName;
+  numFrames = 1;
 
   ifstream f(fileName);
   natoms = 0;
@@ -39,7 +40,7 @@ void topoReader::readFrame(int) {
 
 void topoReader::printFileInfo() {
   cout << "File Name:          " << fileName << endl;
-  cout << "Number of Frames:   " << 1        << endl;
+  cout << "Number of Frames:   " << numFrames<< endl;
   cout << "Number of Atoms:    " << natoms   << endl;
 }
 

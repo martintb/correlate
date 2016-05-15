@@ -29,7 +29,4 @@ $(EXEC): $(DEPS)
 
 
 clean:
-	rm -f $(EXEC)
-
-allclean:
 	rm -f $(EXEC) $(AGOBJ) $(READEROBJ) $(MAINOBJ) $(FILEOBJ) $(UTILOBJ) $(CUDAOBJ) $(KERNOBJ) $(COREOBJ)
