@@ -1,0 +1,12 @@
+#!/bin/bash
+#$ -pe mpi 40
+#$ -l exclusive=1
+#$ -N MPICUDA
+#$ -M martintb@udel.edu
+#$ -m eas
+#$ -j y
+#$ -o OUTPUTS
+
+export VALET_PATH=$VALET_PATH:$WORKDIR/udsw/valet/etc
+
+mpirun ./exec
