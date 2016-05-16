@@ -51,17 +51,17 @@ Calculation:
 
 The following readers are available:
 .dcd            DCD trajectory file
-.lmpbond        LAMMPS structure file w/ AtomStyle Bond
-.lmpfull        LAMMPS structure file w/ AtomStyle Full
-.lmpmolecular   LAMMPS structure file w/ AtomStyle Molecular
-.topo           Simple 2-Column (Type,Molecule) Topology File
+.topo           Two-Column (Type,Molecule) topology file
+.lmpbond        LAMMPS topology file w/ AtomStyle Bond
+.lmpfull        LAMMPS topology file w/ AtomStyle Full
+.lmpmolecular   LAMMPS topology file w/ AtomStyle Molecular
 .xml            HOOMD-Blue topology file (optional molecule section is supported)
 
 The following calculation kernels are available:
-printProcXYZ
 histogram
 rdf
 omega
+printProcXYZ
 ```
 ### via configiration file:
 note the lack of quotation marks for strings
@@ -91,11 +91,11 @@ output_freq   = 1
     * command line specification super-cedes the input file
 
 ## Supported Topology and Trajectory Files:
+* Two-Column (Type,Molecule) topology File (.topo)
 * LAMMPS data file w/ AtomStyle Bond (.lmpbond)
 * LAMMPS data file w/ AtomStyle Full (.lmpfull)
 * LAMMPS data file w/ AtomStyle Molecular (.lmpmolecular)
 * CHARMM/LAMMPS/HOOMD style DCD trajectory file (.dcd)
-* Simple 2-Column (Type,Molecule) Topology File (.topo)
 * HOOMD-Blue xml files (with optional molecule section supported) (.xml)
 
 ## Dependencies:
