@@ -8,5 +8,6 @@
 #$ -o OUTPUTS
 
 export VALET_PATH=$VALET_PATH:$WORKDIR/udsw/valet/etc
+source ../../env/Valet.sh
 
 mpirun ./exec

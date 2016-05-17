@@ -136,7 +136,7 @@ void Writer::writeHeader(int cutoff) {
   file << "# --------------------------------------------------------------------------" << endl;
 
   for (int i=0;i<conf->xsize;i++) {
-    float x = i*conf->dx;
+    float x = (i+1)*conf->dx;
     if (x<cutoff) {
       file << x << " ";
     }
@@ -168,7 +168,7 @@ void Writer::writeHorizontal(bool reset) {
     }
     ofstream file(conf->output_file->path.string(),std::ofstream::app);
     for (int i=0;i<conf->xsize;i++) {
-      float x     = (i*conf->dx);
+      float x     = ((i+1)*conf->dx);
       float value = (vecMaster[i]*coeffMult[i] + coeffAdd[i]);
       if (x<cutoff) {
         file << value << " ";

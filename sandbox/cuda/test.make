@@ -9,8 +9,8 @@ EXEC=exec
 CC=mpicc
 CXX=mpicxx
 LD=mpicxx
-LDFLAGS+= -L$(CUDA_LIB_HOME)
-LDLIBS+= -lcuda -lcudart
+LDFLAGS+= 
+LDLIBS+= -lcudart
 CPPFLAGS+=  -std=c++11 -g -Wall
 CUDAFLAGS= -arch=sm_35
 
