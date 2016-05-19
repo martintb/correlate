@@ -25,7 +25,7 @@ masterAtomGroup::masterAtomGroup(string topoFile,string trjFile,bool printFileIn
   if (printFileInfo) {
     topo->printReaderInfo();
     topo->printFileInfo();
-    cout << "-----------------------------" << endl;
+    cout << "------------------------------------------------" << endl;
     trj->printReaderInfo();
     trj->printFileInfo();
   }
