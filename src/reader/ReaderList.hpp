@@ -6,5 +6,5 @@
 #include "lmpFullReader.hpp"
 #include "topoReader.hpp"
 #include "xmlReader.hpp"
-
+#include "lmpDumpReader.hpp"
 #endif

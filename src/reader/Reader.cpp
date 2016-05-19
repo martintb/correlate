@@ -44,11 +44,12 @@ vector<string> Reader::splitStr(string in,string delim) {
 }
 
 map<string,string> Reader::extInfo = { 
+                                        {".dcd","DCD trajectory file"},
+                                        {".lmpdump","LAMMPS Dump trajectory file"},
+                                        {".topo","Simple 2-Column (Type,Molecule) Topology File"},
                                         {".lmpbond","LAMMPS topology file w/ AtomStyle Bond"},
                                         {".lmpfull","LAMMPS topology file w/ AtomStyle Full"},
                                         {".lmpmolecular","LAMMPS topology file w/ AtomStyle Molecular"},
-                                        {".dcd","DCD trajectory file"},
-                                        {".topo","Simple 2-Column (Type,Molecule) Topology File"},
                                         {".xml","HOOMD-Blue topology file (optional molecule section is supported)"},
                                      };
 
@@ -67,6 +68,9 @@ Reader::ptr Reader::get(string fileName) {
 
   } else if (p.extension().compare(".topo")==0) {
     return make_shared<topoReader>(fileName);
+
+  } else if (p.extension().compare(".lmpdump")==0) {
+    return make_shared<lmpDumpReader>(fileName);
 
   } else if (p.extension().compare(".lmpbond")==0) {
     return make_shared<lmpBondReader>(fileName);
