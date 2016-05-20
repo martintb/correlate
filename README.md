@@ -14,8 +14,10 @@ This will split up a partial radial-distribution function calculation amongst 10
     * radial distribution function
 3. **omega**
     * structure factor calculation via sin(kr)/kr summation
-4. **printProcXYZ**
-    * Print the xyz coordinates of each mpi process (debugging tool)
+4. **msid**
+    * mean-square internal distances 
+4. **procData**
+    * print the xyz coordinates of each mpi process (debugging tool)
 
 ## Input Variables:
 ### via command line:
@@ -52,6 +54,7 @@ Calculation:
 The following readers are available:
 .dcd            DCD trajectory file
 .topo           Two-Column (Type,Molecule) topology file
+.lmpdump        LAMMPS dump trajectory file (sorted or unsorted)
 .lmpbond        LAMMPS topology file w/ AtomStyle Bond
 .lmpfull        LAMMPS topology file w/ AtomStyle Full
 .lmpmolecular   LAMMPS topology file w/ AtomStyle Molecular
@@ -61,7 +64,8 @@ The following calculation kernels are available:
 histogram
 rdf
 omega
-printProcXYZ
+msid
+procData
 ```
 ### via configiration file:
 note the lack of quotation marks for strings
@@ -92,35 +96,36 @@ output_freq   = 1
 
 ## Supported Topology and Trajectory Files:
 * Two-Column (Type,Molecule) topology File (.topo)
-* LAMMPS data file w/ AtomStyle Bond (.lmpbond)
+* LAMMPS dump trajectory file (.lmpdump)
 * LAMMPS data file w/ AtomStyle Full (.lmpfull)
 * LAMMPS data file w/ AtomStyle Molecular (.lmpmolecular)
 * CHARMM/LAMMPS/HOOMD style DCD trajectory file (.dcd)
 * HOOMD-Blue xml files (with optional molecule section supported) (.xml)
 
+Currently, correlate recognizes the filetype purely through the extension of the file. 
+In order to differentiate the various types of LAMMPS files (and others), the user will likely need to rename their files. An alternative is to create symbolic links to the original files, with the corrected extension: e.g. for a lammps data file named *data.lammps* with AtomStyle Full:
+```
+ln -s data.lammps data.lmpfull
+```
+In this way you preserve the original file with the original name name, while allowing correlate to easily recognize the file types. 
+
 ## Dependencies:
 ### Required:
 * cpp compiler with c++11 and std::regex support
-    * tested with gcc 4.9.3
-* boost
-    * boost_filesystem
-    * boost_system
-    * boost_program_options
+    * developed with gcc 4.9.3
+* Boost C++ Libraries
+    * developed with Boost 1.60
+    * required compiled boost sub-libraries:
+        * boost_filesystem
+        * boost_system
+        * boost_program_options
 * an implementation of MPI
     * tested with OpenMPI 1.8.2 and 1.10.2
 
 
-### Future Optional Dependencies:
-2. CUDA
-    * for GPU accelerated kernels (not implemented)
-
 ## Build Instructions:
+Just make sure that the above dependencies are fulfilled and that CFLAGS,LDLIBS, and LDFLAGS are properly set (in environment or in the Makefile) and then run make with the appropriate parallelization level:
 ```
 make -j6
 ```
-Correlate doesn't currently have an install routine set up. Just copy or symlink the correlate executable to directory you need it in. 
-
-## Future Features
-* Support for GPU based kernels via CUDA
-* Support for full CPU + GPU simultaneous operation
-    * User should be able to select fraction of system to be calculated on GPU
+Correlate doesn't currently have an install target set up. Just copy or symlink the correlate executable to directory you need it in or add the source directory to your PATH.  
