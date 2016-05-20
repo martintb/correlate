@@ -45,7 +45,7 @@ vector<string> Reader::splitStr(string in,string delim) {
 
 map<string,string> Reader::extInfo = { 
                                         {".dcd","DCD trajectory file"},
-                                        {".lmpdump","LAMMPS Dump trajectory file"},
+                                        {".lmpdump","LAMMPS dump trajectory file (sorted or unsorted)"},
                                         {".topo","Simple 2-Column (Type,Molecule) Topology File"},
                                         {".lmpbond","LAMMPS topology file w/ AtomStyle Bond"},
                                         {".lmpfull","LAMMPS topology file w/ AtomStyle Full"},

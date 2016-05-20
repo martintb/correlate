@@ -77,10 +77,10 @@ void kernel_switcher(
   //#########################//
                       
   //####################//
-  //### printProcXYZ ###//
+  //### printProcData ###//
   //####################//
-  if (conf->kernel == Config::printProcXYZ) {
-    conf->print("--> Calling kernel: printProcXYZ");
+  if (conf->kernel == Config::procData) {
+    conf->print("--> Calling kernel: procData");
     printProcXYZ(frame,"xyz1",x1,y1,z1);
     printProcXYZ(frame,"xyz2",x2,y2,z2);
     
@@ -112,6 +112,19 @@ void kernel_switcher(
           x2,y2,z2,
           box,
           conf->xmax, conf->dx,
+          compare);
+
+  //#############//
+  //### msid ###//
+  //#############//
+  } else if ( conf->kernel == Config::msid) {
+    conf->print("--> Calling kernel: msid");
+    msid(writer->vecFloat,
+          writer->pair_count,
+          x1,y1,z1,
+          x2,y2,z2,
+          box,
+          conf->xmax,offset,
           compare);
 
   //##############//

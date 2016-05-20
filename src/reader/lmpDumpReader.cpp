@@ -12,7 +12,7 @@
 using namespace std;
 
 lmpDumpReader::lmpDumpReader(string fileName) : 
-  Reader("lmpDump",
+  Reader("lmpdump",
           Reader::POSITION | \
           Reader::BOX
         )
@@ -31,7 +31,7 @@ lmpDumpReader::~lmpDumpReader() {
 std::string lmpDumpReader::nextItem(string tag)
 {
   if (file.eof()) return " ";
-  regex sectionRE("ITEM: "+tag+".*",regex::extended);
+  regex sectionRE("^ITEM: "+tag+".*",regex::extended);
   string line;
   while (getline(file,line)) {
     if (regex_search(line,sectionRE)) {
@@ -81,17 +81,21 @@ void lmpDumpReader::initialParse() {
   numFrames = frameMap.size();
   file.clear();
   file.seekg(0,ios::beg); //return to top of file
-  cout << "--> Done!" << endl;
-  cout << "--> frameStart: " << frameStart << endl;
-  cout << "--> frameEnd:   " << frameEnd << endl;
-  cout << "--> frameSkip:  " << frameSkip << endl;
-  cout << "--> numFrames:  " << numFrames << endl;
+  cout << "--> Success! Read lmpdump and created timestep->framenumber map." << endl;
 }
 
 void lmpDumpReader::goToFrame(int frame, bool recurse) {
+  /* This function is designed so that it'll search forward from
+   * the current point in the file for the specified frame. If that 
+   * frame is not found, it'll reset the pointer to the beginning of
+   * the file and try again. This makes forward iteration through the 
+   * file more efficient, which is the likely use case.
+   */
+
   if ((frame>(numFrames-1)) or (frame<0)) {
-    cerr << "Error! Frame is out of bounds!" << endl;
+    cerr << "Error! Frame is out of bounds for this lmpdump!" << endl;
     cerr << "Frame: " << frame << endl;
+    LOC();
     exit(EXIT_FAILURE);
   }
 
@@ -109,7 +113,7 @@ void lmpDumpReader::goToFrame(int frame, bool recurse) {
   }
 
   // we didn't find the frame from the current position,
-  // so we go back to the start and try again
+  // so we go back to the start and try again (but only once)
   if (recurse) {
     file.clear();
     file.seekg(0,ios::beg); //return to top of file
@@ -157,15 +161,24 @@ void lmpDumpReader::readFrame(int frame) {
   map<string,vector<float> > dataMap;
   float temp;
   for (int i=0;i<natoms;++i) {
+    // the first two keys are ITEM: and ATOMS
     for (auto key = keys.begin()+2;key!=keys.end();++key) {
-      file >>temp;
+      file>>temp;
       dataMap[*key].push_back(temp);
     }
   }
-
-  x = dataMap["x"];
-  y = dataMap["y"];
-  z = dataMap["z"];
+  
+  // lmpDump files can be unsorted, so this loop
+  // effectively sorts the values by id
+  x.resize(natoms);
+  y.resize(natoms);
+  z.resize(natoms);
+  for (int i=0;i<natoms;i++) {
+    int id = static_cast<int>(dataMap["id"][i])-1;
+    x[id] = dataMap["x"][i];
+    y[id] = dataMap["y"][i];
+    z[id] = dataMap["z"][i];
+  }
 }
 
 void lmpDumpReader::printFileInfo() {

@@ -210,14 +210,35 @@ void Config::printKernelList() {
 }
 
 bool Config::setKernelFromStr() {
-  if (kernelStr.compare("printProcXYZ")==0) {
-    kernel = KernelType::printProcXYZ;
+  if (kernelStr.compare("procData")==0) {
+    kernel = KernelType::procData;
   } else if (kernelStr.compare("histogram")==0) {
     kernel = KernelType::histogram;
   } else if (kernelStr.compare("rdf")==0) {
     kernel = KernelType::rdf;
   } else if (kernelStr.compare("omega")==0) {
     kernel = KernelType::omega;
+  } else if (kernelStr.compare("msid")==0) {
+    if (inter) {
+      this->print("==> Overriding --inter flag. Setting to *false* for MSID calculation.");
+      inter=false;
+    }
+    if (not intra) {
+      this->print("==> Overriding --intra flag. Setting to *true* for MSID calculation.");
+      intra=true;
+    }
+    if (dx!=1.0) {
+      this->print("==> Overriding --dx setting. Setting to dx=1 for MSID calculation.");
+      dx=true;
+    }
+    if (not (type1.compare(type2)==0)) {
+      cerr << "Error! type1 and type2 must be equal for MSID calculation!" << endl;
+      cerr << "type1: " << type1 << endl;
+      cerr << "type2: " << type2 << endl;
+      return false;
+    }
+    this->print("==> IMPORTANT! Assuming --xmax is equal to chain length!");
+    kernel = KernelType::msid;
   } else {
     cerr << "Error! Kernel string not recognized." << endl;
     cerr << "Kernel string: " << kernelStr << endl;

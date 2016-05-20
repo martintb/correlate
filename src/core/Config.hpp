@@ -50,18 +50,20 @@ class Config
 
 
     enum KernelType {
-      printProcXYZ,
       histogram,
       rdf,
       omega,
+      msid,
+      procData,
     };
 
     const std::vector<std::string> KernelMap = 
     { 
-      "printProcXYZ",
       "histogram",
       "rdf",
       "omega",
+      "msid",
+      "procData",
     };
     bool setKernelFromStr();
     std::string kernelStr;

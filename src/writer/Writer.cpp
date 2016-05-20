@@ -24,10 +24,10 @@ Writer::Writer(Config::ptr conf) {
 }
 
 Writer::ptr Writer::get(Config::ptr &conf) {
-  if ( conf->kernel == Config::histogram or conf->kernel == Config::rdf) {
+  if ( (conf->kernel == Config::histogram) or (conf->kernel == Config::rdf)) {
     return make_shared<intWriter>(conf);
 
-  } else if ( conf->kernel == Config::omega ) {
+  } else if ( (conf->kernel == Config::omega) or (conf->kernel == Config::msid)) {
     return make_shared<floatWriter>(conf);
 
   } else {
@@ -202,14 +202,24 @@ void Writer::buildCoeff() {
   coeffAdd.assign(conf->xsize,0.0f);
   coeffMult.assign(conf->xsize,1.0f);
   for (int i=0;i<conf->xsize;i++) {
-    float x1  = (i*conf->dx);
-    float x2  = ((i+1)*conf->dx);
-    float vol = ((4.0/3.0) * M_PI * (x2*x2*x2  - x1*x1*x1));
-    if (conf->kernel == Config::rdf) 
+    if (conf->kernel == Config::histogram) 
     {
+      coeffMult[i]*=(1.0/(step_count));
+    }
+    else if (conf->kernel == Config::msid) 
+    {
+      int fac = 2*((conf->xsize)-i-1);
+      coeffMult[i]*=(1.0/(step_count*fac));
+    }
+    else if (conf->kernel == Config::rdf) 
+    {
+      float x1  = (i*conf->dx);
+      float x2  = ((i+1)*conf->dx);
+      float vol = ((4.0/3.0) * M_PI * (x2*x2*x2  - x1*x1*x1));
       coeffMult[i]*=(1.0/(step_count*vol*pair_rho));
     } 
     else if ( conf->kernel == Config::omega) {
+      float x2  = ((i+1)*conf->dx);
       if (conf->selfHist) coeffAdd[i] += 1.0;
       coeffMult[i]*=(1.0/(step_count*tot_natoms*x2));
     }
