@@ -89,7 +89,10 @@ output_freq   = 1
 * Values in parenthesis represent the default used if unspecified
 * Type groups can be specified by using commas
     * e.g. --type1=A,B or --type2=3,4,5
+* Use of --inter and --intra require that *sane* molecule numbers be passed in the topology file
+    * These flags are meaningless for the msid kernel, and therefore are ignored in this case. 
 * frame_start supports negative indexing from the last frame in the trajectory
+    * e.g. -10 represents 10 frames from the end of the trajectory
 * frame_end takes a -1 argument to mean the last frame in the trajectory
 * all variables can be specified either as command line arguments or in config file or both
     * command line specification super-cedes the input file
@@ -128,4 +131,4 @@ Just make sure that the above dependencies are fulfilled and that CFLAGS,LDLIBS,
 ```
 make -j6
 ```
-Correlate doesn't currently have an install target set up. Just copy or symlink the correlate executable to directory you need it in or add the source directory to your PATH.  
+Correlate doesn't currently have an install target set up. Just copy or symlink the correlate executable to directory you need it in or add the source directory to your PATH.
