@@ -15,8 +15,6 @@ using namespace std;
 
 bool parse_opts(int argc, char* argv[], Config::ptr &conf) 
 {
-  cout << "--> Attempting to parse command line and configure file options..." << endl;
-
   string config_file;
   po::options_description baseOpt("Base Options");
   baseOpt.add_options()
