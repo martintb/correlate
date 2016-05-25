@@ -8,11 +8,25 @@ from collections import defaultdict
 import MDAnalysis
 import subprocess,shlex
 
-trial_path = '/home/work/jayaraman_lab/martintb/bigpnc/trials/main'
-trial_key_file = os.path.join(trial_path,'trial_key.py')
-RE,SI = analyze.create.trialRE(trial_key_file, {}, sortKey=['epsAC','fG'])
-trialDict = analyze.trials.parse(trial_path,RE,sort=SI,makeDict=True)
+# trial_path = '/home/work/jayaraman_lab/martintb/bigpnc/trials/main'
+# trial_key_file = os.path.join(trial_path,'trial_key.py')
+# RE,SI = analyze.create.trialRE(trial_key_file, {}, sortKey=['fG','epsAC'])
+# trialDictA = analyze.trials.parse(trial_path,RE,sort=SI,makeDict=True)
 
+trial_path = '/home/work/jayaraman_lab/martintb/bigpnc/trials/small'
+trial_key_file = os.path.join(trial_path,'trial_key.py')
+RE,SI = analyze.create.trialRE(trial_key_file, {'fG':[0.7,1.0],'lenMatrix1':50}, sortKey=['fG','epsAC'])
+trialDictA = analyze.trials.parse(trial_path,RE,sort=SI,makeDict=True)
+
+
+trial_path = '/home/work/jayaraman_lab/martintb/bigpnc/trials/omega'
+trial_key_file = os.path.join(trial_path,'trial_key.py')
+RE,SI = analyze.create.trialRE(trial_key_file, {}, sortKey=['fG','epsAC'])
+trialDictB = analyze.trials.parse(trial_path,RE,sort=SI,makeDict=True)
+
+trialDict = {}
+trialDict.update(trialDictA)
+trialDict.update(trialDictB)
 
 #think of better names for these variables 
 rmax = 50
@@ -20,17 +34,24 @@ dr = 0.1
 N = int(rmax/dr)
 dk = np.pi/((N+1)*dr)
 kmax = N*dk
-num_frames_to_sample = 125
+num_frames_to_sample = 80
 frame_skip = 1
-frames_per_chunk = 25
+frames_per_chunk = 10
 num_chunks = int(num_frames_to_sample/frames_per_chunk)
 
 pklKeys = [dr,rmax,'{:5.4f}'.format(dk),'{:4.2f}'.format(kmax),num_frames_to_sample,frame_skip,frames_per_chunk]
 pklStr = '-'.join([str(i) for i in pklKeys])
-dumpName = '/home/work/jayaraman_lab/martintb/bigpnc/pkl/CORR-{}.pkl'.format(pklStr)
+dumpName = '/home/work/jayaraman_lab/martintb/bigpnc/pkl/SMALLCHI-{}.pkl'.format(pklStr)
 updateAll = False
 
 tempFile = 'temp.dat'
+# topoFile = 'data.lmpbond'
+# trjFile = 'trajectory.eq.dcd'
+# topology_format = 'DATA'
+xmlFile = 'initial.xml'
+topoFile = 'hoomd.topo'
+trjFile = 'eq_trajectory.dcd'
+topology_format = 'xml'
 
 pairs = []
 pairs += [('P','P')]
@@ -57,7 +78,9 @@ except IOError:
   print '.:: Making new',dumpName,'!' 
   dump={}
 
-for i,TP in enumerate(analyze.trials.loop(trialDict,repSelect=['0','L100'])):
+repSelect = ['0','L100']
+repSelect = ['0']
+for i,TP in enumerate(analyze.trials.loop(trialDict,repSelect=repSelect)):
   t1 = time.time()
   print 'Considering trial',i,'of',len(trialDict.keys())
 
@@ -65,20 +88,27 @@ for i,TP in enumerate(analyze.trials.loop(trialDict,repSelect=['0','L100'])):
   trialSpec['pairs'] = pairs
   trialSpec['pairMap'] = pairMap
 
-  if not os.path.exists(TP.make('data.lmpbond')):
-    print '.:: Data file doesn\'t exist! Skipping...'
+  if not os.path.exists(TP.make(topoFile)):
+    print '.:: topoFile file doesn\'t exist! Skipping...'
     continue
 
-  if not os.path.exists(TP.make('trajectory.eq.dcd')):
-    print '.:: DCD file doesn\'t exist! Skipping...'
+  if not os.path.exists(TP.make(trjFile)):
+    print '.:: trjFile doesn\'t exist! Skipping...'
     continue
 
   try:
-    universe = MDAnalysis.Universe(TP.make('data.lmpbond'),
-                                   TP.make('trajectory.eq.dcd'),
-                                   topology_format='DATA')
+    if topology_format=='DATA':
+      universe = MDAnalysis.Universe(TP.make(topoFile),
+                                   TP.make(trjFile),
+                                   topology_format=topology_format)
+    elif topology_format=='xml':
+      universe = MDAnalysis.Universe(TP.make(xmlFile),
+                                   TP.make(trjFile),
+                                   topology_format=topology_format)
+    else:
+      raise ValueError('Incorrect topology_format')
   except IOError,OSError:
-    print '.:: It appears that either the data or dcd file are missing or corrupted. Skipping...'
+    print '.:: It appears that either the data or trj file are missing or corrupted. Skipping...'
     continue
 
   numFrames = universe.trajectory.n_frames
@@ -172,8 +202,6 @@ for i,TP in enumerate(analyze.trials.loop(trialDict,repSelect=['0','L100'])):
     for k,v in phiDD[chunk]['2COMP'].items():
       print '--> Type: ',k,'phi2:',v
 
-
-
   intraRDFDD      = {}
   interRDFDD      = {}
   fullRDFDD       = {}
@@ -183,13 +211,25 @@ for i,TP in enumerate(analyze.trials.loop(trialDict,repSelect=['0','L100'])):
   frameStart      = fd['frames'][0,0]
   frameEnd        = fd['frames'][-1,1]
   for pair in pairs:
+    if (numParticles==0) and ('P' in pair):
+      print '--> Skipping pair',pair,'as numParticles is',numParticles
+      continue
+
+    if (numParticles==0) and ('G' in pair):
+      print '--> Skipping pair',pair,'as numParticles is',numParticles
+      continue
+
+    if (numMatrix1==0) and ('M' in pair):
+      print '--> Skipping pair',pair,'as numMatrix1 is',numMatrix1
+      continue
+
     cmd_list=  ['mpirun correlate']
     cmd_list+= [' --output_file={}'.format(tempFile)]
     cmd_list+= [' --output_freq={}'.format(frames_per_chunk)]
     cmd_list+= [' --overwrite']
     cmd_list+= [' --input_path={}'.format(TP.make())]
-    cmd_list+= [' --topo={}'.format('data.lmpbond')]
-    cmd_list+= [' --trj={}'.format('trajectory.eq.dcd')]
+    cmd_list+= [' --topo={}'.format(topoFile)]
+    cmd_list+= [' --trj={}'.format(trjFile)]
     cmd_list+= [' --type1={}'.format(pairMap[pair[0]])]
     cmd_list+= [' --type2={}'.format(pairMap[pair[1]])]
     cmd_list+= [' --frame_start={}'.format(frameStart)]
@@ -240,6 +280,21 @@ for i,TP in enumerate(analyze.trials.loop(trialDict,repSelect=['0','L100'])):
     subprocess.check_call(shlex.split(cmd))
     corr_data = np.loadtxt(tempFile)
     intraOmegaDD[pair] = {'x':corr_data[0],'y':corr_data[1:]}
+    os.remove(tempFile)
+
+
+    cmd = ''
+    print '.:: Setting up the following command to calculate the full omega:'
+    cmd_list[-4]=' --dx={}'.format(dk)
+    cmd_list[-3]=' --xmax={}'.format(kmax)
+    cmd_list[-2]=' --kernel={}'.format('omega')
+    cmd_list[-1]=''
+    for cmd_chunk in cmd_list:
+      cmd += cmd_chunk
+      print '\t',cmd_chunk
+    subprocess.check_call(shlex.split(cmd))
+    corr_data = np.loadtxt(tempFile)
+    fullOmegaDD[pair] = {'x':corr_data[0],'y':corr_data[1:]}
     os.remove(tempFile)
 
 

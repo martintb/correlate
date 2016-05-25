@@ -16,11 +16,11 @@ print 'xshape:',x.shape
 print 'yshape:',y.shape
 y = np.average(y,axis=0)
 
-N=50
-fac2 = np.array([2*(N-i-1) for i in range(N)])[:-1]
-fac1 = np.array([2*(N-i) for i in range(N)])[:-1]
-# y*= 1.0/(x*fac2*8000/fac1)
-y*= 1.0/(x*8000)
+# N=50
+# fac2 = np.array([2*(N-i-1) for i in range(N)])[:-1]
+# fac1 = np.array([2*(N-i) for i in range(N)])[:-1]
+# # y*= 1.0/(x*fac2*8000/fac1)
+# y*= 1.0/(x*8000)
 
 kw ={}
 kw['lw'] = 1.25

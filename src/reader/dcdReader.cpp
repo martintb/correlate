@@ -90,30 +90,40 @@ void dcdReader::goToFrame(int frame=0) {
 void dcdReader::readFrame(int frame=0) {
   uint32_t dummy[2];
   double BOX[6];
-  float X[natoms];
-  float Y[natoms];
-  float Z[natoms];
+  // float X[natoms];
+  // float Y[natoms];
+  // float Z[natoms];
 
   this->goToFrame(frame);
 
+  // file.read((char*)&dummy,1*sizeof(uint32_t));
+  // file.read((char*)&dummy,2*sizeof(uint32_t));
+  // file.read((char*)&X,sizeof(X));
+  // file.read((char*)&dummy,2*sizeof(uint32_t));
+  // file.read((char*)&Y,sizeof(Y));
+  // file.read((char*)&dummy,2*sizeof(uint32_t));
+  // file.read((char*)&Z,sizeof(Z));
+  // file.read((char*)&dummy,1*sizeof(uint32_t));
+
   file.read((char*)&dummy,1*sizeof(uint32_t));
+  // file.read(reinterpret_cast<char*>(&(box.front())),box.size()*sizeof(double));
   file.read((char*)&BOX,sizeof(BOX));
   file.read((char*)&dummy,2*sizeof(uint32_t));
-  file.read((char*)&X,sizeof(X));
+  file.read(reinterpret_cast<char*>(&(x.front())),x.size()*sizeof(float));
   file.read((char*)&dummy,2*sizeof(uint32_t));
-  file.read((char*)&Y,sizeof(Y));
+  file.read(reinterpret_cast<char*>(&(y.front())),y.size()*sizeof(float));
   file.read((char*)&dummy,2*sizeof(uint32_t));
-  file.read((char*)&Z,sizeof(Z));
+  file.read(reinterpret_cast<char*>(&(z.front())),z.size()*sizeof(float));
   file.read((char*)&dummy,1*sizeof(uint32_t));
 
   box[0] = BOX[0];
   box[1] = BOX[2];
   box[2] = BOX[5];
-  for (int i=0;i<natoms;i++) {
-    x[i] = X[i];
-    y[i] = Y[i];
-    z[i] = Z[i];
-  }
+  // for (int i=0;i<natoms;i++) {
+  //   x[i] = X[i];
+  //   y[i] = Y[i];
+  //   z[i] = Z[i];
+  // }
 
   if (frame==0) {
     int measured=((int) file.tellg())-headerBytes;

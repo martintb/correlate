@@ -115,7 +115,7 @@ void Writer::writeHeader(int cutoff) {
   file << "# trj file    = " << conf->trj_file->path       << endl;
   file << "# output file = " << conf->output_file->path    << endl;
   file << "# output freq = " << conf->output_freq          << endl;
-  file << "# overwrite   = " << boolalpha<<conf->output_freq<< endl;
+  file << "# overwrite   = " << boolalpha<<conf->overwrite<< endl;
   file << "# type1       = " << conf->type1                << endl;
   file << "# type2       = " << conf->type2                << endl;
   file << "# natoms1     = " << conf->natoms1              << endl;
