@@ -158,6 +158,7 @@ void stepper(Config::ptr &conf) {
     timer.toc("kernel",/*printSplit=*/true);
 
 
+    MPI::COMM_WORLD.Barrier();
     timer.toc("frame loop",/*printSplit=*/true);
     conf->print("-----------------------------------------------------------");
   }

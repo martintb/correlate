@@ -47,13 +47,15 @@ void Timer::toc(string key,bool printSplit)
   dt[key] += fsecs(t1-t0[key]).count();
   counts[key] += 1;
 
-  if ((mpi_rank==0) and printSplit) {
-    cout << ">>> root proc ";
-    cout << key;
-    cout << " split: ";
-    cout << fsecs(t1-t0[key]).count();
-    cout << " seconds" << endl;
-  };
+  if (printSplit) {
+    if (mpi_rank==0) {
+      cout << ">>> root proc ";
+      cout << key;
+      cout << " split: ";
+      cout << fsecs(t1-t0[key]).count();
+      cout << " seconds" << endl;
+    }
+  }
 }
 
 void Timer::print_stats() 
