@@ -136,7 +136,7 @@ void Writer::writeHeader(int cutoff) {
   file << "# --------------------------------------------------------------------------" << endl;
 
   for (int i=0;i<conf->xsize;i++) {
-    float x = (i+1)*conf->dx;
+    float x = ((i+1)*conf->dx);
     if (x<cutoff) {
       file << x << " ";
     }
