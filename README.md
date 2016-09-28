@@ -16,8 +16,13 @@ This will split up a partial radial-distribution function calculation amongst 10
     * structure factor calculation via sin(kr)/kr summation
 4. **msid**
     * mean-square internal distances 
-4. **procData**
+5. **procData**
     * print the xyz coordinates of each mpi process (debugging tool)
+
+### WARNING 1 (FOR MSID ONLY)
+All of the molecules must have be in "unwrapped" coordinates. The minimum image convention will not be applied during the calculation. The unwrapped coordinates can be specified in LAMMPS or created via post-processing in VMD or a custom script.
+
+Furthermore, only linear chain molecules will work for this calculator. The calculator assumes that if index 7 and index 12 are in the same molecule, they are separated by 5 bonds.  
 
 ## Input Variables:
 ### via command line:
@@ -100,6 +105,7 @@ output_freq   = 1
 ## Supported Topology and Trajectory Files:
 * Two-Column (Type,Molecule) topology File (.topo)
 * LAMMPS dump trajectory file (.lmpdump)
+* LAMMPS data file w/ AtomStyle bond (.lmpbond)
 * LAMMPS data file w/ AtomStyle Full (.lmpfull)
 * LAMMPS data file w/ AtomStyle Molecular (.lmpmolecular)
 * CHARMM/LAMMPS/HOOMD style DCD trajectory file (.dcd)
@@ -111,6 +117,12 @@ In order to differentiate the various types of LAMMPS files (and others), the us
 ln -s data.lammps data.lmpfull
 ```
 In this way you preserve the original file with the original name name, while allowing correlate to easily recognize the file types. 
+
+### WARNING 1
+All filedata must be sorted by atom index! This includes all types and all positions at all frames. LAMMPS, in particular, does not sort its data or dump files by default. *Correlate* code assumes that¸ in the array of types and positions, type[10] and pos[10] both correspond to the same atom. 
+
+### WARNING 2
+The LAMMPS dump reader currently only works with **unscaled** coordinates. You must have x, y, and z columns (not xs,ys,zs) in your dump file trajectory. Note that this is **not** the default dump format for LAMMPS, and you will have to define a dump custom to get these columns.
 
 ## Dependencies:
 ### Required:

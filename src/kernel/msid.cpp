@@ -16,12 +16,12 @@ void msid(
 
   int natoms1 = x1.size();
   int natoms2 = x2.size();
-  float bx = box[0];
-  float by = box[1];
-  float bz = box[2];
-  float bx2 = bx/2.0;
-  float by2 = by/2.0;
-  float bz2 = bz/2.0;
+  // float bx = box[0];
+  // float by = box[1];
+  // float bz = box[2];
+  // float bx2 = bx/2.0;
+  // float by2 = by/2.0;
+  // float bz2 = bz/2.0;
 
   int lmax = xmax;//+1;
 
@@ -33,9 +33,9 @@ void msid(
         float dy = abs(y1[i] - y2[j]);
         float dz = abs(z1[i] - z2[j]);
 
-        if (dx>bx2) dx-=bx;
-        if (dy>by2) dy-=by;
-        if (dz>bz2) dz-=bz;
+        // if (dx>bx2) dx-=bx;
+        // if (dy>by2) dy-=by;
+        // if (dz>bz2) dz-=bz;
         float distsq = (dx*dx + dy*dy + dz*dz);
         int l = abs((i-j+offset))-1;
         if ((l>=0) and (l<lmax)) {
