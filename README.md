@@ -113,8 +113,11 @@ ln -s data.lammps data.lmpfull
 ```
 In this way you preserve the original file with the original name name, while allowing correlate to easily recognize the file types. 
 
-### WARNING!!
+### WARNING 1
 All filedata must be sorted by atom index! This includes all types and all positions at all frames. LAMMPS in particular does not sort its data or dump files by default and it breaks this code. The code assumes that in the array of types and positions type[10] and pos[10] both correspond to the same atom. 
+
+### WARNING 2
+The LAMMPS dump read currently only works with **unscaled** coordinates. You must have x, y, and z columns (not xs,ys,zs) columns in your dump file trajectory. Note that this is **not** the default dump format for LAMMPS, and you will have to define a dump custom. 
 
 ## Dependencies:
 ### Required:
