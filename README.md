@@ -16,8 +16,14 @@ This will split up a partial radial-distribution function calculation amongst 10
     * structure factor calculation via sin(kr)/kr summation
 4. **msid**
     * mean-square internal distances 
-4. **procData**
+5. **procData**
     * print the xyz coordinates of each mpi process (debugging tool)
+
+### Warning 1
+For MSID, all of the molecules must have be in "unwrapped" coordinates. The minimum image convention will not be applied during the calculation. The unwrapped coordinates can be specified in LAMMPS or created via post-processing in VMD or a custom script.
+
+### Warning 2
+For MSID, only linear chain molecules will work for this calculator. The calculator assumes that if index 7 and index 12 are in the same molecule, they are separated by 5 bonds.  
 
 ## Input Variables:
 ### via command line:
