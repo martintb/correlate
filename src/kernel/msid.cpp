@@ -33,9 +33,9 @@ void msid(
         float dy = abs(y1[i] - y2[j]);
         float dz = abs(z1[i] - z2[j]);
 
-        if (dx>bx2) dx-=bx;
-        if (dy>by2) dy-=by;
-        if (dz>bz2) dz-=bz;
+        // if (dx>bx2) dx-=bx;
+        // if (dy>by2) dy-=by;
+        // if (dz>bz2) dz-=bz;
         float distsq = (dx*dx + dy*dy + dz*dz);
         int l = abs((i-j+offset))-1;
         if ((l>=0) and (l<lmax)) {
