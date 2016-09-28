@@ -86,7 +86,7 @@ void Writer::writeVertical(bool reset) {
 }
 
 
-void Writer::writeHeader(int cutoff) {
+void Writer::writeHeader(float cutoff) {
   ofstream file(conf->output_file->path.string());
   time_t now = chrono::system_clock::to_time_t(chrono::system_clock::now());
   string date = ctime(&now);

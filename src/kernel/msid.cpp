@@ -16,12 +16,12 @@ void msid(
 
   int natoms1 = x1.size();
   int natoms2 = x2.size();
-  float bx = box[0];
-  float by = box[1];
-  float bz = box[2];
-  float bx2 = bx/2.0;
-  float by2 = by/2.0;
-  float bz2 = bz/2.0;
+  // float bx = box[0];
+  // float by = box[1];
+  // float bz = box[2];
+  // float bx2 = bx/2.0;
+  // float by2 = by/2.0;
+  // float bz2 = bz/2.0;
 
   int lmax = xmax;//+1;
 
