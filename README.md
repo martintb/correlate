@@ -100,6 +100,7 @@ output_freq   = 1
 ## Supported Topology and Trajectory Files:
 * Two-Column (Type,Molecule) topology File (.topo)
 * LAMMPS dump trajectory file (.lmpdump)
+* LAMMPS data file w/ AtomStyle bond (.lmpbond)
 * LAMMPS data file w/ AtomStyle Full (.lmpfull)
 * LAMMPS data file w/ AtomStyle Molecular (.lmpmolecular)
 * CHARMM/LAMMPS/HOOMD style DCD trajectory file (.dcd)
@@ -111,6 +112,9 @@ In order to differentiate the various types of LAMMPS files (and others), the us
 ln -s data.lammps data.lmpfull
 ```
 In this way you preserve the original file with the original name name, while allowing correlate to easily recognize the file types. 
+
+### WARNING!!
+All filedata must be sorted by atom index! This includes all types and all positions at all frames. LAMMPS in particular does not sort its data or dump files by default and it breaks this code. The code assumes that in the array of types and positions type[10] and pos[10] both correspond to the same atom. 
 
 ## Dependencies:
 ### Required:
