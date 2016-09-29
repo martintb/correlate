@@ -5,6 +5,7 @@
 #include <map>
 
 #include "lmpBaseReader.hpp"
+#include "debug.hpp"
 
 using namespace std;
 
@@ -24,6 +25,13 @@ void lmpBaseReader::goToSection(ifstream &f, string section_title)
 map<string,float> lmpBaseReader::readHeader(ifstream &f)
 {
   f.seekg(0,ios::beg); //return to top of file
+  if (not f.good()) {
+    cout << "file.bad():  "  << boolalpha << f.bad()  << endl;
+    cout << "file.fail(): "  << boolalpha << f.fail() << endl;
+    cout << "file.eof():  "  << boolalpha << f.eof()  << endl;
+    LOC();
+    exit(EXIT_FAILURE);
+  }
 
   regex natoms("(.*) atoms",regex::extended);
   regex nbonds("(.*) bonds",regex::extended);
@@ -99,5 +107,9 @@ map<string,float> lmpBaseReader::readHeader(ifstream &f)
     if (lineNo>maxHeaderSize) break;
     lineNo++;
   }
+
+  // nead to clear eofbit and failbit in case the end of the file was reached
+  f.clear(); 
+
   return headerData;
 }
