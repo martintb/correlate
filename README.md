@@ -1,4 +1,4 @@
-#**CORRELATE**
+# CORRELATE
 Calculates various spatial correlation functions in real and reciprocal space. Code is MPI aware and can be used with any number of MPI processes up to the number of atoms in your calculation.
 
 Example invocation:
