@@ -51,6 +51,7 @@ map<string,string> Reader::extInfo = {
                                         {".lmpfull","LAMMPS topology file w/ AtomStyle Full"},
                                         {".lmpmolecular","LAMMPS topology file w/ AtomStyle Molecular"},
                                         {".xml","HOOMD-Blue topology file (optional molecule section is supported)"},
+                                        {".xyz","1-Frame trajectory file (lx,ly,lz in comment line, type data is ignored)"},
                                      };
 
 void Reader::printReaderList() {
@@ -83,6 +84,9 @@ Reader::ptr Reader::get(string fileName) {
 
   } else if (p.extension().compare(".xml")==0) {
     return make_shared<xmlReader>(fileName);
+
+  } else if (p.extension().compare(".xyz")==0) {
+    return make_shared<xyzReader>(fileName);
 
   } else {
     cerr << "Error! File extension not recognized!" << endl;

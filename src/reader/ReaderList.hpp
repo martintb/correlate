@@ -7,4 +7,5 @@
 #include "topoReader.hpp"
 #include "xmlReader.hpp"
 #include "lmpDumpReader.hpp"
+#include "xyzReader.hpp"
 #endif
