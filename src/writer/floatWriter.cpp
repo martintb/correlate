@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "floatWriter.hpp"
+#include "types.hpp"
 
 using namespace std;
 
@@ -21,6 +22,6 @@ void floatWriter::gather() {
   vecMaster.assign(allVecFloat.begin(),allVecFloat.end());
 
   pair_count_master = 0;
-  MPI::COMM_WORLD.Reduce(&pair_count,&pair_count_master,1, MPI::UNSIGNED_LONG,MPI::SUM,0);
+  MPI::COMM_WORLD.Reduce(&pair_count,&pair_count_master,1, count_mpi_t,MPI::SUM,0);
 }
 

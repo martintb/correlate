@@ -1,6 +1,5 @@
 #!/bin/bash -l
 
-tyenv --add python 
-# tyenv --add rapidxml 
-tyenv --add boost 
-tyenv --add arma 
+typyEnv --add python --dev
+typyEnv --add boost --dev
+# typyEnv --add arma --dev

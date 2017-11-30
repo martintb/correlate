@@ -1,11 +1,12 @@
 #include <vector>
 #include <cmath>
 #include "msid.hpp"
+#include "types.hpp"
 
 using namespace std;
 void msid(
                 vector<float> &hist,
-                unsigned long &pair_count,
+                count_t &pair_count,
                 const vector<float> &x1, const vector<float> &y1, const vector<float> &z1,
                 const vector<float> &x2, const vector<float> &y2, const vector<float> &z2,
                 const vector<float> &box, 

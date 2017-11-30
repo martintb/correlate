@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "Config.hpp"
+#include "types.hpp"
 
 class Writer {
   public: 
@@ -20,10 +21,10 @@ class Writer {
     std::vector<float> vecFloat;
     std::vector<float> vecMaster; // final storage vector before output
 
-    std::vector<float> box;
+    std::vector<float_t> box;
     unsigned long step_count;
-    unsigned long pair_count;
-    unsigned long pair_count_master; // for mpi transfer
+    count_t pair_count;
+    count_t pair_count_master; // for mpi transfer
 
 
     std::vector<float> coeffAdd; //coefficients to add to vecMaster before output
