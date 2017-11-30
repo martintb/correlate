@@ -14,6 +14,7 @@
 #include "intWriter.hpp"
 #include "Config.hpp"
 #include "version.hpp"
+#include "types.hpp"
 
 using namespace std;
 
@@ -54,7 +55,7 @@ void Writer::writeVertical(bool reset) {
   if (conf->isRoot()) {
     buildCoeff();
 
-    float cutoff;
+    float_type cutoff;
     if ( conf->kernel == Config::histogram or conf->kernel == Config::rdf) {
       cutoff = box[0]/(step_count*2.0);
       cout << "--> Cutting off data at lx/2.0 = "  << cutoff << endl;
@@ -70,7 +71,7 @@ void Writer::writeVertical(bool reset) {
     file << setw(width)  << conf->KernelMap[conf->kernel];
     file << endl;
     for (int i=0;i<conf->xsize;i++) {
-      float x = i*conf->dx;
+      float_type x = i*conf->dx;
       if (x<cutoff) {
         file << setw(width) << x;
         file << setw(width) << vecMaster[i]*coeffMult[i] + coeffAdd[i]; 
@@ -86,7 +87,7 @@ void Writer::writeVertical(bool reset) {
 }
 
 
-void Writer::writeHeader(float cutoff) {
+void Writer::writeHeader(float_type cutoff) {
   ofstream file(conf->output_file->path.string());
   time_t now = chrono::system_clock::to_time_t(chrono::system_clock::now());
   string date = ctime(&now);
@@ -136,7 +137,7 @@ void Writer::writeHeader(float cutoff) {
   file << "# --------------------------------------------------------------------------" << endl;
 
   for (int i=0;i<conf->xsize;i++) {
-    float x = ((i+1)*conf->dx);
+    float_type x = ((i+1)*conf->dx);
     if (x<cutoff) {
       file << x << " ";
     }
@@ -149,7 +150,7 @@ void Writer::writeHorizontal(bool reset) {
   if (conf->isRoot()) {
     buildCoeff();
 
-    float cutoff;
+    float_type cutoff;
     if ( conf->kernel == Config::histogram or conf->kernel == Config::rdf) {
       cutoff = box[0]/(step_count*2.0);
       cout << "--> Cutting off data at lx/2.0 = "  << cutoff << endl;
@@ -168,8 +169,8 @@ void Writer::writeHorizontal(bool reset) {
     }
     ofstream file(conf->output_file->path.string(),std::ofstream::app);
     for (int i=0;i<conf->xsize;i++) {
-      float x     = ((i+1)*conf->dx);
-      float value = (vecMaster[i]*coeffMult[i] + coeffAdd[i]);
+      float_type x     = ((i+1)*conf->dx);
+      float_type value = (vecMaster[i]*coeffMult[i] + coeffAdd[i]);
       if (x<cutoff) {
         file << value << " ";
       }
@@ -184,7 +185,7 @@ void Writer::writeHorizontal(bool reset) {
 }
 
 void Writer::buildCoeff() {
-  float tot_natoms;
+  float_type tot_natoms;
   if (conf->selfHist) {
     tot_natoms = conf->natoms1;
   } else {
@@ -193,11 +194,11 @@ void Writer::buildCoeff() {
 
   // process incremental box data
   pair_count_master /= step_count;
-  float lx = box[0]/step_count;
-  float ly = box[1]/step_count;
-  float lz = box[2]/step_count;
-  float box_volume = lx*ly*lz;
-  float pair_rho = pair_count_master/box_volume;
+  float_type lx = box[0]/step_count;
+  float_type ly = box[1]/step_count;
+  float_type lz = box[2]/step_count;
+  float_type box_volume = lx*ly*lz;
+  float_type pair_rho = pair_count_master/box_volume;
 
   coeffAdd.assign(conf->xsize,0.0f);
   coeffMult.assign(conf->xsize,1.0f);
@@ -213,13 +214,13 @@ void Writer::buildCoeff() {
     }
     else if (conf->kernel == Config::rdf) 
     {
-      float x1  = (i*conf->dx);
-      float x2  = ((i+1)*conf->dx);
-      float vol = ((4.0/3.0) * M_PI * (x2*x2*x2  - x1*x1*x1));
+      float_type x1  = (i*conf->dx);
+      float_type x2  = ((i+1)*conf->dx);
+      float_type vol = ((4.0/3.0) * M_PI * (x2*x2*x2  - x1*x1*x1));
       coeffMult[i]*=(1.0/(step_count*vol*pair_rho));
     } 
     else if ( conf->kernel == Config::omega) {
-      float x2  = ((i+1)*conf->dx);
+      float_type x2  = ((i+1)*conf->dx);
       if (conf->selfHist) coeffAdd[i] += 1.0;
       coeffMult[i]*=(1.0/(step_count*tot_natoms*x2));
     }

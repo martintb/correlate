@@ -1,6 +1,6 @@
 .PHONY: clean gdb
 
-EXEC=correlate2
+EXEC=correlate
 MAINOBJ:=src/core/main.o
 CC=mpicc
 CXX=mpicxx

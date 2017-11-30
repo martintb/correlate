@@ -146,7 +146,7 @@ void kernel_switcher(
   writer->box[0]+=box[0];
   writer->box[1]+=box[1];
   writer->box[2]+=box[2];
-  if (writer->step_count == static_cast<unsigned long>(conf->output_freq)) {
+  if (writer->step_count == static_cast<int_type>(conf->output_freq)) {
     writer->write(/*writeVertical=*/false,/*reset_counters=*/true);
   }
 }

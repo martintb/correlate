@@ -2,11 +2,12 @@
 #define TYPES_HPP
 
 #include <mpi.h>
-#define count_mpi_t MPI::UNSIGNED_LONG_LONG
 
-typedef unsigned long long count_t;
-typedef unsigned long int_t;
-typedef float float_t;
+#define int_mpi_type MPI::UNSIGNED_LONG_LONG
+#define float_mpi_type MPI::DOUBLE
+
+typedef unsigned long long int_type;
+typedef double float_type;
 
 
 #endif
